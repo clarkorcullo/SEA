@@ -4,26 +4,23 @@
 
 This document provides a detailed breakdown of the `app.py` file structure, making it easy to understand, navigate, and modify the main Flask application.
 
-**Last Updated:** October 2025  
-**Current Version:** Production-ready with comprehensive security implementation
-
 ---
 
 ## 📂 **FILE ORGANIZATION**
 
-### **Current Structure (Enhanced with Security):**
+### **Current Structure (1,208 lines):**
 
 ```
 app.py
 ├── 📝 DOCUMENTATION HEADER
-├── 🔧 IMPORTS AND SETUP (Security middleware imports)
-├── ⚙️ CONFIGURATION (Security settings)
+├── 🔧 IMPORTS AND SETUP
+├── ⚙️ CONFIGURATION
 ├── 🗄️ DATABASE INITIALIZATION
-├── 🔐 AUTHENTICATION ROUTES (Enhanced with security)
+├── 🔐 AUTHENTICATION ROUTES
 ├── 📚 LEARNING ROUTES
 ├── 📊 ASSESSMENT ROUTES
 ├── 🎮 SIMULATION ROUTES
-├── 📈 PROGRESS ROUTES (Enhanced with security)
+├── 📈 PROGRESS ROUTES
 ├── 🔧 SYSTEM ROUTES
 ├── ⚠️ ERROR HANDLERS
 └── 🚀 APPLICATION ENTRY POINT
@@ -77,12 +74,6 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-# Security middleware imports
-from security_middleware import (
-    rate_limit, brute_force_protection, require_csrf, 
-    input_validation, validate_file_upload, generate_secure_filename
-)
-
 # Local application imports
 from data_models.base_models import db
 from data_models import (User, PasswordResetToken, Module, ...)
@@ -124,23 +115,19 @@ def create_default_questions():
     """Create default assessment questions for all modules"""
 ```
 
-### **5. 🔐 AUTHENTICATION ROUTES (Lines 201-450) - ENHANCED WITH SECURITY**
+### **5. 🔐 AUTHENTICATION ROUTES (Lines 201-450)**
 ```python
 @app.route('/')
 def index():
     """Home page route - displays the main landing page"""
 
 @app.route('/register', methods=['GET', 'POST'])
-@rate_limit(max_requests=5, window=300)  # Rate limiting
-@input_validation(max_length=1000)       # Input validation
 def register():
-    """User registration route - handles new user account creation with security"""
+    """User registration route - handles new user account creation"""
 
 @app.route('/login', methods=['GET', 'POST'])
-@rate_limit(max_requests=5, window=300)      # Rate limiting
-@brute_force_protection(max_attempts=5, lockout_duration=900)  # Brute force protection
 def login():
-    """User login route - handles user authentication with security enhancements"""
+    """User login route - handles user authentication"""
 
 @app.route('/logout')
 def logout():
@@ -186,20 +173,17 @@ def submit_simulation():
     """Submit simulation responses and calculate results"""
 ```
 
-### **9. 📈 PROGRESS ROUTES (Lines 951-1050) - ENHANCED WITH SECURITY**
+### **9. 📈 PROGRESS ROUTES (Lines 951-1050)**
 ```python
-@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/profile')
 @login_required
-@require_csrf                    # CSRF protection
-@input_validation(max_length=1000)  # Input validation
 def profile():
-    """User profile route - displays and manages user profile information with secure file upload"""
+    """User profile route - displays and manages user profile information"""
 
 @app.route('/update_progress', methods=['POST'])
 @login_required
-@require_csrf                    # CSRF protection
 def update_progress():
-    """Update user progress for modules and activities with security validation"""
+    """Update user progress for modules and activities"""
 ```
 
 ### **10. 🔧 SYSTEM ROUTES (Lines 1051-1100)**
@@ -330,23 +314,19 @@ except Exception as e:
 ## 📊 **CODE QUALITY METRICS**
 
 ### **Current Statistics**
-- **Total Lines**: 1,208+ (Enhanced with security)
+- **Total Lines**: 1,208
 - **Functions**: 25+
-- **Routes**: 15+ (All with security middleware)
+- **Routes**: 15+
 - **Error Handlers**: 2
-- **Security Features**: CSRF, Rate Limiting, Brute Force Protection, Input Validation
 - **Documentation**: Comprehensive
 
 ### **Best Practices Followed**
 - ✅ **Comprehensive Documentation**: Every function has detailed docstrings
 - ✅ **Error Handling**: Try-catch blocks in all routes
-- ✅ **Logging**: Extensive logging for debugging and security events
+- ✅ **Logging**: Extensive logging for debugging
 - ✅ **Separation of Concerns**: Business logic in services
-- ✅ **Security**: Enterprise-grade security implementation
+- ✅ **Security**: Proper authentication and validation
 - ✅ **Code Organization**: Clear section separation
-- ✅ **Security Middleware**: CSRF, rate limiting, input validation
-- ✅ **Secure File Upload**: Path traversal prevention, file type validation
-- ✅ **Account Security**: Brute force protection, account lockout
 
 ---
 

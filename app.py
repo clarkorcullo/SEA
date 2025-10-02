@@ -49,13 +49,6 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy import text
 
-# Security imports
-from security_middleware import (
-    security, rate_limit, brute_force_protection, require_csrf, 
-    input_validation, generate_secure_filename, validate_file_upload,
-    log_security_event
-)
-
 # Local application imports
 from data_models.base_models import db
 from data_models import (
@@ -283,9 +276,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# Initialize Security Middleware
-security.init_app(app)
-
 # Initialize business services
 user_service = UserService()
 assessment_service = AssessmentService()
@@ -338,7 +328,7 @@ def create_default_data():
                 admin_data = {
                     'username': app.config.get('DEFAULT_ADMIN_USERNAME', 'administrator'),
                     'email': app.config.get('DEFAULT_ADMIN_EMAIL', 'admin@mmdc.edu.ph'),
-                    'password': app.config.get('DEFAULT_ADMIN_PASSWORD'),
+                    'password': app.config.get('DEFAULT_ADMIN_PASSWORD', 'Admin123!@#2025'),
                     'full_name': 'System Administrator',
                     'specialization': 'Information Technology',
                     'year_level': '4th Year'
@@ -363,7 +353,7 @@ def create_default_data():
                 admin_user.year_level = '4th Year'
                 
                 # Set password from environment or default
-                desired_pw = os.environ.get('ADMIN_PASSWORD', app.config.get('DEFAULT_ADMIN_PASSWORD'))
+                desired_pw = os.environ.get('ADMIN_PASSWORD', app.config.get('DEFAULT_ADMIN_PASSWORD', 'Admin123!@#2025'))
                 admin_user.set_password(desired_pw)
                 admin_user.save()
                 logger.info("[SUCCESS] Admin user credentials updated (administrator)")
@@ -1169,18 +1159,16 @@ def register():
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
-@rate_limit(max_requests=5, window=300)  # 5 attempts per 5 minutes
-@brute_force_protection(max_attempts=5, lockout_duration=900)  # 15 minute lockout
 def login():
     """
-    User login route - handles user authentication with enhanced security.
+    User login route - handles user authentication.
     
     Features:
-    - Rate limiting and brute force protection
-    - Account lockout after failed attempts
-    - IP tracking and logging
-    - Password expiration checks
-    - Secure session management
+    - Secure password verification
+    - Session management
+    - Login attempt logging
+    - Redirect to dashboard on success
+    - Automatic database initialization
     
     Methods:
         GET: Display login form
@@ -1201,50 +1189,22 @@ def login():
     
     if request.method == 'POST':
         try:
-            username = request.form.get('username', '').strip()
-            password = request.form.get('password', '')
-            client_ip = request.remote_addr
+            username = request.form['username']
+            password = request.form['password']
             
-            # Input validation
-            if not username or not password:
-                flash('Username and password are required.', 'error')
-                return render_template('login.html')
-            
-            # Check for account lockout
-            user = User.get_by_username(username)
-            if user and user.is_account_locked():
-                flash('Account is temporarily locked due to multiple failed login attempts. Please try again later.', 'error')
-                logger.warning(f"Login attempt on locked account: {username} from {client_ip}")
-                return render_template('login.html')
-            
-            # Authenticate user
             user = user_service.authenticate_user(username, password)
             if user:
-                # Check password expiration
-                if user.is_password_expired():
-                    flash('Your password has expired. Please reset your password.', 'warning')
-                    return redirect(url_for('forgot_password'))
-                
-                # Record successful login
-                user.record_successful_login(client_ip)
                 login_user(user)
-                
-                # Log security event
-                logger.info(f"SECURITY: Successful login - User: {username}, IP: {client_ip}")
-                
                 flash('Login successful!', 'success')
+                logger.info(f"User {username} logged in successfully")
                 return redirect(url_for('dashboard'))
             else:
-                # Record failed login attempt
-                if user:
-                    user.record_failed_login()
-                    logger.warning(f"SECURITY: Failed login attempt - User: {username}, IP: {client_ip}")
-                
                 flash('Invalid username or password.', 'error')
+                logger.warning(f"Login failed for user {username}: Invalid credentials")
                 
         except Exception as e:
-            logger.error(f"SECURITY: Login error - {e}, IP: {request.remote_addr}")
-            flash('Login error occurred. Please try again.', 'error')
+            flash(f'Login error: {e}', 'error')
+            logger.error(f"Login failed: {e}")
     
     return render_template('login.html')
 
@@ -2413,82 +2373,21 @@ def submit_simulation():
 # 10.7 PROGRESS AND ANALYTICS ROUTES
 # =============================================================================
 
-@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/profile')
 @login_required
-@require_csrf
-@input_validation(max_length=1000)
 def profile():
     """
-    User profile route - displays and manages user profile information with enhanced security.
+    User profile route - displays and manages user profile information.
     
     Features:
-    - Secure profile picture upload with validation
-    - Input sanitization and validation
-    - CSRF protection
-    - File type and size validation
-    - Path traversal prevention
+    - Profile information display
+    - Edit capabilities
+    - Progress overview
+    - Achievement tracking
     
     Returns:
         str: Rendered profile template
     """
-    if request.method == 'POST':
-        try:
-            # Handle profile picture upload with security validation
-            if 'profile_picture' in request.files:
-                file = request.files['profile_picture']
-                if file and file.filename:
-                    # Security validation
-                    is_valid, error_msg = validate_file_upload(
-                        file, 
-                        allowed_extensions=['.png', '.jpg', '.jpeg', '.gif'],
-                        max_size=2 * 1024 * 1024  # 2MB max
-                    )
-                    
-                    if not is_valid:
-                        flash(f'File upload error: {error_msg}', 'error')
-                        return redirect(url_for('profile'))
-                    
-                    # Generate secure filename to prevent path traversal
-                    secure_filename = generate_secure_filename(file.filename)
-                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename)
-                    
-                    # Ensure upload directory exists
-                    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-                    
-                    # Save file
-                    file.save(file_path)
-                    
-                    # Update user profile
-                    current_user.profile_picture = secure_filename
-                    current_user.save()
-                    
-                    # Log security event
-                    logger.info(f"SECURITY: Profile picture uploaded - User: {current_user.username}, File: {secure_filename}")
-                    
-                    flash('Profile picture updated successfully!', 'success')
-                    return redirect(url_for('profile'))
-            
-            # Handle profile information update with input sanitization
-            profile_data = {
-                'full_name': request.form.get('full_name', '').strip()[:100],  # Limit length
-                'email': request.form.get('email', '').strip()[:120],
-                'specialization': request.form.get('specialization', '').strip()[:50],
-                'year_level': request.form.get('year_level', '').strip()[:20],
-                'birthday': request.form.get('birthday'),
-                'address': request.form.get('address', '').strip()[:200]
-            }
-            
-            # Validate and update profile
-            if user_service.update_user_profile(current_user.id, profile_data):
-                logger.info(f"SECURITY: Profile updated - User: {current_user.username}")
-                flash('Profile updated successfully!', 'success')
-            else:
-                flash('Failed to update profile. Please check your information.', 'error')
-                
-        except Exception as e:
-            logger.error(f"SECURITY: Profile update error - {e}, User: {current_user.username}")
-            flash('Profile update error occurred. Please try again.', 'error')
-    
     try:
         return render_template('profile.html', user=current_user)
     except Exception as e:
@@ -3302,22 +3201,15 @@ def create_admin():
                 admin_user.full_name = 'System Administrator'
                 admin_user.specialization = 'Information Technology'
                 admin_user.year_level = '4th Year'
-                admin_password = os.environ.get('ADMIN_PASSWORD')
-                if not admin_password:
-                    return f"❌ ADMIN_PASSWORD environment variable not set. Please set it before creating admin user."
-                admin_user.set_password(admin_password)
+                admin_user.set_password('Admin123!@#2025')
                 admin_user.save()
-                return f"✅ Admin user updated successfully<br>Username: administrator<br>Password: [Set via ADMIN_PASSWORD environment variable]<br>Email: admin@mmdc.edu.ph"
+                return f"✅ Admin user updated successfully<br>Username: administrator<br>Password: Admin123!@#2025<br>Email: admin@mmdc.edu.ph"
             else:
                 # Create new admin user
-                admin_password = os.environ.get('ADMIN_PASSWORD')
-                if not admin_password:
-                    return f"❌ ADMIN_PASSWORD environment variable not set. Please set it before creating admin user."
-                
                 admin_data = {
                     'username': 'administrator',
                     'email': 'admin@mmdc.edu.ph',
-                    'password': admin_password,
+                    'password': 'Admin123!@#2025',
                     'full_name': 'System Administrator',
                     'specialization': 'Information Technology',
                     'year_level': '4th Year'
@@ -3325,7 +3217,7 @@ def create_admin():
                 
                 user = user_service.create_user(admin_data)
                 if user:
-                    return f"✅ Admin user created successfully<br>Username: administrator<br>Password: [Set via ADMIN_PASSWORD environment variable]<br>Email: admin@mmdc.edu.ph"
+                    return f"✅ Admin user created successfully<br>Username: administrator<br>Password: Admin123!@#2025<br>Email: admin@mmdc.edu.ph"
                 else:
                     return f"❌ Failed to create admin user"
                 
@@ -3349,24 +3241,17 @@ def create_admin_direct():
                 admin_user.full_name = 'System Administrator'
                 admin_user.specialization = 'Information Technology'
                 admin_user.year_level = '4th Year'
-                admin_password = os.environ.get('ADMIN_PASSWORD')
-                if not admin_password:
-                    return f"❌ ADMIN_PASSWORD environment variable not set. Please set it before creating admin user."
-                admin_user.set_password(admin_password)
+                admin_user.set_password('Admin123!@#2025')
                 db.session.commit()
-                return f"✅ Admin user updated successfully (Direct Method)<br>Username: administrator<br>Password: [Set via ADMIN_PASSWORD environment variable]<br>Email: admin@mmdc.edu.ph"
+                return f"✅ Admin user updated successfully (Direct Method)<br>Username: administrator<br>Password: Admin123!@#2025<br>Email: admin@mmdc.edu.ph"
             else:
                 # Create new admin user directly
                 from werkzeug.security import generate_password_hash
                 
-                admin_password = os.environ.get('ADMIN_PASSWORD')
-                if not admin_password:
-                    return f"❌ ADMIN_PASSWORD environment variable not set. Please set it before creating admin user."
-                
                 admin_user = User(
                     username='administrator',
                     email='admin@mmdc.edu.ph',
-                    password_hash=generate_password_hash(admin_password),
+                    password_hash=generate_password_hash('Admin123!@#2025'),
                     full_name='System Administrator',
                     specialization='Information Technology',
                     year_level='4th Year'
@@ -3374,7 +3259,7 @@ def create_admin_direct():
                 
                 db.session.add(admin_user)
                 db.session.commit()
-                return f"✅ Admin user created successfully (Direct Method)<br>Username: administrator<br>Password: [Set via ADMIN_PASSWORD environment variable]<br>Email: admin@mmdc.edu.ph"
+                return f"✅ Admin user created successfully (Direct Method)<br>Username: administrator<br>Password: Admin123!@#2025<br>Email: admin@mmdc.edu.ph"
                 
     except Exception as e:
         return f"❌ Direct Method Error: {str(e)}"
