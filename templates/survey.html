@@ -235,12 +235,12 @@ document.getElementById('survey-form').addEventListener('submit', function(e) {
                 window.location.href = '/module/6?open=certificate';
             }, 1200);
         } else {
-            alert('Error submitting survey: ' + data.error);
+            errorHandler.handleApiError({ status: 400, statusText: data.error }, 'Survey submission');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error submitting survey. Please try again.');
+        errorHandler.handleNetworkError(error, 'Survey submission');
     });
 });
 </script>

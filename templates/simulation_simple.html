@@ -95,7 +95,13 @@ document.querySelector('form').addEventListener('submit', function(e) {
     
     if (!answered) {
         e.preventDefault();
-        alert('Please select an option before submitting.');
+        errorHandler.showWarning(
+            'Please Select an Option',
+            'Please select an option before submitting.',
+            {
+                confirmText: 'Continue'
+            }
+        );
         return false;
     }
 });

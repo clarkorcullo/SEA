@@ -337,49 +337,136 @@
 
 <script>
 function saveSettings() {
-    alert('Settings saved successfully! (This is a demo - actual implementation would save to database)');
+    modalSystem.success(
+        'Settings Saved',
+        'Settings saved successfully! (This is a demo - actual implementation would save to database)',
+        {
+            confirmText: 'OK'
+        }
+    );
 }
 
 function backupDatabase() {
-    alert('Database backup functionality will be implemented in the next version.');
+    modalSystem.info(
+        'Database Backup',
+        'Database backup functionality will be implemented in the next version.',
+        {
+            confirmText: 'OK'
+        }
+    );
 }
 
 function restoreDatabase() {
-    alert('Database restore functionality will be implemented in the next version.');
+    modalSystem.info(
+        'Database Restore',
+        'Database restore functionality will be implemented in the next version.',
+        {
+            confirmText: 'OK'
+        }
+    );
 }
 
 function resetDatabase() {
-    if (confirm('Are you sure you want to reset the database? This will delete ALL data and cannot be undone!')) {
-        alert('Database reset functionality will be implemented in the next version.');
-    }
+    modalSystem.confirm(
+        'Reset Database',
+        'Are you sure you want to reset the database? This will delete ALL data and cannot be undone!',
+        {
+            confirmText: 'Reset Database',
+            cancelText: 'Cancel'
+        }
+    ).then(confirmed => {
+        if (confirmed) {
+            modalSystem.info(
+                'Database Reset',
+                'Database reset functionality will be implemented in the next version.',
+                {
+                    confirmText: 'OK'
+                }
+            );
+        }
+    });
 }
 
 function clearCache() {
-    alert('Cache cleared successfully!');
+    modalSystem.success(
+        'Cache Cleared',
+        'Cache cleared successfully!',
+        {
+            confirmText: 'OK'
+        }
+    );
 }
 
 function optimizeDatabase() {
-    alert('Database optimization completed!');
+    modalSystem.success(
+        'Database Optimized',
+        'Database optimization completed!',
+        {
+            confirmText: 'OK'
+        }
+    );
 }
 
 function generateLogs() {
-    alert('System logs generated successfully!');
+    modalSystem.success(
+        'Logs Generated',
+        'System logs generated successfully!',
+        {
+            confirmText: 'OK'
+        }
+    );
 }
 
 function systemHealth() {
-    alert('System health check completed - all systems operational!');
+    modalSystem.success(
+        'System Health Check',
+        'System health check completed - all systems operational!',
+        {
+            confirmText: 'OK'
+        }
+    );
 }
 
 function deleteAllUsers() {
-    if (confirm('Are you sure you want to delete ALL users? This action cannot be undone!')) {
-        alert('Delete all users functionality will be implemented in the next version.');
-    }
+    modalSystem.confirm(
+        'Delete All Users',
+        'Are you sure you want to delete ALL users? This action cannot be undone!',
+        {
+            confirmText: 'Delete All Users',
+            cancelText: 'Cancel'
+        }
+    ).then(confirmed => {
+        if (confirmed) {
+            modalSystem.info(
+                'Delete Users',
+                'Delete all users functionality will be implemented in the next version.',
+                {
+                    confirmText: 'OK'
+                }
+            );
+        }
+    });
 }
 
 function resetSystem() {
-    if (confirm('Are you sure you want to reset the ENTIRE system? This will delete ALL data and cannot be undone!')) {
-        alert('System reset functionality will be implemented in the next version.');
-    }
+    modalSystem.confirm(
+        'Reset Entire System',
+        'Are you sure you want to reset the ENTIRE system? This will delete ALL data and cannot be undone!',
+        {
+            confirmText: 'Reset System',
+            cancelText: 'Cancel'
+        }
+    ).then(confirmed => {
+        if (confirmed) {
+            modalSystem.info(
+                'System Reset',
+                'System reset functionality will be implemented in the next version.',
+                {
+                    confirmText: 'OK'
+                }
+            );
+        }
+    });
 }
 </script>
 {% endblock %}

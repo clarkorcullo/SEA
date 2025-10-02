@@ -131,12 +131,38 @@ document.getElementById('final-assessment-form').addEventListener('submit', func
     
     if (!allAnswered) {
         e.preventDefault();
-        alert('Please answer all 25 questions before submitting the final assessment.');
+        errorHandler.showWarning(
+            'Incomplete Assessment',
+            'Please answer all 25 questions before submitting the final assessment.',
+            {
+                confirmText: 'Continue Assessment'
+            }
+        );
     } else {
-        // Confirm submission
-        if (!confirm('Are you sure you want to submit your final assessment? You cannot change your answers after submission.')) {
-            e.preventDefault();
-        }
+        // Confirm submission with custom modal
+        e.preventDefault();
+        modalSystem.confirm(
+            'Submit Final Assessment',
+            'Are you ready to start the Final Assessment? You will have 2 hours to complete 25 questions.',
+            {
+                confirmText: 'Start Assessment',
+                cancelText: 'Review Answers'
+            }
+        ).then(confirmed => {
+            if (confirmed) {
+                // Show loading state
+                const loadingModal = modalSystem.loading(
+                    'Submitting Assessment',
+                    'Please wait while we process your final assessment...'
+                );
+                
+                // Submit the form
+                setTimeout(() => {
+                    modalSystem.close();
+                    document.getElementById('assessmentForm').submit();
+                }, 1000);
+            }
+        });
     }
 });
 

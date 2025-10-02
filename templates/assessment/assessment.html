@@ -210,8 +210,13 @@ document.addEventListener('DOMContentLoaded', function() {
         timeRemaining.textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         
         if (timeLeft <= 0) {
-            alert('Time is up! The assessment will be submitted automatically.');
-            form.submit();
+            modalSystem.warning(
+                'Time is Up!',
+                'Time is up! The assessment will be submitted automatically.',
+                {
+                    onConfirm: () => form.submit()
+                }
+            );
             return;
         }
         
@@ -256,14 +261,41 @@ document.addEventListener('DOMContentLoaded', function() {
         const answered = document.querySelectorAll('input[type="radio"]:checked').length;
         if (answered < 25) {
             e.preventDefault();
-            alert('Please answer all questions before submitting.');
+            errorHandler.showWarning(
+                'Incomplete Assessment',
+                'Please answer all questions before submitting.',
+                {
+                    confirmText: 'Continue Assessment'
+                }
+            );
             return false;
         }
         
-        if (!confirm('Are you sure you want to submit your assessment? You cannot change your answers after submission.')) {
-            e.preventDefault();
-            return false;
-        }
+        e.preventDefault();
+        modalSystem.confirm(
+            'Submit Assessment',
+            'Are you sure you want to submit your assessment? You cannot change your answers after submission.',
+            {
+                confirmText: 'Submit Assessment',
+                cancelText: 'Review Answers'
+            }
+        ).then(confirmed => {
+            if (confirmed) {
+                // Show loading state
+                const loadingModal = modalSystem.loading(
+                    'Submitting Assessment',
+                    'Please wait while we process your assessment...'
+                );
+                
+                // Submit the form
+                setTimeout(() => {
+                    modalSystem.close();
+                    form.submit();
+                }, 1000);
+            }
+        });
+        
+        return false;
     });
     
     // Prevent accidental page refresh

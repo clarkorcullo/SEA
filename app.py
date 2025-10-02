@@ -1348,6 +1348,37 @@ def reset_password(token):
         return redirect(url_for('login'))
 
 # =============================================================================
+# 10.1 ERROR LOGGING API
+# =============================================================================
+
+@app.route('/api/log-error', methods=['POST'])
+@login_required
+def log_error():
+    """
+    Log client-side errors to server for debugging and monitoring.
+    
+    Returns:
+        JSON: Success/error response
+    """
+    try:
+        error_data = request.get_json()
+        
+        if not error_data:
+            return jsonify({'success': False, 'error': 'No error data provided'}), 400
+        
+        # Log error to application log
+        logger.error(f"Client Error: {error_data.get('message', 'Unknown error')} - "
+                    f"Type: {error_data.get('type', 'Unknown')} - "
+                    f"URL: {error_data.get('url', 'Unknown')} - "
+                    f"Details: {error_data.get('details', {})}")
+        
+        return jsonify({'success': True, 'message': 'Error logged successfully'})
+        
+    except Exception as e:
+        logger.error(f"Error in log_error endpoint: {e}")
+        return jsonify({'success': False, 'error': 'Failed to log error'}), 500
+
+# =============================================================================
 # 10.2 LEARNING ROUTES
 # =============================================================================
 

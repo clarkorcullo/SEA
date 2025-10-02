@@ -311,7 +311,13 @@ function viewAnalytics() {
 }
 
 function exportModule() {
-    alert('Module export functionality will be implemented in the next version.');
+    modalSystem.info(
+        'Export Module',
+        'Module export functionality will be implemented in the next version.',
+        {
+            confirmText: 'OK'
+        }
+    );
 }
 
 function refreshModule() {

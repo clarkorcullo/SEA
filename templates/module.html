@@ -1282,37 +1282,63 @@ document.addEventListener('DOMContentLoaded', function() {
     const markCompleteBtn = document.getElementById('markCompleteBtn');
     if (markCompleteBtn) {
         markCompleteBtn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to mark this module as complete?')) {
-                // Update progress via API
-                const metaEl = document.getElementById('moduleMeta');
-                const payload = {
-                    module_id: parseInt(metaEl.getAttribute('data-module-id'), 10),
-                    status: 'completed',
-                    score: parseInt(metaEl.getAttribute('data-score'), 10) || 0,
-                    time_spent: parseInt(metaEl.getAttribute('data-time-spent'), 10) || 0
-                };
+            modalSystem.confirm(
+                'Mark Module Complete',
+                'Are you sure you want to mark this module as complete? This action cannot be undone.',
+                {
+                    confirmText: 'Mark Complete',
+                    cancelText: 'Continue Learning'
+                }
+            ).then(confirmed => {
+                if (confirmed) {
+                    // Show loading state
+                    const loadingModal = modalSystem.loading(
+                        'Updating Progress',
+                        'Please wait while we update your progress...'
+                    );
 
-                fetch('{{ url_for("update_progress") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Module marked as complete!');
-                        location.reload();
-                    } else {
-                        alert('Error updating progress. Please try again.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error updating progress. Please try again.');
-                });
-            }
+                    // Update progress via API
+                    const metaEl = document.getElementById('moduleMeta');
+                    const payload = {
+                        module_id: parseInt(metaEl.getAttribute('data-module-id'), 10),
+                        status: 'completed',
+                        score: parseInt(metaEl.getAttribute('data-score'), 10) || 0,
+                        time_spent: parseInt(metaEl.getAttribute('data-time-spent'), 10) || 0
+                    };
+
+                    fetch('{{ url_for("update_progress") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        modalSystem.close();
+                        if (data.success) {
+                            modalSystem.success(
+                                'Module Completed!',
+                                'Congratulations! You have successfully completed this module.',
+                                {
+                                    onConfirm: () => location.reload()
+                                }
+                            );
+                        } else {
+                            errorHandler.handleApiError({ status: 400, statusText: 'Bad Request' }, 'Module completion');
+                        }
+                    })
+                    .catch(error => {
+                        modalSystem.close();
+                        errorHandler.handleNetworkError(error, 'Module completion');
+                    });
+                }
+            });
         });
     }
     
