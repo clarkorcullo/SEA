@@ -45,7 +45,7 @@ git branch -M main
 ### **2. Connect to GitHub Repository**
 ```bash
 # Add remote origin (replace with your GitHub repository URL)
-git remote add origin https://github.com/clarkorcullo/SEA_ProtoType.git
+git remote add origin https://github.com/clarkorcullo/SEA.git
 
 # Push to GitHub
 git push -u origin main
