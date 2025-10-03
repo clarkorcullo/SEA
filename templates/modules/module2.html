@@ -284,92 +284,81 @@ document.addEventListener('DOMContentLoaded', function(){
       }
     })();
 
-    // Module 2 → Reflection (Drawer) with submission
-    (function initModule2Reflection(){
-      try {
-        var headerReflection = Array.from(document.querySelectorAll('.drawer-item .drawer-title h5'))
-          .find(function(h){ return (h.textContent || '').trim().toLowerCase() === 'reflection'; });
-        var reflectionEl = null;
-        if (headerReflection) {
-          var item = headerReflection.closest('.drawer-item');
-          if (item) {
-            var oc = item.getAttribute('onclick') || '';
-            var m = oc.match(/toggleDrawer\('([^']+)'\)/);
-            if (m && m[1]) reflectionEl = document.getElementById('content-' + m[1]);
-          }
+    // Module 2 → Reflection (Drawer) with submission, consistent with Module 3
+    var headerRefl = Array.from(document.querySelectorAll('.drawer-item .drawer-title h5'))
+      .find(function(h){ return (h.textContent || '').trim().toLowerCase() === 'reflection'; });
+    var reflEl = null;
+    if (headerRefl) {
+      var itemRefl = headerRefl.closest('.drawer-item');
+      if (itemRefl) {
+        var ocRefl = itemRefl.getAttribute('onclick') || '';
+        var mRefl = ocRefl.match(/toggleDrawer\('([^']+)'\)/);
+        if (mRefl && mRefl[1]) {
+          reflEl = document.getElementById('content-' + mRefl[1]);
         }
-        if (!reflectionEl) reflectionEl = document.getElementById('content-reflection');
-        if (reflectionEl) {
-          var rfWrap = reflectionEl.querySelector('.content-wrapper') || reflectionEl;
-          var formHtml = '' +
-            '<div class="accordion-content" id="m2-reflection-form">' +
-              '<h3>Module 2 Reflection</h3>' +
-              '<p class="mb-2">Share your thoughts about phishing, pretexting, and baiting. 4–5 sentences is great.</p>' +
-              '<textarea id="m2ReflectionText" class="form-control" rows="5" placeholder="Type your reflection here..."></textarea>' +
-              '<div class="d-flex justify-content-end" style="margin-top: 0.75rem;">' +
-                '<button id="m2ReflectionSubmit" class="btn btn-primary">Submit Reflection</button>' +
-              '</div>' +
-              '<div id="m2ReflectionStatus" class="mt-2 text-muted" style="min-height: 1.25rem;"></div>' +
-            '</div>';
+      }
+    }
+    if (!reflEl) {
+      // Fallback container id if reflection drawer uses a predictable id
+      reflEl = document.getElementById('content-reflection');
+    }
+    if (reflEl) {
+      var rWrap = reflEl.querySelector('.content-wrapper') || reflEl;
+      rWrap.innerHTML = '' +
+        '<div class="module2-scope"><div class="accordion-content">' +
+          '<h3>Module 2 Reflection: "Spot the Scams"</h3>' +
+          '<p>Great job completing Module 2! You\'ve learned to recognize phishing, pretexting, and baiting attacks. This reflection helps you connect what you\'ve learned to real-world situations.</p>' +
+          '<h4>Reflection Questions</h4>' +
+          '<ol>' +
+            '<li><strong>Which type of social engineering attack (phishing, pretexting, or baiting) do you think is most dangerous and why?</strong></li>' +
+            '<li><strong>Have you ever encountered a suspicious email, call, or social media post? How did you handle it?</strong></li>' +
+            '<li><strong>What\'s one red flag you\'ll always look for now when checking emails or messages?</strong></li>' +
+          '</ol>' +
+          '<div class="resources-section" style="margin-top: 1rem;">' +
+            '<h4>Your Reflection</h4>' +
+            '<p class="mb-2">Share your thoughts below. This helps reinforce your learning and commit to action.</p>' +
+            '<textarea id="m2ReflectionText" class="form-control" rows="5" placeholder="Type your reflection here..."></textarea>' +
+            '<div class="d-flex justify-content-end" style="margin-top: 0.75rem;">' +
+              '<button id="m2ReflectionSubmit" class="btn btn-primary">Submit Reflection</button>' +
+            '</div>' +
+            '<div id="m2ReflectionStatus" class="mt-2 text-muted" style="min-height: 1.25rem;"></div>' +
+          '</div>' +
+        '</div></div>';
 
-          // If a reflection UI already exists in the drawer, do NOT add another one
-          var hasExistingUi = false;
-          try {
-            var textContent = (rfWrap.textContent || '').toLowerCase();
-            if (rfWrap.querySelector('form') || rfWrap.querySelector('button') || rfWrap.querySelector('textarea')) {
-              hasExistingUi = true;
-            }
-            if (textContent.indexOf('submit reflection') !== -1 || textContent.indexOf('your reflection') !== -1) {
-              hasExistingUi = true;
-            }
-          } catch(_) { /* noop */ }
-
-          if (!hasExistingUi) {
-            var existing = (rfWrap.innerHTML || '').trim();
-            if (existing) {
-              if (!rfWrap.querySelector('#m2-reflection-form')) {
-                rfWrap.insertAdjacentHTML('beforeend', formHtml);
-              }
+      // Hook up submission
+      var btn = document.getElementById('m2ReflectionSubmit');
+      if (btn) {
+        btn.addEventListener('click', function(){
+          var txt = document.getElementById('m2ReflectionText');
+          var status = document.getElementById('m2ReflectionStatus');
+          var payload = { module_id: 2, reflection_text: (txt && txt.value || '').trim() };
+          if (!payload.reflection_text) {
+            status.textContent = 'Please enter your reflection before submitting.';
+            status.className = 'mt-2 text-danger';
+            return;
+          }
+          status.textContent = 'Submitting...';
+          status.className = 'mt-2 text-muted';
+          fetch('/submit_reflection', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }).then(function(r){ return r.json(); }).then(function(res){
+            if (res && res.success) {
+              status.textContent = 'Reflection submitted successfully!';
+              status.className = 'mt-2 text-success';
+              if (txt) txt.value = '';
             } else {
-              rfWrap.innerHTML = formHtml;
+              status.textContent = (res && res.error) || 'Submission failed.';
+              status.className = 'mt-2 text-danger';
             }
-          }
-
-          var btn = document.getElementById('m2ReflectionSubmit');
-          if (btn) {
-            btn.addEventListener('click', function(){
-              var txt = document.getElementById('m2ReflectionText');
-              var status = document.getElementById('m2ReflectionStatus');
-              var payload = { module_id: 2, reflection_text: (txt && txt.value || '').trim() };
-              if (!payload.reflection_text) {
-                status.textContent = 'Please enter your reflection before submitting.';
-                status.className = 'mt-2 text-danger';
-                return;
-              }
-              status.textContent = 'Submitting...';
-              status.className = 'mt-2 text-muted';
-              fetch('/submit_reflection', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-              }).then(function(r){ return r.json(); }).then(function(res){
-                if (res && res.success) {
-                  status.textContent = 'Reflection submitted successfully!';
-                  status.className = 'mt-2 text-success';
-                  if (txt) txt.value = '';
-                } else {
-                  status.textContent = (res && res.error) || 'Submission failed.';
-                  status.className = 'mt-2 text-danger';
-                }
-              }).catch(function(){
-                status.textContent = 'Network error. Please try again.';
-                status.className = 'mt-2 text-danger';
-              });
-            });
-          }
-        }
-      } catch(e) { /* silent */ }
-    })();
+          }).catch(function(){
+            status.textContent = 'Network error. Please try again.';
+            status.className = 'mt-2 text-danger';
+          });
+        });
+      }
+    }
 
     function initModule2SimHandlers(){
       try {

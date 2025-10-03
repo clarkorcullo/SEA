@@ -75,6 +75,7 @@ class ModalSystem {
                 display: flex;
                 align-items: center;
                 gap: 12px;
+                position: relative;
             }
 
             .modal-icon {
@@ -109,6 +110,8 @@ class ModalSystem {
                 font-weight: 600;
                 color: #2c3e50;
                 margin: 0;
+                flex: 1;
+                text-align: left;
             }
 
             .modal-body {
@@ -191,6 +194,7 @@ class ModalSystem {
                 justify-content: center;
                 border-radius: 50%;
                 transition: all 0.2s ease;
+                z-index: 10;
             }
 
             .modal-close:hover {

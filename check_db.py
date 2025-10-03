@@ -19,15 +19,27 @@ print(f'Question-related tables: {question_tables}')
 # Check each question table for Module 2 questions
 for table in question_tables:
     try:
-        cursor.execute(f"SELECT COUNT(*) FROM {table} WHERE module_id = 2")
-        count = cursor.fetchone()[0]
-        print(f'Module 2 questions in {table}: {count}')
-        
-        if count > 0:
-            cursor.execute(f"SELECT id, question_text FROM {table} WHERE module_id = 2 LIMIT 2")
-            questions = cursor.fetchall()
-            for q in questions:
-                print(f'  ID: {q[0]}, Question: {q[1][:50]}...')
+        if table == 'finalassessmentquestion':
+            # Final assessment questions don't have module_id
+            cursor.execute(f"SELECT COUNT(*) FROM {table}")
+            count = cursor.fetchone()[0]
+            print(f'Total questions in {table}: {count}')
+            
+            if count > 0:
+                cursor.execute(f"SELECT id, question_text FROM {table} LIMIT 2")
+                questions = cursor.fetchall()
+                for q in questions:
+                    print(f'  ID: {q[0]}, Question: {q[1][:50]}...')
+        else:
+            cursor.execute(f"SELECT COUNT(*) FROM {table} WHERE module_id = 2")
+            count = cursor.fetchone()[0]
+            print(f'Module 2 questions in {table}: {count}')
+            
+            if count > 0:
+                cursor.execute(f"SELECT id, question_text FROM {table} WHERE module_id = 2 LIMIT 2")
+                questions = cursor.fetchall()
+                for q in questions:
+                    print(f'  ID: {q[0]}, Question: {q[1][:50]}...')
     except Exception as e:
         print(f'Error checking {table}: {e}')
 

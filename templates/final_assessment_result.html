@@ -15,7 +15,11 @@
                     <h3 class="card-title mb-0">
                         <i class="fas fa-graduation-cap"></i> Final Assessment Results
                     </h3>
-                    <p class="mb-0">Your comprehensive evaluation results</p>
+                    {% if is_existing_result %}
+                        <p class="mb-0">Your previous assessment results (No retakes allowed after passing)</p>
+                    {% else %}
+                        <p class="mb-0">Your comprehensive evaluation results</p>
+                    {% endif %}
                 </div>
                 
                 <div class="card-body p-4">
@@ -54,6 +58,16 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Review Answers Section -->
+                    <div class="text-center mb-4">
+                        <button class="btn btn-info btn-lg" type="button" data-bs-toggle="collapse" data-bs-target="#resultsAccordion" aria-expanded="false" aria-controls="resultsAccordion">
+                            <i class="fas fa-eye"></i> Review Your Answers
+                        </button>
+                        <p class="text-muted mt-2">
+                            <i class="fas fa-info-circle"></i> Click above to review each question and see correct answers
+                        </p>
                     </div>
 
                     <!-- Detailed Results -->
@@ -136,22 +150,28 @@
                         <div class="alert alert-warning">
                             <h6><i class="fas fa-exclamation-triangle"></i> Assessment Not Passed</h6>
                             <p>You scored {{ "%.1f"|format(percentage) }}% but need 80% to pass the final assessment.</p>
-                            <p><strong>Retake Policy:</strong></p>
-                            <ul>
-                                <li>You can retake the assessment up to 3 times</li>
-                                <li>There is a 48-hour cooldown period between retake cycles</li>
-                                <li>Each retake will have different questions</li>
-                                <li>Review the modules and try again</li>
-                            </ul>
+                            {% if is_existing_result %}
+                                <p><strong>Note:</strong> This was your previous attempt. You may retake the assessment from the dashboard.</p>
+                            {% else %}
+                                <p><strong>Retake Policy:</strong></p>
+                                <ul>
+                                    <li>You can retake the assessment up to 3 times</li>
+                                    <li>There is a 48-hour cooldown period between retake cycles</li>
+                                    <li>Each retake will have different questions</li>
+                                    <li>Review the modules and try again</li>
+                                </ul>
+                            {% endif %}
                         </div>
                         
                         <div class="text-center">
                             <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
                                 <i class="fas fa-home"></i> Back to Dashboard
                             </a>
-                            <a href="{{ url_for('final_assessment') }}" class="btn btn-warning btn-lg ms-2">
-                                <i class="fas fa-redo"></i> Retake Assessment
-                            </a>
+                            {% if not is_existing_result %}
+                                <a href="{{ url_for('final_assessment') }}" class="btn btn-warning btn-lg ms-2">
+                                    <i class="fas fa-redo"></i> Retake Assessment
+                                </a>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>
@@ -159,4 +179,42 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Custom Review Answers button functionality
+    const reviewButton = document.querySelector('button[data-bs-target="#resultsAccordion"]');
+    const accordion = document.getElementById('resultsAccordion');
+    
+    if (reviewButton && accordion) {
+        // Add click event listener as fallback
+        reviewButton.addEventListener('click', function() {
+            console.log('Review Answers button clicked');
+            
+            // Toggle the accordion visibility
+            if (accordion.style.display === 'none' || accordion.style.display === '') {
+                accordion.style.display = 'block';
+                reviewButton.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Your Answers';
+                reviewButton.classList.remove('btn-info');
+                reviewButton.classList.add('btn-secondary');
+            } else {
+                accordion.style.display = 'none';
+                reviewButton.innerHTML = '<i class="fas fa-eye"></i> Review Your Answers';
+                reviewButton.classList.remove('btn-secondary');
+                reviewButton.classList.add('btn-info');
+            }
+        });
+        
+        // Initially hide the accordion
+        accordion.style.display = 'none';
+    }
+    
+    // Also ensure Bootstrap collapse works if available
+    if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+        console.log('Bootstrap collapse available');
+    } else {
+        console.log('Bootstrap collapse not available, using custom solution');
+    }
+});
+</script>
 {% endblock %}
