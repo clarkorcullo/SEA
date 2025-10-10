@@ -127,9 +127,9 @@
             <li>Answer all 25 questions to submit</li>
             <li>You need <strong>80% or higher</strong> to pass</li>
             {% if current_user.is_admin %}
-                <li><strong>Admin Mode:</strong> Unlimited attempts with no cooldown</li>
+            <li><strong>Admin Mode:</strong> Unlimited attempts with no cooldown</li>
             {% else %}
-                <li>You have <strong>3 attempts</strong> with 24-hour cooldown between attempts</li>
+            <li>You have <strong>3 attempts</strong> with 24-hour cooldown between attempts</li>
             {% endif %}
         </ul>
     </div>
