@@ -1,22 +1,22 @@
 <script>
-// Module 2 runtime injector — mirrors Module 1/3/4 style without altering server JSON
+// Module 2 runtime injector — Updated to use modern accordion system
 document.addEventListener('DOMContentLoaded', function(){
   try {
     var meta = document.getElementById('moduleMeta');
     var modId = parseInt(meta && meta.getAttribute('data-module-id') || '0', 10);
     if (modId !== 2) return;
 
-    // 2.1 → 1. Phishing in Philippine (ensure cleaned header image and icons for definitions)
+    // 2.1 → 1. Phishing in the Philippines (ensure cleaned header image and icons for definitions)
     (function enhancePhishingIntro(){
-      var subHeader = Array.from(document.querySelectorAll('.drawer-item .drawer-title h5'))
-        .find(function(h){ return (h.textContent || '').trim().toLowerCase() === '1. phishing in philippine'; });
+      // Updated to use accordion system instead of drawer system
+      var subHeader = Array.from(document.querySelectorAll('.sub-accordion-button'))
+        .find(function(h){ return (h.textContent || '').trim().toLowerCase().includes('phishing in the philippines'); });
       var subEl = null;
       if (subHeader) {
-        var subItem = subHeader.closest('.drawer-item');
+        var subItem = subHeader.closest('.sub-accordion-item');
         if (subItem) {
-          var oc = subItem.getAttribute('onclick') || '';
-          var m = oc.match(/toggleDrawer\('([^']+)'\)/);
-          if (m && m[1]) subEl = document.getElementById('content-' + m[1]);
+          var targetId = subItem.querySelector('.sub-accordion-collapse')?.id;
+          if (targetId) subEl = document.getElementById(targetId);
         }
       }
       if (!subEl) subEl = document.getElementById('content-sub2-1');
@@ -56,17 +56,17 @@ document.addEventListener('DOMContentLoaded', function(){
       });
     })();
 
-    // Knowledge Check drawer normalization (rules + Start button)
+    // Knowledge Check accordion normalization (rules + Start button)
     (function normalizeKC(){
-      var kcHeader = Array.from(document.querySelectorAll('.drawer-item .drawer-title h5'))
-        .find(function(h){ return (h.textContent || '').trim().toLowerCase() === 'knowledge check'; });
+      // Updated to use accordion system
+      var kcHeader = Array.from(document.querySelectorAll('.sub-accordion-button'))
+        .find(function(h){ return (h.textContent || '').trim().toLowerCase().includes('knowledge check'); });
       var kcEl = null;
       if (kcHeader) {
-        var kcItem = kcHeader.closest('.drawer-item');
+        var kcItem = kcHeader.closest('.sub-accordion-item');
         if (kcItem) {
-          var oc = kcItem.getAttribute('onclick') || '';
-          var m = oc.match(/toggleDrawer\('([^']+)'\)/);
-          if (m && m[1]) kcEl = document.getElementById('content-' + m[1]);
+          var targetId = kcItem.querySelector('.sub-accordion-collapse')?.id;
+          if (targetId) kcEl = document.getElementById(targetId);
         }
       }
       if (!kcEl) kcEl = document.getElementById('content-knowledge-check');
@@ -90,27 +90,29 @@ document.addEventListener('DOMContentLoaded', function(){
         '</div>';
     })();
 
-    // Module 2 → Simulation (interactive, mirrors Module 3 approach)
+    // Module 2 → Simulation (interactive, updated to use accordion system)
     (function initModule2Simulation(){
-      var simHeader = Array.from(document.querySelectorAll('.drawer-item .drawer-title h5'))
-        .find(function(h){ return (h.textContent || '').trim().toLowerCase() === 'simulation'; });
+      // Updated to use accordion system
+      var simHeader = Array.from(document.querySelectorAll('.sub-accordion-button'))
+        .find(function(h){ return (h.textContent || '').trim().toLowerCase().includes('simulation'); });
       var simEl = null;
       if (simHeader) {
-        var itemSim = simHeader.closest('.drawer-item');
+        var itemSim = simHeader.closest('.sub-accordion-item');
         if (itemSim) {
-          var ocSim = itemSim.getAttribute('onclick') || '';
-          var mSim = ocSim.match(/toggleDrawer\('([^']+)'\)/);
-          if (mSim && mSim[1]) simEl = document.getElementById('content-' + mSim[1]);
+          var targetId = itemSim.querySelector('.sub-accordion-collapse')?.id;
+          if (targetId) simEl = document.getElementById(targetId);
         }
       }
       if (!simEl) simEl = document.getElementById('content-simulation');
       if (!simEl) {
-        var simTitle = Array.from(document.querySelectorAll('.drawer-item .drawer-title h5'))
-          .find(function(h){ return (h.textContent || '').trim().toLowerCase() === 'simulation'; });
+        // Fallback: look for simulation in accordion body
+        var simTitle = Array.from(document.querySelectorAll('.sub-accordion-button'))
+          .find(function(h){ return (h.textContent || '').trim().toLowerCase().includes('simulation'); });
         if (simTitle) {
-          var simItem = simTitle.closest('.drawer-item');
-          if (simItem && simItem.nextElementSibling && simItem.nextElementSibling.classList.contains('drawer-subcontent')) {
-            simEl = simItem.nextElementSibling;
+          var simItem = simTitle.closest('.sub-accordion-item');
+          if (simItem) {
+            var targetId = simItem.querySelector('.sub-accordion-collapse')?.id;
+            if (targetId) simEl = document.getElementById(targetId);
           }
         }
       }
@@ -274,102 +276,90 @@ document.addEventListener('DOMContentLoaded', function(){
 
       injectSimulation(simEl);
       if (simHeader) {
-        var headerItem = simHeader.closest('.drawer-item');
+        var headerItem = simHeader.closest('.sub-accordion-item');
         if (headerItem) {
           headerItem.addEventListener('click', function(){
-            var target = simEl || (headerItem.nextElementSibling && headerItem.nextElementSibling.classList.contains('drawer-subcontent') ? headerItem.nextElementSibling : null);
+            var target = simEl || headerItem.querySelector('.sub-accordion-collapse');
             if (target) injectSimulation(target);
           });
         }
       }
     })();
 
-    // Module 2 → Reflection (Drawer) with submission
-    (function initModule2Reflection(){
-      try {
-        var headerReflection = Array.from(document.querySelectorAll('.drawer-item .drawer-title h5'))
-          .find(function(h){ return (h.textContent || '').trim().toLowerCase() === 'reflection'; });
-        var reflectionEl = null;
-        if (headerReflection) {
-          var item = headerReflection.closest('.drawer-item');
-          if (item) {
-            var oc = item.getAttribute('onclick') || '';
-            var m = oc.match(/toggleDrawer\('([^']+)'\)/);
-            if (m && m[1]) reflectionEl = document.getElementById('content-' + m[1]);
-          }
+    // Module 2 → Reflection (Accordion) with submission, updated to use accordion system
+    var headerRefl = Array.from(document.querySelectorAll('.sub-accordion-button'))
+      .find(function(h){ return (h.textContent || '').trim().toLowerCase().includes('reflection'); });
+    var reflEl = null;
+    if (headerRefl) {
+      var itemRefl = headerRefl.closest('.sub-accordion-item');
+      if (itemRefl) {
+        var targetId = itemRefl.querySelector('.sub-accordion-collapse')?.id;
+        if (targetId) {
+          reflEl = document.getElementById(targetId);
         }
-        if (!reflectionEl) reflectionEl = document.getElementById('content-reflection');
-        if (reflectionEl) {
-          var rfWrap = reflectionEl.querySelector('.content-wrapper') || reflectionEl;
-          var formHtml = '' +
-            '<div class="accordion-content" id="m2-reflection-form">' +
-              '<h3>Module 2 Reflection</h3>' +
-              '<p class="mb-2">Share your thoughts about phishing, pretexting, and baiting. 4–5 sentences is great.</p>' +
-              '<textarea id="m2ReflectionText" class="form-control" rows="5" placeholder="Type your reflection here..."></textarea>' +
-              '<div class="d-flex justify-content-end" style="margin-top: 0.75rem;">' +
-                '<button id="m2ReflectionSubmit" class="btn btn-primary">Submit Reflection</button>' +
-              '</div>' +
-              '<div id="m2ReflectionStatus" class="mt-2 text-muted" style="min-height: 1.25rem;"></div>' +
-            '</div>';
+      }
+    }
+    if (!reflEl) {
+      // Fallback container id if reflection accordion uses a predictable id
+      reflEl = document.getElementById('content-reflection');
+    }
+    if (reflEl) {
+      var rWrap = reflEl.querySelector('.content-wrapper') || reflEl;
+      rWrap.innerHTML = '' +
+        '<div class="module2-scope"><div class="accordion-content">' +
+          '<h3>Module 2 Reflection: "Spot the Scams"</h3>' +
+          '<p>Great job completing Module 2! You\'ve learned to recognize phishing, pretexting, and baiting attacks. This reflection helps you connect what you\'ve learned to real-world situations.</p>' +
+          '<h4>Reflection Questions</h4>' +
+          '<ol>' +
+            '<li><strong>Which type of social engineering attack (phishing, pretexting, or baiting) do you think is most dangerous and why?</strong></li>' +
+            '<li><strong>Have you ever encountered a suspicious email, call, or social media post? How did you handle it?</strong></li>' +
+            '<li><strong>What\'s one red flag you\'ll always look for now when checking emails or messages?</strong></li>' +
+          '</ol>' +
+          '<div class="resources-section" style="margin-top: 1rem;">' +
+            '<h4>Your Reflection</h4>' +
+            '<p class="mb-2">Share your thoughts below. This helps reinforce your learning and commit to action.</p>' +
+            '<textarea id="m2ReflectionText" class="form-control" rows="5" placeholder="Type your reflection here..."></textarea>' +
+            '<div class="d-flex justify-content-end" style="margin-top: 0.75rem;">' +
+              '<button id="m2ReflectionSubmit" class="btn btn-primary">Submit Reflection</button>' +
+            '</div>' +
+            '<div id="m2ReflectionStatus" class="mt-2 text-muted" style="min-height: 1.25rem;"></div>' +
+          '</div>' +
+        '</div></div>';
 
-          // If a reflection UI already exists in the drawer, do NOT add another one
-          var hasExistingUi = false;
-          try {
-            var textContent = (rfWrap.textContent || '').toLowerCase();
-            if (rfWrap.querySelector('form') || rfWrap.querySelector('button') || rfWrap.querySelector('textarea')) {
-              hasExistingUi = true;
-            }
-            if (textContent.indexOf('submit reflection') !== -1 || textContent.indexOf('your reflection') !== -1) {
-              hasExistingUi = true;
-            }
-          } catch(_) { /* noop */ }
-
-          if (!hasExistingUi) {
-            var existing = (rfWrap.innerHTML || '').trim();
-            if (existing) {
-              if (!rfWrap.querySelector('#m2-reflection-form')) {
-                rfWrap.insertAdjacentHTML('beforeend', formHtml);
-              }
+      // Hook up submission
+      var btn = document.getElementById('m2ReflectionSubmit');
+      if (btn) {
+        btn.addEventListener('click', function(){
+          var txt = document.getElementById('m2ReflectionText');
+          var status = document.getElementById('m2ReflectionStatus');
+          var payload = { module_id: 2, reflection_text: (txt && txt.value || '').trim() };
+          if (!payload.reflection_text) {
+            status.textContent = 'Please enter your reflection before submitting.';
+            status.className = 'mt-2 text-danger';
+            return;
+          }
+          status.textContent = 'Submitting...';
+          status.className = 'mt-2 text-muted';
+          fetch('/submit_reflection', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }).then(function(r){ return r.json(); }).then(function(res){
+            if (res && res.success) {
+              status.textContent = 'Reflection submitted successfully!';
+              status.className = 'mt-2 text-success';
+              if (txt) txt.value = '';
             } else {
-              rfWrap.innerHTML = formHtml;
+              status.textContent = (res && res.error) || 'Submission failed.';
+              status.className = 'mt-2 text-danger';
             }
-          }
-
-          var btn = document.getElementById('m2ReflectionSubmit');
-          if (btn) {
-            btn.addEventListener('click', function(){
-              var txt = document.getElementById('m2ReflectionText');
-              var status = document.getElementById('m2ReflectionStatus');
-              var payload = { module_id: 2, reflection_text: (txt && txt.value || '').trim() };
-              if (!payload.reflection_text) {
-                status.textContent = 'Please enter your reflection before submitting.';
-                status.className = 'mt-2 text-danger';
-                return;
-              }
-              status.textContent = 'Submitting...';
-              status.className = 'mt-2 text-muted';
-              fetch('/submit_reflection', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-              }).then(function(r){ return r.json(); }).then(function(res){
-                if (res && res.success) {
-                  status.textContent = 'Reflection submitted successfully!';
-                  status.className = 'mt-2 text-success';
-                  if (txt) txt.value = '';
-                } else {
-                  status.textContent = (res && res.error) || 'Submission failed.';
-                  status.className = 'mt-2 text-danger';
-                }
-              }).catch(function(){
-                status.textContent = 'Network error. Please try again.';
-                status.className = 'mt-2 text-danger';
-              });
-            });
-          }
-        }
-      } catch(e) { /* silent */ }
-    })();
+          }).catch(function(){
+            status.textContent = 'Network error. Please try again.';
+            status.className = 'mt-2 text-danger';
+          });
+        });
+      }
+    }
 
     function initModule2SimHandlers(){
       try {
@@ -448,6 +438,100 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
   } catch(e) { /* silent */ }
+});
+
+// Enhanced mobile responsiveness for Module 2
+document.addEventListener('DOMContentLoaded', function() {
+  // Add mobile-specific styles for Module 2 simulation
+  if (document.getElementById('moduleMeta')?.getAttribute('data-module-id') === '2') {
+    var style = document.createElement('style');
+    style.textContent = `
+      /* Module 2 Mobile Optimizations */
+      @media (max-width: 576px) {
+        .scenario-card {
+          margin-bottom: 15px !important;
+          padding: 15px !important;
+        }
+        
+        .scenario-header {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          gap: 8px !important;
+        }
+        
+        .scenario-header h4 {
+          font-size: 1rem !important;
+          line-height: 1.3 !important;
+        }
+        
+        .option-item {
+          padding: 10px !important;
+          margin-bottom: 8px !important;
+          min-height: 44px !important;
+        }
+        
+        .option-item label {
+          font-size: 0.9rem !important;
+          line-height: 1.4 !important;
+        }
+        
+        .feedback-content {
+          padding: 12px !important;
+        }
+        
+        .feedback-text {
+          font-size: 0.9rem !important;
+          line-height: 1.5 !important;
+        }
+        
+        .scenario-image img {
+          max-width: 100% !important;
+          height: auto !important;
+        }
+      }
+      
+      @media (min-width: 577px) and (max-width: 768px) {
+        .scenario-card {
+          padding: 18px !important;
+        }
+        
+        .option-item {
+          padding: 12px !important;
+        }
+        
+        .scenario-header h4 {
+          font-size: 1.1rem !important;
+        }
+      }
+      
+      /* Enhanced touch interactions */
+      .option-item {
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+      }
+      
+      .option-item:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+      }
+      
+      .option-item:active {
+        transform: scale(0.98) !important;
+      }
+      
+      /* Better visual feedback */
+      .option-item input[type="radio"]:checked + label {
+        font-weight: 600 !important;
+        color: #007bff !important;
+      }
+      
+      .option-item:has(input[type="radio"]:checked) {
+        border-color: #007bff !important;
+        background-color: rgba(0, 123, 255, 0.05) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 });
 </script>
 

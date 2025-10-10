@@ -1347,18 +1347,17 @@ document.addEventListener('DOMContentLoaded', function() {
         var meta = document.getElementById('moduleMeta');
         var modId = parseInt(meta && meta.getAttribute('data-module-id') || '0', 10);
         if (modId === 2) {
-            // Module 2: Lesson 2.1 → 1. Phishing in Philippine adjustments
+            // Module 2: Lesson 2.1 → 1. Phishing in the Philippines adjustments
             try {
                 // Locate the subtopic header
-                var subHeader = Array.from(document.querySelectorAll('.drawer-item .drawer-title h5'))
-                  .find(function(h){ return (h.textContent || '').trim().toLowerCase() === '1. phishing in philippine'; });
+                var subHeader = Array.from(document.querySelectorAll('.sub-accordion-button'))
+                  .find(function(h){ return (h.textContent || '').trim().toLowerCase().includes('phishing in the philippines'); });
                 var subEl = null;
                 if (subHeader) {
-                    var subItem = subHeader.closest('.drawer-item');
+                    var subItem = subHeader.closest('.sub-accordion-item');
                     if (subItem) {
-                        var oc = subItem.getAttribute('onclick') || '';
-                        var m = oc.match(/toggleDrawer\('([^']+)'\)/);
-                        if (m && m[1]) subEl = document.getElementById('content-' + m[1]);
+                        var targetId = subItem.querySelector('.sub-accordion-collapse')?.id;
+                        if (targetId) subEl = document.getElementById(targetId);
                     }
                 }
                 // Fallback predictable id if present
@@ -1401,16 +1400,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch(e) { /* silent */ }
 
-            // Try to locate the knowledge check drawer body
-            var kcHeader = Array.from(document.querySelectorAll('.drawer-item .drawer-title h5'))
-                .find(function(h){ return (h.textContent || '').trim().toLowerCase() === 'knowledge check'; });
+            // Try to locate the knowledge check accordion body
+            var kcHeader = Array.from(document.querySelectorAll('.sub-accordion-button'))
+                .find(function(h){ return (h.textContent || '').trim().toLowerCase().includes('knowledge check'); });
             var kcEl = null;
             if (kcHeader) {
-                var kcItem = kcHeader.closest('.drawer-item');
+                var kcItem = kcHeader.closest('.sub-accordion-item');
                 if (kcItem) {
-                    var oc = kcItem.getAttribute('onclick') || '';
-                    var m = oc.match(/toggleDrawer\('([^']+)'\)/);
-                    if (m && m[1]) kcEl = document.getElementById('content-' + m[1]);
+                    var targetId = kcItem.querySelector('.sub-accordion-collapse')?.id;
+                    if (targetId) kcEl = document.getElementById(targetId);
                 }
             }
             if (!kcEl) kcEl = document.getElementById('content-knowledge-check');
@@ -1437,4 +1435,227 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (e) { /* silent */ }
 });
 </script>
+
+<style>
+/* Enhanced Mobile & Cross-Device Responsiveness for Module Pages */
+@media (max-width: 576px) {
+    .module-container {
+        padding: 10px;
+    }
+    
+    .module-title {
+        font-size: 1.5rem;
+        line-height: 1.3;
+    }
+    
+    .module-description {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    .module-info-cards {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .info-card {
+        padding: 15px;
+        text-align: center;
+    }
+    
+    .info-value {
+        font-size: 1.1rem;
+    }
+    
+    .module-sidebar {
+        margin-top: 20px;
+    }
+    
+    .sidebar-card {
+        margin-bottom: 15px;
+    }
+    
+    .progress-bar-container {
+        height: 12px;
+    }
+    
+    .btn {
+        min-height: 44px;
+        font-size: 0.9rem;
+        padding: 10px 15px;
+    }
+    
+    /* Mobile-friendly accordion system */
+    .sub-accordion-item {
+        margin-bottom: 10px;
+    }
+    
+    .sub-accordion-button {
+        padding: 12px 15px;
+        font-size: 0.95rem;
+    }
+    
+    .content-wrapper {
+        padding: 15px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    /* Mobile video containers */
+    .video-container {
+        margin: 15px 0;
+    }
+    
+    /* Maintain 16:9 aspect ratio on mobile - remove fixed height */
+    .video-wrapper iframe {
+        /* height: 200px; - REMOVED to maintain proper aspect ratio */
+    }
+    
+    /* Mobile image optimization */
+    .infographic-container img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .module-title {
+        font-size: 1.8rem;
+    }
+    
+    .module-description {
+        font-size: 1rem;
+    }
+    
+    .info-card {
+        padding: 20px;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+    
+    /* Maintain 16:9 aspect ratio - remove fixed height */
+    .video-wrapper iframe {
+        /* height: 250px; - REMOVED to maintain proper aspect ratio */
+    }
+}
+
+/* Tablet Optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .module-container {
+        padding: 20px;
+    }
+    
+    .module-title {
+        font-size: 2rem;
+    }
+    
+    .module-description {
+        font-size: 1.1rem;
+    }
+    
+    .info-card {
+        padding: 25px;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+    
+    /* Maintain 16:9 aspect ratio - remove fixed height */
+    .video-wrapper iframe {
+        /* height: 300px; - REMOVED to maintain proper aspect ratio */
+    }
+    
+    .content-wrapper {
+        padding: 20px;
+        font-size: 1rem;
+    }
+}
+
+/* Desktop Optimizations */
+@media (min-width: 1025px) {
+    .module-container {
+        padding: 30px;
+    }
+    
+    .module-title {
+        font-size: 2.2rem;
+    }
+    
+    .module-description {
+        font-size: 1.2rem;
+    }
+    
+    .info-card {
+        padding: 30px;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+    
+    /* Maintain 16:9 aspect ratio - remove fixed height */
+    .video-wrapper iframe {
+        /* height: 400px; - REMOVED to maintain proper aspect ratio */
+    }
+    
+    .content-wrapper {
+        padding: 25px;
+        font-size: 1.1rem;
+    }
+    
+    /* Enhanced hover effects for desktop */
+    .sub-accordion-item:hover {
+        transform: translateX(5px);
+        transition: transform 0.2s ease;
+    }
+}
+
+/* Ultra-wide screen support */
+@media (min-width: 1400px) {
+    .module-container {
+        padding: 40px;
+    }
+    
+    .module-title {
+        font-size: 2.5rem;
+    }
+    
+    /* Maintain 16:9 aspect ratio - remove fixed height */
+    .video-wrapper iframe {
+        /* height: 450px; - REMOVED to maintain proper aspect ratio */
+    }
+}
+
+/* Print optimizations */
+@media print {
+    .module-sidebar,
+    .btn,
+    .navbar,
+    .footer {
+        display: none !important;
+    }
+    
+    .module-container {
+        padding: 0;
+        margin: 0;
+    }
+    
+    .content-wrapper {
+        padding: 10px;
+        font-size: 12pt;
+        line-height: 1.4;
+    }
+    
+    .video-container {
+        display: none;
+    }
+}
+</style>
 {% endblock %}

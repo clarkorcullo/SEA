@@ -195,7 +195,7 @@ class AssessmentResult(BaseModel, TimestampMixin):
             print(f"Error parsing answers data: {e}")
             return None
     
-    def calculate_pass_status(self, passing_threshold: float = 70.0) -> bool:
+    def calculate_pass_status(self, passing_threshold: float = 80.0) -> bool:
         """Calculate if assessment was passed"""
         self.passed = self.percentage_score >= passing_threshold
         return self.passed

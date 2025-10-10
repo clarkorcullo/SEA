@@ -39,9 +39,21 @@ class AnalyticsService:
             total_assessments = AssessmentResult.count()
             passed_assessments = AssessmentResult.query.filter_by(passed=True).count()
             
-            # Simulation statistics
-            total_simulations = SimulationResult.count()
-            completed_simulations = SimulationResult.query.filter_by(completed=True).count()
+            # Simulation statistics - Count simulations based on completed modules with simulations
+            modules_with_sims = Module.query.filter_by(has_simulation=True).all()
+            total_simulations = 0
+            completed_simulations = 0
+            
+            for module in modules_with_sims:
+                # Count total possible simulations (number of users * modules with simulations)
+                total_simulations += total_users
+                
+                # Count completed simulations (users who completed this module)
+                completed_count = UserProgress.query.filter_by(
+                    module_id=module.id, 
+                    status='completed'
+                ).count()
+                completed_simulations += completed_count
             
             # Feedback statistics
             total_feedback = FeedbackSurvey.count()
@@ -117,17 +129,48 @@ class AnalyticsService:
             valid_users = 0
             
             for user in users:
-                # Get user statistics
-                user_stats = user.get_progress_summary()
+                # Get actual progress data from UserProgress table
+                user_progress = UserProgress.get_user_progress(user.id)
+                completed_modules = [p for p in user_progress if p.status == 'completed']
+                modules_completed = len(completed_modules)
                 
-                if user_stats['total_assessments'] > 0:
-                    total_assessment_score += user_stats['average_score']
-                    total_simulation_score += user_stats.get('simulation_statistics', {}).get('average_score', 0)
-                    total_completion_percentage += user_stats['completion_percentage']
+                # Calculate completion percentage based on actual data
+                total_modules = 6  # Total modules including Final Assessment
+                completion_percentage = (modules_completed / total_modules) * 100 if total_modules > 0 else 0
+                
+                # Get assessment data
+                user_assessments = AssessmentResult.get_user_assessments(user.id)
+                total_assessments = len(user_assessments)
+                
+                # Calculate average assessment score
+                if total_assessments > 0:
+                    total_score = sum(assessment.percentage_score for assessment in user_assessments)
+                    average_assessment_score = total_score / total_assessments
+                    total_assessment_score += average_assessment_score
                     valid_users += 1
                 
+                # Get simulation data - Count completed modules with simulations
+                modules_with_sims = Module.query.filter_by(has_simulation=True).all()
+                user_simulations_completed = 0
+                simulation_scores = []
+                
+                for module in modules_with_sims:
+                    module_progress = UserProgress.query.filter_by(
+                        user_id=user.id, 
+                        module_id=module.id, 
+                        status='completed'
+                    ).first()
+                    if module_progress:
+                        user_simulations_completed += 1
+                        simulation_scores.append(module_progress.score)
+                
+                if simulation_scores:
+                    simulation_avg = sum(simulation_scores) / len(simulation_scores)
+                    total_simulation_score += simulation_avg
+                
+                total_completion_percentage += completion_percentage
+                
                 # Categorize performance
-                completion_percentage = user_stats['completion_percentage']
                 if completion_percentage >= 90:
                     performance_data['performance_distribution']['excellent'] += 1
                 elif completion_percentage >= 70:
@@ -137,11 +180,10 @@ class AnalyticsService:
                 else:
                     performance_data['performance_distribution']['below_average'] += 1
                 
-                # Categorize completion
-                modules_completed = user_stats['modules_completed']
+                # Categorize completion based on actual data
                 if modules_completed >= 5:
                     performance_data['completion_distribution']['completed_all'] += 1
-                elif modules_completed >= 4:
+                elif modules_completed >= 3:
                     performance_data['completion_distribution']['completed_half'] += 1
                 elif modules_completed > 0:
                     performance_data['completion_distribution']['completed_some'] += 1
@@ -152,13 +194,34 @@ class AnalyticsService:
             if valid_users > 0:
                 performance_data['average_scores']['assessment_score'] = round(total_assessment_score / valid_users, 2)
                 performance_data['average_scores']['simulation_score'] = round(total_simulation_score / valid_users, 2)
-                performance_data['average_scores']['completion_percentage'] = round(total_completion_percentage / valid_users, 2)
+            
+            if len(users) > 0:
+                performance_data['average_scores']['completion_percentage'] = round(total_completion_percentage / len(users), 2)
             
             return performance_data
             
         except Exception as e:
             print(f"Error getting user performance analytics: {e}")
-            return {}
+            return {
+                'total_users': 0,
+                'performance_distribution': {
+                    'excellent': 0,
+                    'good': 0,
+                    'average': 0,
+                    'below_average': 0
+                },
+                'completion_distribution': {
+                    'completed_all': 0,
+                    'completed_half': 0,
+                    'completed_some': 0,
+                    'not_started': 0
+                },
+                'average_scores': {
+                    'assessment_score': 0,
+                    'simulation_score': 0,
+                    'completion_percentage': 0
+                }
+            }
     
     @staticmethod
     def get_module_analytics() -> List[Dict[str, Any]]:

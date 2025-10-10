@@ -138,10 +138,20 @@ class User(UserMixin, BaseModel, TimestampMixin):
                 total_score += max(progress.score, progress.highest_score)
             self.total_score = total_score
             
-            # Count completed simulations
-            completed_simulations = SimulationResult.query.filter_by(
-                user_id=self.id, completed=True
-            ).count()
+            # Count completed simulations - Count completed modules that have simulations
+            from data_models.content_models import Module
+            modules_with_sims = Module.query.filter_by(has_simulation=True).all()
+            completed_simulations = 0
+            
+            for module in modules_with_sims:
+                module_progress = UserProgress.query.filter_by(
+                    user_id=self.id, 
+                    module_id=module.id, 
+                    status='completed'
+                ).first()
+                if module_progress:
+                    completed_simulations += 1
+            
             self.simulations_completed = completed_simulations
             
             return self.save()

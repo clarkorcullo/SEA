@@ -8,10 +8,10 @@ class AssessmentConstants:
     """Constants for assessment-related functionality"""
     
     # Passing thresholds
-    PASSING_THRESHOLD = 70.0
+    PASSING_THRESHOLD = 80.0
     EXCELLENT_THRESHOLD = 90.0
     GOOD_THRESHOLD = 80.0
-    AVERAGE_THRESHOLD = 70.0
+    AVERAGE_THRESHOLD = 80.0
     
     # Question counts
     DEFAULT_KNOWLEDGE_CHECK_QUESTIONS = 5
@@ -156,7 +156,7 @@ class SimulationConstants:
     
     # Scoring
     MAX_SIMULATION_SCORE = 100
-    PASSING_SIMULATION_SCORE = 70
+    PASSING_SIMULATION_SCORE = 80
     
     # Time limits (in minutes)
     DEFAULT_SIMULATION_TIME = 10
@@ -188,7 +188,7 @@ class ProgressConstants:
     MAX_ATTEMPTS_PER_ASSESSMENT = 5
     
     # Completion requirements
-    MIN_SCORE_TO_COMPLETE = 70
+    MIN_SCORE_TO_COMPLETE = 80
     MIN_TIME_TO_COMPLETE = 1  # minutes
     
     # Achievement thresholds

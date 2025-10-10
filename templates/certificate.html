@@ -2,12 +2,20 @@
 
 {% block title %}Certificate - Social Engineering Awareness{% endblock %}
 
+{% block head %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+{% endblock %}
+
 {% block content %}
 <div class="container certificate-container">
     <div class="row justify-content-center">
         <div class="col-lg-12">
-            <div class="card shadow-lg certificate-page">
-                <div class="card-body p-0">
+            <div class="certificate-page">
+                <div class="certificate-body-wrapper">
                     <div class="certificate-content certificate-bg">
                         <img src="/learning_assets/Documents/CertTemplate.png" alt="Certificate Background" class="cert-bg-print"/>
                     <!-- Certificate Header -->
@@ -32,19 +40,15 @@
                             <p class="text-muted">for BSIT Students</p>
                         </div>
 
-                        
-
-                        
-
                         <div class="mb-4">
                             <p class="lead">This certificate acknowledges the successful completion of comprehensive training in:</p>
-                            <ul class="achievement-list achievement-grid">
-                                <li><i class="fas fa-check-circle"></i><span>Social Engineering Threat Recognition</span></li>
-                                <li><i class="fas fa-check-circle"></i><span>Phishing Attack Prevention</span></li>
-                                <li><i class="fas fa-check-circle"></i><span>Pretexting and Baiting Awareness</span></li>
-                                <li><i class="fas fa-check-circle"></i><span>Quid Pro Quo Attack Prevention</span></li>
-                                <li><i class="fas fa-check-circle"></i><span>Interactive Simulation Training</span></li>
-                                <li><i class="fas fa-check-circle"></i><span>Real‑world Scenario Analysis</span></li>
+                            <ul class="achievement-list achievement-grid" style="gap: 0 !important;">
+                                <li style="gap: 12px !important; margin: 0 !important; padding: 0 !important; margin-bottom: 12px !important;"><i class="fas fa-check-circle" style="padding: 0 !important;"></i><span style="margin: 0 !important; padding: 0 !important;">Social Engineering Threat Recognition</span></li>
+                                <li style="gap: 12px !important; margin: 0 !important; padding: 0 !important; margin-bottom: 12px !important;"><i class="fas fa-check-circle" style="padding: 0 !important;"></i><span style="margin: 0 !important; padding: 0 !important;">Phishing Attack Prevention</span></li>
+                                <li style="gap: 12px !important; margin: 0 !important; padding: 0 !important; margin-bottom: 12px !important;"><i class="fas fa-check-circle" style="padding: 0 !important;"></i><span style="margin: 0 !important; padding: 0 !important;">Pretexting and Baiting Awareness</span></li>
+                                <li style="gap: 12px !important; margin: 0 !important; padding: 0 !important; margin-bottom: 12px !important;"><i class="fas fa-check-circle" style="padding: 0 !important;"></i><span style="margin: 0 !important; padding: 0 !important;">Quid Pro Quo Attack Prevention</span></li>
+                                <li style="gap: 12px !important; margin: 0 !important; padding: 0 !important; margin-bottom: 12px !important;"><i class="fas fa-check-circle" style="padding: 0 !important;"></i><span style="margin: 0 !important; padding: 0 !important;">Interactive Simulation Training</span></li>
+                                <li style="gap: 12px !important; margin: 0 !important; padding: 0 !important; margin-bottom: 12px !important;"><i class="fas fa-check-circle" style="padding: 0 !important;"></i><span style="margin: 0 !important; padding: 0 !important;">Real‑world Scenario Analysis</span></li>
                             </ul>
                         </div>
 
@@ -54,14 +58,14 @@
                                     <div class="signature-item">
                                         <img class="signature-image" src="/learning_assets/Documents/KimSignature.png" alt="Signature - Kimberly Cruz">
                                         <div class="signature-line"></div>
-                                        <p class="mt-1 mb-0 sig-name"><strong>Kimberly Cruz</strong></p>
+                                        <p class="mt-1 mb-0 sig-name"><strong>Juan dela Cruz</strong></p>
                                         <div class="sig-role">Program Director</div>
                                         <div class="sig-org">Mapúa Malayan Digital College</div>
                                     </div>
                                     <div class="signature-item">
-                                        <img class="signature-image" src="/learning_assets/Documents/ClarosSign.png" alt="Signature - Claros Orcullo">
+                                        <img class="signature-image" src="/learning_assets/Documents/ClarosSign.png" alt="Signature - Maria dela Cruz">
                                         <div class="signature-line"></div>
-                                        <p class="mt-1 mb-0 sig-name"><strong>Claros Orcullo</strong></p>
+                                        <p class="mt-1 mb-0 sig-name"><strong>Maria dela Cruz</strong></p>
                                         <div class="sig-role">Academic Coordinator</div>
                                         <div class="sig-org">Mapúa Malayan Digital College</div>
                                     </div>
@@ -91,10 +95,66 @@
 </div>
 
 <style>
-/* Screen layout enhancements */
-.certificate-container { font-family: Georgia, "Times New Roman", Times, serif; }
-.certificate-page { border: none; }
-.certificate-content { position: relative; border: 3px solid #007bff; border-radius: 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); }
+/* Cache buster: 2025-10-09-18-51 */
+/* Achievement List Styling with Proper Spacing */
+.achievement-item {
+    display: flex !important;
+    align-items: center !important;
+    margin-bottom: 12px !important;
+    gap: 0 !important;
+    padding: 0 !important;
+}
+
+.achievement-icon {
+    color: #28a745 !important;
+    margin-right: 12px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    padding: 0 !important;
+    min-width: 16px !important;
+    font-size: 0.9rem !important;
+    flex-shrink: 0 !important;
+}
+
+.achievement-text {
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: left !important;
+    flex: 1 !important;
+}
+
+/* Mobile-First Responsive Design */
+.certificate-container { 
+    font-family: Georgia, "Times New Roman", Times, serif; 
+    padding: 0 15px;
+    background: transparent; /* No background - let it blend naturally */
+}
+
+.certificate-page { 
+    border: none; 
+    margin: 0;
+    background: transparent; /* No background */
+    box-shadow: none; /* Remove any shadow */
+}
+
+.certificate-body-wrapper {
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 0;
+    margin: 0;
+}
+
+.certificate-content { 
+    position: relative; 
+    border: none; /* Remove border that might be causing white background */
+    border-radius: 0; /* Remove border radius */
+    background: white; /* White background for readability in preview */
+    overflow: visible; /* Allow template to show through */
+    min-height: 800px; /* Match certificate template size */
+    width: 100%; /* Full width */
+}
+
 .certificate-bg { 
     background-image: url('/learning_assets/Documents/CertTemplate.png');
     background-size: cover; 
@@ -102,95 +162,752 @@
     background-position: center; 
     border: none; 
     border-radius: 0; 
-    /* inner safe area to keep content inside the border */
-    padding: 90px 100px 90px 100px; 
+    background-color: white; /* White background for readability in preview */
+    /* Mobile-first responsive padding */
+    padding: 20px 15px;
+    min-height: 100%; /* Fill the certificate content area */
 }
-.certificate-inner { background: transparent; }
-.cert-bg-print { display: none; }
-.certificate-title { letter-spacing: 0.5px; font-size: 2.1rem; }
-.cert-title-row { display: inline-flex; align-items: center; gap: 12px; }
-.cert-ribbon { height: 36px; width: auto; mix-blend-mode: multiply; filter: contrast(140%) saturate(110%); }
+
+.certificate-inner { 
+    background: transparent !important; 
+    background-color: transparent !important;
+}
+
+.cert-bg-print { 
+    display: none; 
+}
+
+/* Mobile Typography */
+.certificate-title { 
+    letter-spacing: 0.3px; 
+    font-size: 1.4rem;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+.cert-title-row { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    justify-content: center;
+}
+
+.cert-ribbon { 
+    height: 24px; 
+    width: auto; 
+    mix-blend-mode: multiply; 
+    filter: contrast(140%) saturate(110%); 
+}
+
 .cert-ribbon-vert {
-    position: absolute;
-    right: 110px; /* push into the free space on the right inside the border */
-    top: 74px;  /* moved up by ~15mm */
-    height: 320px; /* tall strip covering title down to program line area */
-    width: auto;
-    mix-blend-mode: multiply;
-    filter: contrast(140%) saturate(110%);
-    pointer-events: none;
+    display: none; /* Hide on mobile */
 }
-.certificate-subtitle { font-weight: 500; }
-.certificate-intro { font-style: italic; font-size: 1.1rem; }
-.certificate-name { font-weight: 700; text-decoration: underline; font-size: 1.8rem; }
-.certificate-program { font-weight: 600; font-size: 1.35rem; }
-.cert-logo { height: 45px; width: auto; }
-.achievement-box { background: #f8fff9; border: 1px solid #d1e7dd; border-radius: 10px; padding: 16px; }
-.achievement-list { list-style: none; padding: 0; margin: 0 auto; max-width: 800px; }
-.achievement-list li { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; line-height: 1.4; }
-.achievement-list li i { color: #28a745; margin-top: 3px; min-width: 18px; }
-.achievement-list li span { flex: 1; }
-.achievement-grid { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 24px; row-gap: 8px; }
-.achievement-grid li { margin: 0; }
 
-/* Remove decorative CSS borders when using image */
-.certificate-page { position: relative; }
+.certificate-subtitle { 
+    font-weight: 500; 
+}
 
-/* Vertical signature arrangement */
-.signature-block { display: flex; gap: 120px; justify-content: center; align-items: flex-start; }
-.signature-item { display: flex; flex-direction: column; align-items: center; }
-.signature-line { border-top: 2px solid #007bff; width: 220px; margin: 1px auto 0 auto; height: 2px; }
+.certificate-intro { 
+    font-style: italic; 
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.certificate-name { 
+    font-weight: 700; 
+    text-decoration: underline; 
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+}
+
+.certificate-program { 
+    font-weight: 600; 
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.cert-logo { 
+    height: 50px; 
+    width: auto; 
+}
+
+/* Mobile Achievement List */
+.achievement-list { 
+    list-style: none; 
+    padding: 0; 
+    margin: 0 auto; 
+    max-width: 100%;
+}
+
+.achievement-list li { 
+    display: flex; 
+    align-items: flex-start; 
+    gap: 12px !important; 
+    margin-bottom: 6px; 
+    line-height: 1.3;
+    font-size: 0.85rem;
+}
+
+.achievement-list li i { 
+    color: #28a745; 
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 12px !important;
+    min-width: 14px;
+    font-size: 0.9rem;
+}
+
+.achievement-list li span { 
+    flex: 1; 
+    text-align: left !important;
+    justify-content: flex-start !important;
+}
+
+.achievement-grid { 
+    display: block; /* Single column on mobile */
+}
+
+.achievement-grid li { 
+    margin-top: 0 !important;
+    margin-bottom: 6px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Mobile Signature Layout */
+.signature-block { 
+    display: flex; 
+    flex-direction: column;
+    gap: 20px; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.signature-item { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
+    max-width: 150px;
+}
+
+.signature-line { 
+    border-top: 1px solid #007bff; 
+    width: 120px; 
+    margin: 2px auto 0 auto; 
+    height: 1px; 
+}
+
 .signature-image {
-    max-height: 100px; /* slightly larger */
-    margin-bottom: 0; /* bring closer to line/name */
-    opacity: 0.95;
-    mix-blend-mode: multiply; /* helps blend out white/light backgrounds */
-    filter: contrast(160%) saturate(0%); /* enhance strokes, remove coloration */
+    max-height: 60px;
+    margin-bottom: 2px;
+    opacity: 0.9;
+    mix-blend-mode: multiply;
+    filter: contrast(140%) saturate(0%);
     background: transparent;
 }
-.sig-name { font-size: 1.05rem; margin-top: 0 !important; }
-.sig-role, .sig-org { font-size: 0.95rem; color: #6c757d; line-height: 1.1; }
 
-/* Vertical Certificate ID (screen) */
-.cert-id-vertical {
-    position: absolute;
-    left: 6mm; /* moved another ~2mm left */
-    top: 50%;
-    transform: translateY(-50%);
-    writing-mode: vertical-rl; /* true vertical text */
-    text-orientation: mixed;
-    color: #6c757d;
-    font-size: 1.05rem;
-    letter-spacing: 0.6px;
+.sig-name { 
+    font-size: 0.9rem; 
+    margin-top: 0 !important; 
+    text-align: center;
 }
 
-/* A4 print settings */
-@page { size: A4 landscape; margin: 6mm; }
+.sig-role, .sig-org { 
+    font-size: 0.75rem; 
+    color: #6c757d; 
+    line-height: 1.1;
+    text-align: center;
+}
+
+/* Mobile Certificate ID */
+.cert-id-vertical {
+    position: static;
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.8rem;
+    letter-spacing: 0.3px;
+    margin: 10px 0;
+    writing-mode: horizontal-tb;
+}
+
+/* Tablet Styles (768px and up) */
+@media (min-width: 768px) {
+    .certificate-container {
+        padding: 0 30px;
+        background: transparent; /* No background */
+        min-height: 100vh;
+    }
+    
+    .certificate-bg {
+        padding: 40px 30px;
+        background-image: url('/learning_assets/Documents/CertTemplate.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-color: white; /* White background for readability in preview */
+        min-height: 100%;
+    }
+    
+    .certificate-title {
+        font-size: 1.8rem;
+    }
+    
+    .certificate-name {
+        font-size: 1.6rem;
+    }
+    
+    .certificate-program {
+        font-size: 1.3rem;
+    }
+    
+    .cert-logo {
+        height: 60px;
+    }
+    
+.cert-ribbon-vert {
+        display: block;
+    position: absolute;
+        right: 30px;
+        top: 80px; /* Moved up from 120px to 80px */
+        height: 140px; /* Reduced from 180px to 140px */
+    width: auto;
+    mix-blend-mode: normal;
+    filter: contrast(100%) saturate(100%);
+    pointer-events: none;
+    opacity: 0.9;
+}
+    
+    .achievement-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 20px;
+        row-gap: 6px;
+    }
+    
+    .signature-block {
+        flex-direction: row;
+        gap: 60px;
+    }
+    
+    .signature-item {
+        max-width: 180px;
+    }
+    
+    .signature-line {
+        width: 150px;
+        border-top: 2px solid #007bff;
+        height: 2px;
+    }
+    
+.signature-image {
+        max-height: 80px;
+    }
+    
+    .sig-name {
+        font-size: 1rem;
+    }
+    
+    .sig-role, .sig-org {
+        font-size: 0.85rem;
+    }
+    
+.cert-id-vertical {
+    position: absolute;
+        left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+        writing-mode: vertical-rl;
+    text-orientation: mixed;
+        font-size: 0.9rem;
+        letter-spacing: 0.4px;
+    }
+}
+
+/* Desktop Styles (1024px and up) */
+@media (min-width: 1024px) {
+    .certificate-container {
+        background: transparent; /* No background */
+        min-height: 100vh;
+    }
+    
+    .certificate-bg {
+        padding: 60px 50px;
+        background-image: url('/learning_assets/Documents/CertTemplate.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-color: white; /* White background for readability in preview */
+        min-height: 100%;
+    }
+    
+    .certificate-title {
+        font-size: 2.1rem;
+    }
+    
+    .certificate-name {
+        font-size: 1.8rem;
+    }
+    
+    .certificate-program {
+        font-size: 1.35rem;
+    }
+    
+    .cert-logo {
+        height: 70px;
+    }
+    
+    .cert-ribbon-vert {
+        right: 50px;
+        top: 100px; /* Moved up from 140px to 100px */
+        height: 200px; /* Reduced from 260px to 200px */
+        mix-blend-mode: normal;
+        filter: contrast(100%) saturate(100%);
+        opacity: 0.9;
+    }
+    
+    .achievement-grid {
+        grid-template-columns: repeat(3, 1fr);
+        column-gap: 24px;
+    }
+    
+    .signature-block {
+        gap: 120px;
+    }
+    
+    .signature-item {
+        max-width: 220px;
+    }
+    
+    .signature-line {
+        width: 220px;
+    }
+    
+    .signature-image {
+        max-height: 100px;
+    }
+    
+    .sig-name {
+        font-size: 1.05rem;
+    }
+    
+    .sig-role, .sig-org {
+        font-size: 0.95rem;
+    }
+    
+    .cert-id-vertical {
+        left: 25px;
+    font-size: 1.05rem;
+    letter-spacing: 0.6px;
+    }
+}
+
+/* Large Desktop Styles (1200px and up) */
+@media (min-width: 1200px) {
+    .certificate-container {
+        background: transparent; /* No background */
+        min-height: 100vh;
+    }
+    
+    .certificate-bg {
+        padding: 90px 100px;
+        background-image: url('/learning_assets/Documents/CertTemplate.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-color: white; /* White background for readability in preview */
+        min-height: 100%;
+    }
+    
+    .cert-ribbon-vert {
+        right: 110px;
+        top: 120px; /* Moved up from 160px to 120px */
+        height: 220px; /* Reduced from 300px to 220px */
+        mix-blend-mode: normal;
+        filter: contrast(100%) saturate(100%);
+        opacity: 0.9;
+    }
+    
+    .cert-id-vertical {
+        left: 30px;
+    }
+}
+
+/* Mobile Styles (up to 767px) */
+@media (max-width: 767px) {
+    .certificate-container {
+        padding: 10px;
+        background: transparent; /* No background */
+        min-height: 100vh;
+    }
+    
+    .certificate-bg {
+        padding: 20px 15px;
+        background-image: url('/learning_assets/Documents/CertTemplate.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-color: white; /* White background for readability in preview */
+        min-height: 100%;
+    }
+    
+    .certificate-title {
+        font-size: 1.4rem;
+        letter-spacing: 0.3px;
+        margin-bottom: 10px;
+    }
+    
+    .certificate-name {
+        font-size: 1.3rem;
+        margin-bottom: 8px;
+    }
+    
+    .certificate-program {
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+    
+    .cert-logo {
+        height: 40px;
+    }
+    
+    .cert-ribbon-vert {
+        display: none; /* Hide on mobile for better layout */
+    }
+    
+    .achievement-grid {
+        display: block; /* Single column on mobile */
+    }
+    
+    .achievement-list li {
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+    
+    .signature-block {
+        flex-direction: column;
+        gap: 20px;
+        padding: 0 10px;
+    }
+    
+    .signature-item {
+        max-width: 100%;
+    }
+    
+    .signature-line {
+        width: 100px;
+        border-top: 1px solid #007bff;
+        height: 1px;
+    }
+    
+    .signature-image {
+        max-height: 50px;
+    }
+    
+    .sig-name {
+        font-size: 0.85rem;
+    }
+    
+    .sig-role, .sig-org {
+        font-size: 0.7rem;
+    }
+    
+    .cert-id-vertical {
+        position: static;
+        text-align: center;
+        margin: 15px 0;
+        writing-mode: horizontal-tb;
+        font-size: 0.75rem;
+    }
+    
+    .text-center.mt-3 {
+        padding: 20px 10px;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+}
+
+/* Small Mobile Styles (up to 480px) */
+@media (max-width: 480px) {
+    .certificate-container {
+        padding: 5px;
+    }
+    
+    .certificate-bg {
+        padding: 15px 10px;
+        background-color: white; /* White background for readability in preview */
+        min-height: 100%;
+    }
+    
+    .certificate-title {
+        font-size: 1.2rem;
+    }
+    
+    .certificate-name {
+        font-size: 1.1rem;
+    }
+    
+    .certificate-program {
+        font-size: 1rem;
+    }
+    
+    .cert-logo {
+        height: 35px;
+    }
+    
+    .achievement-list li {
+        font-size: 0.75rem;
+        margin-bottom: 6px;
+    }
+    
+    .signature-block {
+        gap: 15px;
+    }
+    
+    .signature-image {
+        max-height: 40px;
+    }
+    
+    .sig-name {
+        font-size: 0.8rem;
+    }
+    
+    .sig-role, .sig-org {
+        font-size: 0.65rem;
+    }
+    
+    .btn-lg {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* A4 print settings - Landscape orientation */
+@page { 
+    size: A4 landscape; 
+    margin: 8mm; 
+}
+
 @media print {
+    /* Force landscape orientation */
+    @page {
+        size: A4 landscape;
+        margin: 8mm;
+    }
+    
+    /* Hide navigation and buttons */
     .navbar, .footer, .btn { display: none !important; }
-    html, body { margin: 0 !important; padding: 0 !important; width: 297mm; height: 210mm; overflow: hidden; }
-    .certificate-page, .certificate-content, .certificate-inner { box-shadow: none !important; background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .certificate-content { border: 3px solid #007bff !important; }
-    /* Force background template to print even if browser hides CSS backgrounds */
-    .certificate-bg { background: none !important; }
-    .cert-bg-print { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
-    /* Lock certificate to a single A4 landscape page (fixed canvas slightly smaller than page box) */
-    .certificate-container { width: 297mm !important; max-width: 297mm !important; margin: 0 auto !important; page-break-inside: avoid; }
-    .certificate-page { width: 285mm !important; height: 192mm !important; margin: 0 auto !important; break-inside: avoid; page-break-inside: avoid; page-break-after: avoid; }
-    .card-body { width: 285mm !important; height: 192mm !important; margin: 0 !important; padding: 0 !important; }
-    .certificate-content { width: 285mm !important; height: 192mm !important; overflow: hidden !important; position: relative; }
-    .certificate-bg { padding: 14mm 18mm 18mm 18mm !important; }
-    /* Vertical Cert ID for print */
-    .cert-id-vertical { left: 4mm; top: 50%; transform: translateY(-50%); writing-mode: vertical-rl; text-orientation: mixed; font-size: 1rem; }
-    /* Extra guards against accidental page breaking */
-    .certificate-container, .certificate-page, .card, .card-body, .certificate-content { page-break-before: avoid; page-break-after: avoid; }
-    .achievement-grid { column-gap: 18px; }
-    .certificate-title { font-size: 1.9rem; }
-    .cert-ribbon { height: 32px; }
-    .cert-ribbon-vert { height: 300px; right: 100px; top: 63px; }
-    .certificate-name { font-size: 1.7rem; }
-    .certificate-program { font-size: 1.25rem; }
-    .cert-logo { height: 42px; }
+    
+    /* Reset body and html for print */
+    html, body { 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        width: 100% !important; 
+        height: 100% !important; 
+        overflow: hidden; 
+        font-size: 12pt;
+    }
+    
+    /* Print-specific certificate styling */
+    .certificate-container { 
+        width: 100% !important; 
+        max-width: 100% !important; 
+        margin: 0 !important; 
+        padding: 0 !important;
+        page-break-inside: avoid; 
+    }
+    
+    .certificate-page, .certificate-content, .certificate-inner { 
+        box-shadow: none !important; 
+        background: transparent !important; 
+        background-color: transparent !important;
+        -webkit-print-color-adjust: exact; 
+        print-color-adjust: exact; 
+    }
+    
+    .certificate-content { 
+        border: none !important; /* Remove border for print */
+        width: 100% !important; 
+        height: auto !important; 
+        overflow: visible !important; 
+        position: relative; 
+        page-break-inside: avoid;
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+    
+    .certificate-bg { 
+        background: none !important; 
+        padding: 15mm 10mm !important;
+    }
+    
+    .cert-bg-print { 
+        display: block; 
+        position: absolute; 
+        inset: 0; 
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover; 
+        z-index: -1; 
+    }
+    
+    /* Print typography adjustments */
+    .certificate-title { 
+        font-size: 18pt !important; 
+        margin-bottom: 8pt !important;
+    }
+    
+    .certificate-name { 
+        font-size: 16pt !important; 
+        margin-bottom: 6pt !important;
+    }
+    
+    .certificate-program { 
+        font-size: 14pt !important; 
+        margin-bottom: 4pt !important;
+    }
+    
+    .certificate-intro, .lead {
+        font-size: 11pt !important;
+    }
+    
+    .cert-logo { 
+        height: 55px !important; 
+    }
+    
+    /* Print achievement list */
+    .achievement-list li {
+        font-size: 10pt !important;
+        margin-bottom: 4pt !important;
+    }
+    
+    .achievement-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        column-gap: 15pt !important;
+        row-gap: 4pt !important;
+    }
+    
+    /* Print signature layout */
+    .signature-block {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 40pt !important;
+        justify-content: center !important;
+        margin-top: 15pt !important;
+    }
+    
+    .signature-item {
+        max-width: 120pt !important;
+    }
+    
+    .signature-line {
+        width: 100pt !important;
+        border-top: 1px solid #007bff !important;
+        height: 1px !important;
+    }
+    
+    .signature-image {
+        max-height: 60px !important;
+    }
+    
+    .sig-name {
+        font-size: 10pt !important;
+    }
+    
+    .sig-role, .sig-org {
+        font-size: 9pt !important;
+    }
+    
+    /* Print certificate ID */
+    .cert-id-vertical {
+        position: static !important;
+        text-align: center !important;
+        font-size: 9pt !important;
+        margin: 8pt 0 !important;
+        writing-mode: horizontal-tb !important;
+    }
+    
+    /* Hide vertical ribbon for print */
+    .cert-ribbon-vert {
+        display: none !important;
+    }
+    
+    /* Prevent page breaks */
+    .certificate-container, 
+    .certificate-page, 
+    .card, 
+    .card-body, 
+    .certificate-content { 
+        page-break-before: avoid !important; 
+        page-break-after: avoid !important; 
+        page-break-inside: avoid !important;
+    }
+}
+
+/* Landscape print optimizations */
+@media print {
+    .certificate-bg {
+        padding: 14mm 18mm !important;
+    }
+    
+    .certificate-title {
+        font-size: 22pt !important;
+    }
+    
+    .certificate-name {
+        font-size: 20pt !important;
+    }
+    
+    .certificate-program {
+        font-size: 16pt !important;
+    }
+    
+    .achievement-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        column-gap: 20pt !important;
+    }
+    
+    .signature-block {
+        gap: 80pt !important;
+    }
+    
+    .signature-item {
+        max-width: 150pt !important;
+    }
+    
+    .signature-line {
+        width: 140pt !important;
+    }
+    
+    .signature-image {
+        max-height: 80px !important;
+    }
+    
+    .cert-id-vertical {
+        position: absolute !important;
+        left: 6mm !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        writing-mode: vertical-rl !important;
+        text-orientation: mixed !important;
+        font-size: 11pt !important;
+        margin: 0 !important;
+    }
+    
+    .cert-ribbon-vert {
+        display: block !important;
+        position: absolute !important;
+        right: 18mm !important;
+        top: 25mm !important; /* Moved up from 35mm to 25mm */
+        height: 200px !important; /* Reduced from 300px to 200px */
+        width: auto !important;
+    }
 }
 
 /* Explicit named page to force landscape across PDF/Printer drivers */
@@ -201,16 +918,71 @@
   .certificate-container, .certificate-page, .card-body, .certificate-content { width: 100% !important; max-width: 100% !important; }
 }
 </style>
-<script>
-// Ensure background graphics are visible by converting background to an inline image for print fallback
-// Force landscape via named page class before printing
-function prepareLandscapePrint() {
-  document.body.classList.add('page-a4-land');
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+// Print function with landscape orientation
+function printCert() {
+    // Add landscape class to body for print
+    document.body.classList.add('page-a4-land');
+    
+    // Hide action buttons temporarily
+    const actionButtons = document.querySelector('.text-center.mt-3');
+    if (actionButtons) {
+        actionButtons.style.display = 'none';
+    }
+    
+    // Trigger print
+    window.print();
+    
+    // Restore after print
+    setTimeout(() => {
+        document.body.classList.remove('page-a4-land');
+        if (actionButtons) {
+            actionButtons.style.display = 'block';
+        }
+    }, 1000);
 }
-document.addEventListener('DOMContentLoaded', prepareLandscapePrint);
-document.getElementById('printCertBtn')?.addEventListener('click', function(){
-  prepareLandscapePrint();
-  window.print();
+
+// Wait for page to load
+document.addEventListener('DOMContentLoaded', function() {
+    // Add print button click handler
+    var printButton = document.getElementById('printCertBtn');
+    if (printButton) {
+        printButton.onclick = function() {
+            printCert();
+        };
+    }
+    
+    // Fix achievement list spacing with new class structure
+    var items = document.querySelectorAll('.achievement-item');
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        item.style.display = 'flex';
+        item.style.alignItems = 'center';
+        item.style.marginBottom = '12px';
+        item.style.gap = '12px';
+        item.style.padding = '0';
+        
+        var icon = item.querySelector('.achievement-icon');
+        if (icon) {
+            icon.style.marginRight = '12px';
+            icon.style.marginTop = '0';
+            icon.style.marginBottom = '0';
+            icon.style.marginLeft = '0';
+            icon.style.padding = '0';
+            icon.style.flexShrink = '0';
+        }
+        
+        var span = item.querySelector('.achievement-text');
+        if (span) {
+            span.style.margin = '0';
+            span.style.padding = '0';
+            span.style.textAlign = 'left';
+            span.style.flex = '1';
+        }
+    }
 });
 </script>
-{% endblock %} 
+{% endblock %}

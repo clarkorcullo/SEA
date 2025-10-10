@@ -66,7 +66,7 @@ class Config:
     
     # Assessment Configuration
     KNOWLEDGE_CHECK_PASSING_SCORE = 80  # Percentage
-    FINAL_ASSESSMENT_PASSING_SCORE = 70  # Percentage
+    FINAL_ASSESSMENT_PASSING_SCORE = 80  # Percentage
     MAX_ASSESSMENT_ATTEMPTS = 3
     ASSESSMENT_COOLDOWN_HOURS = 48
     

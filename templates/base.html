@@ -2,8 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#3498db">
+    <meta name="msapplication-TileColor" content="#3498db">
     <title>{% block title %}Social Engineering Awareness - MMDC{% endblock %}</title>
+    {% block head %}{% endblock %}
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='SEALogo.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='SEALogo.png') }}">
@@ -252,11 +259,13 @@
             border-color: #e1e8ed;
         }
 
-        /* Responsive adjustments */
+        /* Enhanced Mobile & Touch Optimizations */
         @media (max-width: 768px) {
             body {
                 padding-top: 70px;
                 padding-bottom: 90px;
+                -webkit-text-size-adjust: 100%;
+                -webkit-tap-highlight-color: rgba(0,0,0,0.1);
             }
             
             .footer-logo {
@@ -265,6 +274,81 @@
             
             .footer-text {
                 font-size: 1em;
+            }
+            
+            /* Touch-friendly buttons */
+            .btn, .dropdown-item, .nav-link {
+                min-height: 44px;
+                min-width: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Improved mobile navigation */
+            .navbar-brand {
+                font-size: 1.2em;
+            }
+            
+            .logo {
+                height: 20px;
+            }
+            
+            /* Better mobile cards */
+            .card {
+                margin-bottom: 15px;
+                border-radius: 12px;
+            }
+            
+            /* Mobile-friendly forms */
+            .form-control {
+                font-size: 16px; /* Prevents zoom on iOS */
+                padding: 12px 15px;
+            }
+            
+            /* Improved mobile spacing */
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+        }
+        
+        /* Tablet Optimizations */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                max-width: 95%;
+            }
+            
+            .card {
+                margin-bottom: 20px;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+        
+        /* Large Desktop Optimizations */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1140px;
+            }
+            
+            .card {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            }
+        }
+        
+        /* Ultra-wide screen support */
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1320px;
             }
         }
     </style>

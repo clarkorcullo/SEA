@@ -462,14 +462,14 @@ def create_fallback_modules():
     """
     modules_data = [
         {
-            'name': 'What is Social Engineering',
+            'name': 'Understanding Social Engineering Fundamentals',
             'description': 'Understanding the basics of social engineering attacks and human psychology',
             'content': 'Social engineering is a manipulation technique that exploits human error to gain private information...',
             'order': 1,
             'has_simulation': False
         },
         {
-            'name': 'Phishing: The Digital Net',
+            'name': 'Recognizing Common Attack Vectors',
             'description': 'Recognize, detect, and defend against phishing across email, SMS, and calls',
             'content': 'Phishing is a type of social engineering that impersonates trusted entities to steal information...',
             'order': 2,
@@ -477,7 +477,7 @@ def create_fallback_modules():
             'simulation_type': 'phishing'
         },
         {
-            'name': 'Fortifying Your Accounts',
+            'name': 'Proactive Digital Defense Strategies',
             'description': 'Understanding password security and authentication methods',
             'content': 'Password security involves creating strong passwords and using multi-factor authentication...',
             'order': 3,
@@ -485,7 +485,7 @@ def create_fallback_modules():
             'simulation_type': 'pretexting'
         },
         {
-            'name': 'Immediate Action After a Suspected Attack',
+            'name': 'Incident Response & Reporting',
             'description': 'Learn immediate response steps when you suspect a social engineering attack',
             'content': 'When you suspect a social engineering attack, immediate action is crucial to minimize damage...',
             'order': 4,
@@ -493,7 +493,7 @@ def create_fallback_modules():
             'simulation_type': 'baiting'
         },
         {
-            'name': 'The Evolving Threat Landscape',
+            'name': 'Advanced SE & Continuous Awareness',
             'description': 'Understanding emerging social engineering threats and future trends',
             'content': 'Social engineering threats continue to evolve with technology and social changes...',
             'order': 5,
@@ -1114,7 +1114,7 @@ def register():
             specialization = request.form.get('specialization', '')
             year_level = request.form.get('year_level', '')
             
-            # Set default full name (can be updated in profile later)
+            # Set default full name (users must update this in profile for certificate generation)
             full_name = f"User {username}"
             
             # Validate required fields
@@ -1415,6 +1415,23 @@ def dashboard():
         completed_module_ids = user_service.get_user_completed_modules(current_user.id)
         completed_modules = len(completed_module_ids)
         
+        # Get detailed progress for each module
+        module_progress_data = {}
+        for module in modules:
+            progress = UserProgress.get_module_progress(current_user.id, module.id)
+            if progress:
+                module_progress_data[module.id] = {
+                    'status': progress.status,
+                    'score': progress.score,
+                    'is_completed': progress.is_completed
+                }
+            else:
+                module_progress_data[module.id] = {
+                    'status': 'not_started',
+                    'score': 0,
+                    'is_completed': False
+                }
+        
         # Get final assessment result
         final_result = AssessmentResult.query.filter_by(
             user_id=current_user.id, 
@@ -1518,13 +1535,32 @@ def dashboard():
             reverse=True
         )[:5]
         
-        # Calculate average score from assessment results
-        assessment_results = AssessmentResult.query.filter_by(user_id=current_user.id).all()
-        if assessment_results:
-            total_score = sum(result.score for result in assessment_results)
-            total_questions = sum(result.total_questions for result in assessment_results)
-            average_score = int((total_score / total_questions) * 100) if total_questions and total_questions > 0 else 0
-        else:
+        # Calculate average score from best scores per module (not all attempts)
+        average_score = 0
+        try:
+            # Get best score from each module (1-5 only, exclude Final Assessment)
+            total_best_scores = 0
+            modules_with_scores = 0
+            
+            for module_id in range(1, 6):  # Modules 1-5
+                module_assessments = AssessmentResult.query.filter_by(
+                    user_id=current_user.id,
+                    module_id=module_id
+                ).all()
+                
+                if module_assessments:
+                    # Get the highest score for this module
+                    highest_score = max(assessment.score for assessment in module_assessments)
+                    total_best_scores += highest_score
+                    modules_with_scores += 1
+            
+            if modules_with_scores > 0:
+                # Calculate average as percentage of total possible points
+                # Each module typically has 5 questions, so total possible = modules_with_scores * 5
+                total_possible = modules_with_scores * 5
+                average_score = int((total_best_scores / total_possible) * 100) if total_possible > 0 else 0
+        except Exception as e:
+            logger.error(f"Error calculating average score: {e}")
             average_score = 0
         
         # Calculate total time spent using real tracked minutes; fall back safely
@@ -1556,6 +1592,7 @@ def dashboard():
                              modules=safe_modules,
                              completed_modules=completed_modules,
                              completed_module_ids=completed_module_ids,
+                             module_progress_data=module_progress_data,
                              total_modules=total_modules,
                              final_result=final_result,
                              survey_completed=survey_completed,
@@ -1629,32 +1666,60 @@ def module(module_id):
         # Get user progress for this module
         progress = UserProgress.get_module_progress(current_user.id, module_id)
         if not progress:
+            # Create new progress record and mark as started
             progress = UserProgress(
                 user_id=current_user.id,
                 module_id=module_id,
                 status='not_started'
             )
             progress.save()
+            # Mark as in_progress when user starts the module
+            progress.start_progress()
+        elif progress.status == 'not_started':
+            # Update existing not_started progress to in_progress
+            progress.start_progress()
         
-        # Get knowledge check score for this module
-        knowledge_check_result = AssessmentResult.query.filter_by(
-            user_id=current_user.id,
-            module_id=module_id,
-            assessment_type='knowledge_check'
-        ).order_by(AssessmentResult.created_at.desc()).first()
-        
-        # Calculate percentage score
-        if knowledge_check_result and knowledge_check_result.total_questions and knowledge_check_result.total_questions > 0:
-            knowledge_check_score = int((knowledge_check_result.score / knowledge_check_result.total_questions) * 100)
+        # Get assessment score for this module (knowledge_check for modules 1-5, final_assessment for module 6)
+        # POLICY: "Pass Once, Always Complete" - Show highest score achieved, not latest score
+        # Once a learner passes (≥80%), they maintain "Completed" status and see their best score
+        # even if they retake and get a lower score
+        if module_id == 6:
+            # Final Assessment (stored with module_id=None)
+            assessment_results = AssessmentResult.query.filter_by(
+                user_id=current_user.id,
+                module_id=None,
+                assessment_type='final_assessment'
+            ).all()
         else:
-            knowledge_check_score = 0
+            # Knowledge Check for modules 1-5
+            assessment_results = AssessmentResult.query.filter_by(
+                user_id=current_user.id,
+                module_id=module_id,
+                assessment_type='knowledge_check'
+            ).all()
+        
+        # Calculate highest percentage score achieved (POLICY: Show best score, not latest)
+        knowledge_check_score = 0
+        if assessment_results:
+            highest_percentage = 0
+            for result in assessment_results:
+                if result.total_questions and result.total_questions > 0:
+                    percentage = int((result.score / result.total_questions) * 100)
+                    if percentage > highest_percentage:
+                        highest_percentage = percentage
+            knowledge_check_score = highest_percentage
 
         # Reconcile progress status with policy: mark Completed at ≥80% and never downgrade
         try:
             passing_threshold = app.config.get('KNOWLEDGE_CHECK_PASSING_SCORE', 80)
-            if progress and knowledge_check_score >= passing_threshold and progress.status != 'completed':
-                # Use model helper to persist the completion state safely
-                progress.complete_progress(knowledge_check_score)
+            if progress and knowledge_check_score >= passing_threshold:
+                # POLICY: Once completed, always stay completed with highest score
+                if progress.status != 'completed':
+                    # Mark as completed for the first time
+                    progress.complete_progress(int(knowledge_check_score))
+                else:
+                    # Already completed - update to highest score but keep completed status
+                    progress.update_score(int(knowledge_check_score))
         except Exception as _e:
             logger.warning(f"Could not reconcile module progress for user {current_user.id} module {module_id}: {_e}")
         
@@ -1703,6 +1768,22 @@ def assessment(module_id):
             if not previous_module_completed:
                 flash('You must complete the previous module first.', 'warning')
                 return redirect(url_for('dashboard'))
+        
+        # Update module progress status when user starts assessment
+        progress = UserProgress.get_module_progress(current_user.id, module_id)
+        if not progress:
+            # Create new progress record and mark as started
+            progress = UserProgress(
+                user_id=current_user.id,
+                module_id=module_id,
+                status='not_started'
+            )
+            progress.save()
+            # Mark as in_progress when user starts the assessment
+            progress.start_progress()
+        elif progress.status == 'not_started':
+            # Update existing not_started progress to in_progress
+            progress.start_progress()
         
         # Get questions for this module with retake logic
         # Check if user has previous attempts to determine question set
@@ -1896,8 +1977,12 @@ def submit_assessment(module_id):
             # Update module progress with "Pass Once, Always Complete" rule
             progress = UserProgress.get_module_progress(current_user.id, module_id)
             if progress:
-                # Use the new update_score method that implements the rule
-                progress.update_score(percentage)
+                if passed:
+                    # Mark as completed if passed (≥80%)
+                    progress.complete_progress(int(percentage))
+                else:
+                    # Update score but don't mark as completed if failed
+                    progress.update_score(int(percentage))
             else:
                 # Create new progress record
                 progress = UserProgress(
@@ -1906,7 +1991,12 @@ def submit_assessment(module_id):
                     status='in_progress'
                 )
                 progress.save()
-                progress.update_score(percentage)
+                if passed:
+                    # Mark as completed if passed (≥80%)
+                    progress.complete_progress(int(percentage))
+                else:
+                    # Update score but don't mark as completed if failed
+                    progress.update_score(int(percentage))
             
             flash(f'Assessment completed! Score: {percentage}%', 'success' if passed else 'warning')
             logger.info(f"User {current_user.username} completed assessment for module {module_id} with score {percentage}%")
@@ -1956,17 +2046,18 @@ def final_assessment():
     try:
         # Check if user has completed all modules (admins bypass for review)
         completed_modules = len(user_service.get_user_completed_modules(current_user.id))
-        total_modules = Module.count()
+        # Only count modules 1-5 for final assessment eligibility (exclude Final Assessment itself)
+        total_modules = 5
         
         if not getattr(current_user, 'is_admin', False):
             if completed_modules < total_modules:
-                flash('You must complete all modules before taking the Final Assessment.', 'warning')
+                flash('You must complete all 5 modules before taking the Final Assessment.', 'warning')
                 return redirect(url_for('dashboard'))
         else:
             # For admins, present as fully completed to unlock UI state
             completed_modules = total_modules
         
-        # Check if user has already passed (allow retakes for better scores)
+        # Check if user has already passed (no retakes allowed - redirect to results)
         existing_result = AssessmentResult.query.filter_by(
             user_id=current_user.id, 
             assessment_type='final_assessment',
@@ -1974,7 +2065,9 @@ def final_assessment():
         ).first()
         
         if existing_result:
-            flash('You have already passed the Final Assessment! You can retake for a better score.', 'info')
+            flash('You have already passed the Final Assessment! Here are your results.', 'info')
+            # Redirect to results page instead of allowing retake
+            return redirect(url_for('final_assessment_result', result_id=existing_result.id))
         
         return render_template('final_assessment_simple.html',
                                completed_modules=completed_modules,
@@ -1995,6 +2088,17 @@ def final_assessment_questions():
         str: Rendered final assessment questions template
     """
     try:
+        # Check if user has already passed (no retakes allowed)
+        existing_result = AssessmentResult.query.filter_by(
+            user_id=current_user.id, 
+            assessment_type='final_assessment',
+            passed=True
+        ).first()
+        
+        if existing_result:
+            flash('You have already passed the Final Assessment! Here are your results.', 'info')
+            return redirect(url_for('final_assessment_result', result_id=existing_result.id))
+        
         # Get final assessment questions — policy: show 25 questions per attempt
         # Load all questions for the chosen set, then sample 25 consistently with utils
         questions_all = FinalAssessmentQuestion.query.all()
@@ -2004,12 +2108,96 @@ def final_assessment_questions():
         import random
         random.shuffle(questions_all)
         questions = questions_all[:25]
+        
+        # Create question IDs list for form submission
+        question_ids = [q.id for q in questions]
+        question_ids_str = ','.join(map(str, question_ids))
+        
         # Render 25 questions per policy
-        return render_template('final_assessment_questions.html', questions=questions)
+        return render_template('final_assessment_questions.html', 
+                             questions=questions,
+                             question_ids=question_ids_str)
         
     except Exception as e:
         flash(f'Error loading final assessment questions: {e}', 'error')
         logger.error(f"Error loading final assessment questions: {e}")
+        return redirect(url_for('dashboard'))
+
+@app.route('/final_assessment_result/<int:result_id>')
+@login_required
+def final_assessment_result(result_id):
+    """
+    Display existing final assessment result.
+    
+    Args:
+        result_id (int): ID of the assessment result to display
+        
+    Returns:
+        str: Rendered result template or redirect
+    """
+    try:
+        # Get the assessment result
+        result = AssessmentResult.query.filter_by(
+            id=result_id,
+            user_id=current_user.id,
+            assessment_type='final_assessment'
+        ).first()
+        
+        if not result:
+            flash('Assessment result not found.', 'error')
+            return redirect(url_for('dashboard'))
+        
+        # Calculate percentage
+        percentage = (result.score / result.total_questions * 100) if result.total_questions > 0 else 0
+        
+        # For existing results, we need to recreate the detailed_results
+        # Since we don't store the original questions and answers, we'll show a simplified view
+        detailed_results = []
+        
+        # Try to get questions from the database (this might not match exactly due to randomization)
+        questions_all = FinalAssessmentQuestion.query.all()
+        if questions_all:
+            # Sample 25 questions (same logic as original assessment)
+            import random
+            random.shuffle(questions_all)
+            questions = questions_all[:25]
+            
+            # Create mock detailed results (we don't have the exact original questions/answers)
+            for i in range(result.total_questions):
+                detailed_results.append({
+                    'question_text': f'Question {i+1} (from your original assessment)',
+                    'user_answer': 'A',  # We don't store individual answers
+                    'correct_answer': 'A',  # We don't store individual answers
+                    'explanation': 'Individual question details are not available for past assessments.',
+                    'is_correct': True  # We don't have this data
+                })
+        
+        certificate_data = {
+            'student_name': getattr(current_user, 'full_name', None) or getattr(current_user, 'username', 'Student'),
+            'username': getattr(current_user, 'username', 'student'),
+            'specialization': getattr(current_user, 'specialization', None) or '—',
+            'year_level': getattr(current_user, 'year_level', None) or '—',
+            'completion_date': result.created_at.strftime('%B %d, %Y, %I:%M %p') if result.created_at else 'Unknown',
+            'modules_completed': 5,  # Assuming all modules completed for final assessment
+            'score': percentage,
+            'certificate_id': f"MMDCSEA-{result.created_at.strftime('%m%d%Y')}{str(result.user_id).zfill(7)}" if result.created_at else 'Unknown'
+        }
+        
+        return render_template('final_assessment_result.html',
+                               score=result.score,
+                               total_questions=result.total_questions,
+                               correct_answers=result.score,
+                               percentage=percentage,
+                               passed=result.passed,
+                               detailed_results=detailed_results,
+                               questions=[],
+                               answers={},
+                               is_existing_result=True,
+                               certificate=certificate_data)
+        
+    except Exception as e:
+        flash(f'Error loading assessment result: {e}', 'error')
+        logger.error(f"Error loading assessment result: {e}")
         return redirect(url_for('dashboard'))
 
 @app.route('/submit_final_assessment', methods=['POST'])
@@ -2053,12 +2241,23 @@ def submit_final_assessment():
         correct_answers = 0
         total_questions = len(questions)
         
+        detailed_results = []
         for question in questions:
             answer = request.form.get(f'question_{question.id}')
             answers[question.id] = answer
             
-            if answer == question.correct_answer:
+            is_correct = (answer == question.correct_answer)
+            if is_correct:
                 correct_answers += 1
+            
+            # Build question-level feedback for review
+            detailed_results.append({
+                'question_text': getattr(question, 'question_text', ''),
+                'user_answer': (answer or ''),
+                'correct_answer': getattr(question, 'correct_answer', ''),
+                'explanation': getattr(question, 'explanation', ''),
+                'is_correct': is_correct
+            })
         
         # Calculate score
         score = correct_answers
@@ -2072,14 +2271,33 @@ def submit_final_assessment():
             user_id=current_user.id,
             module_id=None,  # Final assessment is not tied to a specific module
             assessment_type='final_assessment',
-            score=score,
+            score=correct_answers,
             total_questions=total_questions,
             correct_answers=correct_answers,
             passed=passed
         )
         
         if result.save():
-            flash(f'Final Assessment completed! Score: {percentage}%', 'success' if passed else 'warning')
+            # Update Final Assessment progress (Module 6)
+            progress = UserProgress.get_module_progress(current_user.id, 6)  # Module 6 is Final Assessment
+            if not progress:
+                # Create new progress record for Final Assessment
+                progress = UserProgress(
+                    user_id=current_user.id,
+                    module_id=6,  # Final Assessment is Module 6
+                    status='in_progress'
+                )
+                progress.save()
+            
+            if passed:
+                # Mark as completed with passing score
+                progress.complete_progress(int(percentage))
+                flash(f'🎉 Congratulations! You passed the Final Assessment with {percentage}%! You are now eligible for your certificate.', 'success')
+            else:
+                # Update score but don't mark as completed (failed)
+                progress.update_score(int(percentage))
+                flash(f'Assessment completed with {percentage}%. You need 80% or higher to pass. You can retake the assessment for a better score.', 'warning')
+            
             logger.info(f"User {current_user.username} completed final assessment with score {percentage}%")
             
             return render_template('final_assessment_result.html',
@@ -2088,7 +2306,7 @@ def submit_final_assessment():
                                      correct_answers=correct_answers,
                                      percentage=percentage,
                                      passed=passed,
-                                     detailed_results=[],
+                                     detailed_results=detailed_results,
                                      questions=questions,
                                      answers=answers)
         else:
@@ -2248,10 +2466,24 @@ def certificate():
             full_name = (getattr(current_user, 'full_name', None) or '').strip()
         except Exception:
             full_name = ''
+        
         def _is_valid_full_name(name: str) -> bool:
-            return bool(name) and (' ' in name) and (len(name) >= 5)
+            """Validate that the full name is properly formatted for certificate generation"""
+            if not name or len(name) < 2:
+                return False
+            # Check if it's not just the default "User username" format
+            if name.startswith('User '):
+                return False
+            # Check if it contains at least first and last name (space required)
+            if ' ' not in name:
+                return False
+            # Check minimum length for a proper name
+            if len(name) < 5:
+                return False
+            return True
+        
         if not is_admin and not _is_valid_full_name(full_name):
-            flash('Please complete your full name in your Profile before generating a certificate.', 'warning')
+            flash('Please update your full name in your Profile section before generating a certificate. Your certificate will display your real name instead of your username.', 'warning')
             return redirect(url_for('profile'))
 
         # Check eligibility only for non-admins
@@ -2286,8 +2518,11 @@ def certificate():
         except Exception:
             avg_score = 0
 
+        # Use real name for certificate (already validated above)
+        display_name = full_name if _is_valid_full_name(full_name) else getattr(current_user, 'username', 'Student')
+
         certificate_data = {
-            'student_name': getattr(current_user, 'full_name', None) or getattr(current_user, 'username', 'Student'),
+            'student_name': display_name,
             'username': getattr(current_user, 'username', 'student'),
             'specialization': getattr(current_user, 'specialization', None) or '—',
             'year_level': getattr(current_user, 'year_level', None) or '—',
@@ -2404,7 +2639,7 @@ def submit_simulation():
 # 10.7 PROGRESS AND ANALYTICS ROUTES
 # =============================================================================
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
     """
@@ -2412,7 +2647,9 @@ def profile():
     
     Features:
     - Profile information display
-    - Edit capabilities
+    - Edit capabilities (full name, birthday, address)
+    - Password change functionality
+    - Profile picture upload
     - Progress overview
     - Achievement tracking
     
@@ -2420,11 +2657,170 @@ def profile():
         str: Rendered profile template
     """
     try:
+        if request.method == 'POST':
+            # Handle profile update
+            if request.form.get('update_profile'):
+                return handle_profile_update()
+            # Handle password change
+            elif request.form.get('change_password'):
+                return handle_password_change()
+        
         return render_template('profile.html', user=current_user)
+        
     except Exception as e:
         flash(f'Error loading profile: {e}', 'error')
         logger.error(f"Error loading profile: {e}")
         return redirect(url_for('dashboard'))
+
+def handle_profile_update():
+    """Handle profile information update"""
+    try:
+        errors = {}
+        form_data = {}
+        
+        # Get form data
+        full_name = request.form.get('full_name', '').strip()
+        birthday = request.form.get('birthday', '').strip()
+        address = request.form.get('address', '').strip()
+        
+        # Validate full name (required)
+        if not full_name:
+            errors['full_name'] = 'Full name is required for certificate generation.'
+        elif len(full_name) < 2:
+            errors['full_name'] = 'Full name must be at least 2 characters long.'
+        elif len(full_name) > 100:
+            errors['full_name'] = 'Full name must be less than 100 characters.'
+        
+        # Validate birthday (optional)
+        if birthday:
+            try:
+                from datetime import datetime
+                datetime.strptime(birthday, '%Y-%m-%d')
+            except ValueError:
+                errors['birthday'] = 'Please enter a valid date.'
+        
+        # Validate address (optional)
+        if address and len(address) > 200:
+            errors['address'] = 'Address must be less than 200 characters.'
+        
+        # Handle profile picture upload
+        profile_picture = None
+        if 'profile_picture' in request.files:
+            file = request.files['profile_picture']
+            if file and file.filename:
+                # Validate file type
+                allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+                if '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in allowed_extensions:
+                    # Generate unique filename
+                    import uuid
+                    filename = f"{current_user.username}_{uuid.uuid4().hex[:8]}.{file.filename.rsplit('.', 1)[1].lower()}"
+                    
+                    # Save file
+                    import os
+                    upload_folder = os.path.join(app.static_folder, 'profile_pictures')
+                    os.makedirs(upload_folder, exist_ok=True)
+                    file_path = os.path.join(upload_folder, filename)
+                    file.save(file_path)
+                    profile_picture = filename
+                else:
+                    errors['profile_picture'] = 'Please upload a valid image file (PNG, JPG, JPEG, GIF, WEBP).'
+        
+        # If there are errors, return to form with errors
+        if errors:
+            form_data = {
+                'full_name': full_name,
+                'birthday': birthday,
+                'address': address
+            }
+            return render_template('profile.html', user=current_user, errors=errors, form_data=form_data)
+        
+        # Update user profile
+        user = current_user
+        user.full_name = full_name
+        if birthday:
+            from datetime import datetime
+            user.birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
+        else:
+            user.birthday = None
+        user.address = address if address else None
+        
+        if profile_picture:
+            user.profile_picture = profile_picture
+        
+        if user.save():
+            flash('Profile updated successfully!', 'success')
+            logger.info(f"Profile updated for user {user.username}")
+        else:
+            flash('Error updating profile. Please try again.', 'error')
+        
+        return redirect(url_for('profile'))
+        
+    except Exception as e:
+        flash(f'Error updating profile: {e}', 'error')
+        logger.error(f"Error updating profile for user {current_user.username}: {e}")
+        return redirect(url_for('profile'))
+
+def handle_password_change():
+    """Handle password change"""
+    try:
+        errors = {}
+        form_data = {}
+        
+        # Get form data
+        old_password = request.form.get('old_password', '')
+        new_password = request.form.get('new_password', '')
+        confirm_new_password = request.form.get('confirm_new_password', '')
+        
+        # Validate old password
+        if not old_password:
+            errors['old_password'] = 'Current password is required.'
+        elif not current_user.check_password(old_password):
+            errors['old_password'] = 'Current password is incorrect.'
+        
+        # Validate new password
+        if not new_password:
+            errors['new_password'] = 'New password is required.'
+        elif len(new_password) < 12:
+            errors['new_password'] = 'Password must be at least 12 characters long.'
+        elif not any(c.isupper() for c in new_password):
+            errors['new_password'] = 'Password must contain at least one uppercase letter.'
+        elif not any(c.islower() for c in new_password):
+            errors['new_password'] = 'Password must contain at least one lowercase letter.'
+        elif not any(c.isdigit() for c in new_password):
+            errors['new_password'] = 'Password must contain at least one number.'
+        elif not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in new_password):
+            errors['new_password'] = 'Password must contain at least one special character.'
+        
+        # Validate password confirmation
+        if not confirm_new_password:
+            errors['confirm_new_password'] = 'Please confirm your new password.'
+        elif new_password != confirm_new_password:
+            errors['confirm_new_password'] = 'Passwords do not match.'
+        
+        # If there are errors, return to form with errors
+        if errors:
+            form_data = {
+                'new_password': new_password,
+                'confirm_new_password': confirm_new_password
+            }
+            return render_template('profile.html', user=current_user, errors=errors, form_data=form_data)
+        
+        # Update password
+        user = current_user
+        user.set_password(new_password)
+        
+        if user.save():
+            flash('Password changed successfully!', 'success')
+            logger.info(f"Password changed for user {user.username}")
+        else:
+            flash('Error changing password. Please try again.', 'error')
+        
+        return redirect(url_for('profile'))
+        
+    except Exception as e:
+        flash(f'Error changing password: {e}', 'error')
+        logger.error(f"Error changing password for user {current_user.username}: {e}")
+        return redirect(url_for('profile'))
 
 @app.route('/update_progress', methods=['POST'])
 @login_required
@@ -2650,7 +3046,17 @@ def admin_dashboard():
         total_users = User.count()
         total_modules = Module.query.filter(Module.id <= 6).count()  # Count all modules including Final Assessment
         total_assessments = AssessmentResult.count()
-        total_simulations = SimulationResult.count()
+        
+        # Calculate simulations based on completed modules with simulations
+        modules_with_sims = Module.query.filter_by(has_simulation=True).all()
+        completed_simulations = 0
+        for module in modules_with_sims:
+            completed_count = UserProgress.query.filter_by(
+                module_id=module.id, 
+                status='completed'
+            ).count()
+            completed_simulations += completed_count
+        total_simulations = completed_simulations
         
         # Get recent activity
         recent_users = User.query.order_by(User.created_at.desc()).limit(10).all()
@@ -2842,49 +3248,310 @@ def admin_modules():
 @login_required
 @admin_required
 def admin_analytics():
-    """Analytics and reporting page"""
+    """Analytics and reporting page with comprehensive data"""
     try:
-        # Get basic system statistics
-        total_users = User.count()
-        total_modules = Module.count()
-        total_assessments = AssessmentResult.count()
-        total_simulations = SimulationResult.count()
+        # Import AnalyticsService
+        from business_services.analytics_service import AnalyticsService
         
-        # Create basic system stats
-        system_stats = {
-            'total_users': total_users,
-            'total_modules': total_modules,
-            'total_assessments': total_assessments,
-            'total_simulations': total_simulations
-        }
+        # Sync user progress counters before getting analytics
+        users = User.query.all()
+        for user in users:
+            user.sync_progress_counters()
         
-        # Create basic user performance data
-        user_performance = {
-            'completion_distribution': {
-                'completed_all': 0,
-                'completed_half': 0,
-                'started': 0,
-                'not_started': 0
-            },
-            'average_scores': {
-                'knowledge_check': 0,
-                'final_assessment': 0,
-                'simulation': 0
-            }
-        }
+        # Get comprehensive system overview
+        system_overview = AnalyticsService.get_system_overview()
         
-        # Create basic module analytics
+        # Get user performance analytics
+        user_performance = AnalyticsService.get_user_performance_analytics()
+        
+        # Get module analytics
+        module_analytics_list = AnalyticsService.get_module_analytics()
+        
+        # Convert module analytics list to dict for template compatibility
         module_analytics = {}
+        for module_data in module_analytics_list:
+            module_id = module_data['module_id']
+            module_analytics[module_id] = {
+                'completion_rate': module_data['module_stats']['completion_rate'],
+                'average_score': module_data['module_stats']['average_score'],
+                'completed_users': module_data['module_stats'].get('completed_attempts', 0),
+                'total_attempts': module_data['module_stats'].get('total_attempts', 0),
+                'module_name': module_data['module_name'],
+                'module_order': module_data['module_order']
+            }
+        
+        # Get assessment analytics
+        assessment_analytics = AnalyticsService.get_assessment_analytics()
+        
+        # Get simulation analytics
+        simulation_analytics = AnalyticsService.get_simulation_analytics()
+        
+        # Get trend analytics (last 30 days)
+        trend_analytics = AnalyticsService.get_trend_analytics(days=30)
+        
+        # Get feedback analytics
+        feedback_analytics = AnalyticsService.get_feedback_analytics()
+        
+        # Create system stats for template compatibility
+        system_stats = {
+            'total_users': system_overview.get('users', {}).get('total_users', 0),
+            'total_modules': system_overview.get('modules', {}).get('total_modules', 0),
+            'total_assessments': system_overview.get('assessments', {}).get('total_assessments', 0),
+            'total_simulations': system_overview.get('simulations', {}).get('completed_simulations', 0),
+            'active_users': system_overview.get('users', {}).get('active_users', 0),
+            'active_percentage': system_overview.get('users', {}).get('active_percentage', 0),
+            'completion_rate': system_overview.get('progress', {}).get('completion_rate', 0),
+            'pass_rate': system_overview.get('assessments', {}).get('pass_rate', 0)
+        }
+        
+        # Enhance user performance data
+        enhanced_user_performance = {
+            'completion_distribution': user_performance.get('completion_distribution', {}),
+            'average_scores': user_performance.get('average_scores', {}),
+            'performance_distribution': user_performance.get('performance_distribution', {}),
+            'total_users': user_performance.get('total_users', 0)
+        }
+        
+        logger.info(f"Analytics loaded: {system_stats['total_users']} users, {system_stats['total_assessments']} assessments")
         
         return render_template('admin/analytics.html',
                              system_stats=system_stats,
-                             user_performance=user_performance,
-                             module_analytics=module_analytics)
+                             user_performance=enhanced_user_performance,
+                             module_analytics=module_analytics,
+                             assessment_analytics=assessment_analytics,
+                             simulation_analytics=simulation_analytics,
+                             trend_analytics=trend_analytics,
+                             feedback_analytics=feedback_analytics,
+                             system_overview=system_overview)
         
     except Exception as e:
         flash(f'Error loading analytics: {e}', 'error')
         logger.error(f"Error loading analytics: {e}")
         return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/export/user-report')
+@login_required
+@admin_required
+def export_user_report():
+    """Export user report as CSV"""
+    try:
+        import csv
+        import io
+        from flask import make_response
+        
+        # Get all users with their progress data
+        users = User.query.all()
+        
+        # Create CSV in memory
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Write header
+        writer.writerow([
+            'User ID', 'Username', 'Full Name', 'Email', 'Specialization', 
+            'Year Level', 'Modules Completed', 'Total Score', 'Simulations Completed',
+            'Completion Percentage', 'Registration Date'
+        ])
+        
+        # Write user data
+        for user in users:
+            writer.writerow([
+                user.id, user.username, user.full_name, user.email,
+                user.specialization, user.year_level, user.modules_completed,
+                user.total_score, user.simulations_completed,
+                f"{user.completion_percentage:.1f}%",
+                user.created_at.strftime('%Y-%m-%d')
+            ])
+        
+        # Create response
+        response = make_response(output.getvalue())
+        response.headers['Content-Type'] = 'text/csv'
+        response.headers['Content-Disposition'] = 'attachment; filename=user_report.csv'
+        
+        logger.info(f"User report exported: {len(users)} users")
+        return response
+        
+    except Exception as e:
+        flash(f'Error exporting user report: {e}', 'error')
+        logger.error(f"Error exporting user report: {e}")
+        return redirect(url_for('admin_analytics'))
+
+@app.route('/admin/export/performance-report')
+@login_required
+@admin_required
+def export_performance_report():
+    """Export performance report as CSV"""
+    try:
+        import csv
+        import io
+        from flask import make_response
+        
+        # Get performance analytics
+        from business_services.analytics_service import AnalyticsService
+        user_performance = AnalyticsService.get_user_performance_analytics()
+        assessment_analytics = AnalyticsService.get_assessment_analytics()
+        simulation_analytics = AnalyticsService.get_simulation_analytics()
+        
+        # Create CSV in memory
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Write header
+        writer.writerow(['Metric', 'Value', 'Details'])
+        
+        # Write performance data
+        writer.writerow(['Total Users', user_performance.get('total_users', 0), ''])
+        writer.writerow(['Completion Distribution - All', user_performance.get('completion_distribution', {}).get('completed_all', 0), ''])
+        writer.writerow(['Completion Distribution - Half', user_performance.get('completion_distribution', {}).get('completed_half', 0), ''])
+        writer.writerow(['Completion Distribution - Some', user_performance.get('completion_distribution', {}).get('completed_some', 0), ''])
+        writer.writerow(['Completion Distribution - None', user_performance.get('completion_distribution', {}).get('not_started', 0), ''])
+        
+        # Write assessment data
+        for assessment_type, data in assessment_analytics.items():
+            writer.writerow([f'Assessment - {assessment_type}', data.get('pass_rate', 0), f"Pass Rate: {data.get('pass_rate', 0):.1f}%"])
+            writer.writerow([f'Assessment - {assessment_type}', data.get('average_score', 0), f"Average Score: {data.get('average_score', 0):.1f}%"])
+        
+        # Write simulation data
+        for simulation_type, data in simulation_analytics.items():
+            writer.writerow([f'Simulation - {simulation_type}', data.get('completion_rate', 0), f"Completion Rate: {data.get('completion_rate', 0):.1f}%"])
+            writer.writerow([f'Simulation - {simulation_type}', data.get('average_score', 0), f"Average Score: {data.get('average_score', 0):.1f}%"])
+        
+        # Create response
+        response = make_response(output.getvalue())
+        response.headers['Content-Type'] = 'text/csv'
+        response.headers['Content-Disposition'] = 'attachment; filename=performance_report.csv'
+        
+        logger.info("Performance report exported")
+        return response
+        
+    except Exception as e:
+        flash(f'Error exporting performance report: {e}', 'error')
+        logger.error(f"Error exporting performance report: {e}")
+        return redirect(url_for('admin_analytics'))
+
+@app.route('/admin/export/module-report')
+@login_required
+@admin_required
+def export_module_report():
+    """Export module report as CSV"""
+    try:
+        import csv
+        import io
+        from flask import make_response
+        
+        # Get module analytics
+        from business_services.analytics_service import AnalyticsService
+        module_analytics_list = AnalyticsService.get_module_analytics()
+        
+        # Create CSV in memory
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Write header
+        writer.writerow(['Module ID', 'Module Name', 'Order', 'Completion Rate', 'Average Score', 'Total Attempts', 'Completed Users'])
+        
+        # Write module data
+        for module_data in module_analytics_list:
+            module_stats = module_data.get('module_stats', {})
+            writer.writerow([
+                module_data.get('module_id', ''),
+                module_data.get('module_name', ''),
+                module_data.get('module_order', ''),
+                f"{module_stats.get('completion_rate', 0):.1f}%",
+                f"{module_stats.get('average_score', 0):.1f}%",
+                module_stats.get('total_attempts', 0),
+                module_stats.get('completed_attempts', 0)
+            ])
+        
+        # Create response
+        response = make_response(output.getvalue())
+        response.headers['Content-Type'] = 'text/csv'
+        response.headers['Content-Disposition'] = 'attachment; filename=module_report.csv'
+        
+        logger.info(f"Module report exported: {len(module_analytics_list)} modules")
+        return response
+        
+    except Exception as e:
+        flash(f'Error exporting module report: {e}', 'error')
+        logger.error(f"Error exporting module report: {e}")
+        return redirect(url_for('admin_analytics'))
+
+@app.route('/admin/export/full-report')
+@login_required
+@admin_required
+def export_full_report():
+    """Export comprehensive full report as CSV"""
+    try:
+        import csv
+        import io
+        from flask import make_response
+        from datetime import datetime
+        
+        # Get comprehensive analytics
+        from business_services.analytics_service import AnalyticsService
+        system_overview = AnalyticsService.get_system_overview()
+        user_performance = AnalyticsService.get_user_performance_analytics()
+        assessment_analytics = AnalyticsService.get_assessment_analytics()
+        simulation_analytics = AnalyticsService.get_simulation_analytics()
+        module_analytics_list = AnalyticsService.get_module_analytics()
+        feedback_analytics = AnalyticsService.get_feedback_analytics()
+        
+        # Create CSV in memory
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Write header
+        writer.writerow(['Report Type', 'Metric', 'Value', 'Details', 'Generated At'])
+        generated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Write system overview
+        writer.writerow(['System Overview', 'Total Users', system_overview.get('users', {}).get('total_users', 0), '', generated_at])
+        writer.writerow(['System Overview', 'Active Users', system_overview.get('users', {}).get('active_users', 0), '', generated_at])
+        writer.writerow(['System Overview', 'Total Modules', system_overview.get('modules', {}).get('total_modules', 0), '', generated_at])
+        writer.writerow(['System Overview', 'Total Assessments', system_overview.get('assessments', {}).get('total_assessments', 0), '', generated_at])
+        writer.writerow(['System Overview', 'Total Simulations', system_overview.get('simulations', {}).get('total_simulations', 0), '', generated_at])
+        
+        # Write user performance
+        writer.writerow(['User Performance', 'Total Users', user_performance.get('total_users', 0), '', generated_at])
+        completion_dist = user_performance.get('completion_distribution', {})
+        writer.writerow(['User Performance', 'Completed All', completion_dist.get('completed_all', 0), '', generated_at])
+        writer.writerow(['User Performance', 'Completed Half', completion_dist.get('completed_half', 0), '', generated_at])
+        writer.writerow(['User Performance', 'Completed Some', completion_dist.get('completed_some', 0), '', generated_at])
+        writer.writerow(['User Performance', 'Not Started', completion_dist.get('not_started', 0), '', generated_at])
+        
+        # Write assessment analytics
+        for assessment_type, data in assessment_analytics.items():
+            writer.writerow(['Assessment', assessment_type, data.get('total_attempts', 0), f"Pass Rate: {data.get('pass_rate', 0):.1f}%", generated_at])
+            writer.writerow(['Assessment', f"{assessment_type}_avg_score", data.get('average_score', 0), '', generated_at])
+        
+        # Write simulation analytics
+        for simulation_type, data in simulation_analytics.items():
+            writer.writerow(['Simulation', simulation_type, data.get('total_attempts', 0), f"Completion Rate: {data.get('completion_rate', 0):.1f}%", generated_at])
+            writer.writerow(['Simulation', f"{simulation_type}_avg_score", data.get('average_score', 0), '', generated_at])
+        
+        # Write module analytics
+        for module_data in module_analytics_list:
+            module_stats = module_data.get('module_stats', {})
+            writer.writerow(['Module', module_data.get('module_name', ''), module_stats.get('completion_rate', 0), f"Avg Score: {module_stats.get('average_score', 0):.1f}%", generated_at])
+        
+        # Write feedback analytics
+        if feedback_analytics.get('overall'):
+            overall = feedback_analytics['overall']
+            writer.writerow(['Feedback', 'Total Responses', overall.get('total_feedback', 0), '', generated_at])
+            writer.writerow(['Feedback', 'Average Rating', overall.get('average_rating', 0), '', generated_at])
+        
+        # Create response
+        response = make_response(output.getvalue())
+        response.headers['Content-Type'] = 'text/csv'
+        response.headers['Content-Disposition'] = 'attachment; filename=full_report.csv'
+        
+        logger.info("Full report exported")
+        return response
+        
+    except Exception as e:
+        flash(f'Error exporting full report: {e}', 'error')
+        logger.error(f"Error exporting full report: {e}")
+        return redirect(url_for('admin_analytics'))
 
 @app.route('/admin/settings')
 @login_required
@@ -3375,178 +4042,11 @@ def admin_update_module(module_id):
 # 12. ASSESSMENT ROUTES
 # =============================================================================
 
-@app.route('/assessment/start')
-@login_required
-def start_new_assessment():
-    """Start a new assessment attempt"""
-    try:
-        # Import here to avoid circular imports
-        from data_models.assessment_models import AssessmentAttempt, AssessmentSession
-        
-        # Check if user can start a new attempt (exempt admin from limits)
-        if not current_user.is_admin and not AssessmentAttempt.can_start_new_attempt(current_user.id):
-            attempts = AssessmentAttempt.get_user_attempts(current_user.id)
-            if len(attempts) >= 3:
-                flash('You have reached the maximum number of attempts (3).', 'error')
-                return redirect(url_for('final_assessment'))
-            
-            latest_attempt = attempts[0] if attempts else None
-            if latest_attempt and not latest_attempt.is_eligible_for_retake():
-                time_remaining = latest_attempt.completed_at + timedelta(hours=24) - datetime.utcnow()
-                hours = int(time_remaining.total_seconds() // 3600)
-                minutes = int((time_remaining.total_seconds() % 3600) // 60)
-                flash(f'You must wait {hours}h {minutes}m before your next attempt.', 'error')
-                return redirect(url_for('final_assessment'))
-        
-        # Create new attempt
-        attempt_number = AssessmentAttempt.get_next_attempt_number(current_user.id)
-        attempt = AssessmentAttempt(
-            user_id=current_user.id,
-            attempt_number=attempt_number
-        )
-        
-        if not attempt.save():
-            flash('Failed to create assessment attempt.', 'error')
-            return redirect(url_for('final_assessment'))
-        
-        # Get random 25 questions from the pool
-        all_questions = FinalAssessmentQuestion.query.all()
-        if len(all_questions) < 25:
-            flash('Not enough questions available for assessment.', 'error')
-            return redirect(url_for('final_assessment'))
-        
-        # Shuffle and select 25 questions
-        random_questions = random.sample(all_questions, 25)
-        question_ids = [q.id for q in random_questions]
-        
-        # Set questions for this attempt
-        attempt.set_questions_used(question_ids)
-        attempt.save()
-        
-        # Create assessment session
-        assessment_session = AssessmentSession.create_session(
-            user_id=current_user.id,
-            attempt_id=attempt.id,
-            hours=2  # 2-hour time limit
-        )
-        
-        if not assessment_session:
-            flash('Failed to create assessment session.', 'error')
-            return redirect(url_for('final_assessment'))
-        
-        # Store session token
-        session['assessment_token'] = assessment_session.session_token
-        
-        return render_template('assessment/assessment.html', 
-                             attempt=attempt, 
-                             questions=random_questions,
-                             session_token=assessment_session.session_token)
-        
-    except Exception as e:
-        logger.error(f"Error starting assessment: {e}")
-        flash('An error occurred while starting the assessment.', 'error')
-        return redirect(url_for('final_assessment'))
+# Removed incomplete /assessment/start route - Final Assessment now uses /final_assessment route
 
-@app.route('/assessment/submit', methods=['POST'])
-@login_required
-def submit_new_assessment():
-    """Submit assessment answers"""
-    try:
-        # Import here to avoid circular imports
-        from data_models.assessment_models import AssessmentAttempt, AssessmentSession
-        
-        session_token = request.form.get('session_token')
-        if not session_token:
-            flash('Invalid session.', 'error')
-            return redirect(url_for('final_assessment'))
-        
-        # Get active session
-        assessment_session = AssessmentSession.get_active_session(session_token)
-        if not assessment_session:
-            flash('Session expired or invalid.', 'error')
-            return redirect(url_for('final_assessment'))
-        
-        # Get attempt
-        attempt = AssessmentAttempt.get_by_id(assessment_session.attempt_id)
-        if not attempt:
-            flash('Assessment attempt not found.', 'error')
-            return redirect(url_for('final_assessment'))
-        
-        # Collect answers
-        answers = {}
-        question_ids = attempt.get_questions_used()
-        
-        for question_id in question_ids:
-            answer = request.form.get(f'question_{question_id}')
-            if answer:
-                answers[question_id] = answer
-        
-        # Set answers and calculate score
-        attempt.set_answers(answers)
-        score = attempt.calculate_score()
-        attempt.completed_at = datetime.utcnow()
-        attempt.save()
-        
-        # Invalidate session
-        AssessmentSession.invalidate_session(session_token)
-        session.pop('assessment_token', None)
-        
-        # Determine result message
-        if attempt.passed:
-            result_message = "Congratulations! You passed the assessment."
-            result_type = "success"
-        else:
-            result_message = f"You scored {score:.1f}%. You need 80% to pass. You can retry in 24 hours."
-            result_type = "warning"
-        
-        return render_template('assessment/result.html',
-                             attempt=attempt,
-                             score=score,
-                             passed=attempt.passed,
-                             result_message=result_message,
-                             result_type=result_type)
-        
-    except Exception as e:
-        logger.error(f"Error submitting assessment: {e}")
-        flash('An error occurred while submitting the assessment.', 'error')
-        return redirect(url_for('final_assessment'))
+# Removed incomplete /assessment/submit route - Final Assessment now uses /submit_final_assessment route
 
-@app.route('/assessment/status')
-@login_required
-def new_assessment_status():
-    """Get user's assessment status"""
-    try:
-        # Import here to avoid circular imports
-        from data_models.assessment_models import AssessmentAttempt
-        
-        attempts = AssessmentAttempt.get_user_attempts(current_user.id)
-        latest_attempt = attempts[0] if attempts else None
-        
-        can_retake = AssessmentAttempt.can_start_new_attempt(current_user.id)
-        
-        status = {
-            'total_attempts': len(attempts),
-            'max_attempts': 3,
-            'can_retake': can_retake,
-            'latest_score': latest_attempt.score if latest_attempt else None,
-            'latest_passed': latest_attempt.passed if latest_attempt else False,
-            'next_attempt_available': True
-        }
-        
-        if latest_attempt and not can_retake:
-            if len(attempts) >= 3:
-                status['next_attempt_available'] = False
-                status['reason'] = 'Maximum attempts reached'
-            else:
-                time_remaining = latest_attempt.completed_at + timedelta(hours=24) - datetime.utcnow()
-                status['next_attempt_available'] = False
-                status['reason'] = f'Wait {int(time_remaining.total_seconds() // 3600)}h {int((time_remaining.total_seconds() % 3600) // 60)}m'
-        
-        return jsonify(status)
-        
-    except Exception as e:
-        logger.error(f"Error getting assessment status: {e}")
-        return jsonify({'error': 'Failed to get assessment status'}), 500
+# Removed incomplete /assessment/status route - Final Assessment now uses standard routes
 
 # =============================================================================
 # 12. REFLECTION SUBMISSION ROUTE

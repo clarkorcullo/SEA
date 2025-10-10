@@ -173,7 +173,10 @@ class UserService:
             
             # Get assessment statistics
             assessments = AssessmentResult.get_user_assessments(user_id)
-            total_assessment_score = sum(a.score for a in assessments) if assessments else 0
+            
+            # Calculate total score as sum of highest scores from each module
+            total_assessment_score = UserService._calculate_total_score_from_best_scores(user_id)
+            
             assessment_stats = {
                 'total_assessments': len(assessments),
                 'passed_assessments': len([a for a in assessments if a.passed]),
@@ -181,12 +184,28 @@ class UserService:
                 'best_score': max(a.score for a in assessments) if assessments else 0
             }
             
-            # Get simulation statistics
-            simulations = SimulationResult.get_user_simulations(user_id)
+            # Get simulation statistics - Count completed modules with simulations
+            from data_models.content_models import Module
+            from data_models.progress_models import UserProgress
+            
+            modules_with_sims = Module.query.filter_by(has_simulation=True).all()
+            user_simulations_completed = 0
+            simulation_scores = []
+            
+            for module in modules_with_sims:
+                module_progress = UserProgress.query.filter_by(
+                    user_id=user_id, 
+                    module_id=module.id, 
+                    status='completed'
+                ).first()
+                if module_progress:
+                    user_simulations_completed += 1
+                    simulation_scores.append(module_progress.score)
+            
             simulation_stats = {
-                'total_simulations': len(simulations),
-                'completed_simulations': len([s for s in simulations if s.completed]),
-                'average_score': sum(s.score for s in simulations) / len(simulations) if simulations and len(simulations) > 0 else 0
+                'total_simulations': len(modules_with_sims),
+                'completed_simulations': user_simulations_completed,
+                'average_score': sum(simulation_scores) / len(simulation_scores) if simulation_scores else 0
             }
             
             # Combine all statistics
@@ -196,13 +215,41 @@ class UserService:
                 'simulation_statistics': simulation_stats
             }
 
-            # Ensure total_score reflects real progress even if User.total_score wasn't updated elsewhere
+            # Ensure total_score reflects real progress with highest scores only
             combined['total_score'] = int(total_assessment_score)
             return combined
             
         except Exception as e:
             print(f"Error getting user statistics: {e}")
             return None
+    
+    @staticmethod
+    def _calculate_total_score_from_best_scores(user_id: int) -> int:
+        """Calculate total score as sum of highest scores from each module"""
+        try:
+            from data_models.content_models import Module
+            
+            total_score = 0
+            modules = Module.get_all_ordered()
+            
+            for module in modules:
+                if module.id <= 5:  # Only count modules 1-5, exclude Final Assessment
+                    # Get all assessment results for this module
+                    module_assessments = AssessmentResult.query.filter_by(
+                        user_id=user_id,
+                        module_id=module.id
+                    ).all()
+                    
+                    if module_assessments:
+                        # Get the highest score for this module
+                        highest_score = max(assessment.score for assessment in module_assessments)
+                        total_score += highest_score
+            
+            return total_score
+            
+        except Exception as e:
+            print(f"Error calculating total score from best scores: {e}")
+            return 0
     
     @staticmethod
     def get_top_performers(limit: int = 10) -> List[Dict[str, Any]]:
@@ -244,44 +291,64 @@ class UserService:
     
     @staticmethod
     def is_module_fully_completed(user_id: int, module_id: int) -> bool:
-        """Check if a module is fully completed (knowledge check + simulation if available)"""
+        """
+        Check if a module is fully completed (knowledge check with 80%+ passing score)
+        
+        POLICY: "Pass Once, Always Complete" - Uses highest score achieved, not latest score.
+        Once a learner passes (≥80%), they maintain "Completed" status even if they retake
+        and get a lower score.
+        """
         try:
             from data_models.content_models import Module
+            from data_models.progress_models import AssessmentResult
             
             # Get module info
             module = Module.get_by_id(module_id)
             if not module:
                 return False
             
-            # Check if knowledge check is completed (passed with 80% or higher)
-            knowledge_check_result = AssessmentResult.query.filter_by(
-                user_id=user_id,
-                module_id=module_id,
-                assessment_type='knowledge_check'
-            ).order_by(AssessmentResult.created_at.desc()).first()
-            
-            if not knowledge_check_result:
+            # Check UserProgress table for completion status
+            progress = UserProgress.get_module_progress(user_id, module_id)
+            if not progress:
                 return False
             
-            # Calculate knowledge check percentage
-            if knowledge_check_result.total_questions and knowledge_check_result.total_questions > 0:
-                knowledge_check_percentage = (knowledge_check_result.score / knowledge_check_result.total_questions) * 100
+            # Check if module is marked as completed in UserProgress
+            # The database uses 'status' column, not 'is_completed'
+            if progress.status != 'completed':
+                return False
+            
+            # POLICY: Check highest score achieved, not current score
+            # Get all assessment results for this module to find highest score
+            if module_id == 6:
+                # Final Assessment (stored with module_id=None)
+                assessment_results = AssessmentResult.query.filter_by(
+                    user_id=user_id,
+                    module_id=None,
+                    assessment_type='final_assessment'
+                ).all()
             else:
-                knowledge_check_percentage = 0
-            if knowledge_check_percentage < 80:  # Need 80% to pass
-                return False
-            
-            # If module has simulation, check if simulation is completed
-            if module.has_simulation:
-                # Check for module-specific simulation completion
-                simulation_result = SimulationResult.query.filter_by(
+                # Knowledge Check for modules 1-5
+                assessment_results = AssessmentResult.query.filter_by(
                     user_id=user_id,
                     module_id=module_id,
-                    completed=True
-                ).first()
-                
-                if not simulation_result:
-                    return False
+                    assessment_type='knowledge_check'
+                ).all()
+            
+            # Calculate highest percentage score achieved
+            highest_percentage = 0
+            if assessment_results:
+                for result in assessment_results:
+                    if result.total_questions and result.total_questions > 0:
+                        percentage = int((result.score / result.total_questions) * 100)
+                        if percentage > highest_percentage:
+                            highest_percentage = percentage
+            
+            # Check if the highest score meets the 80% threshold
+            if highest_percentage < 80:
+                return False
+            
+            # Note: Simulations are optional - modules are considered complete with just knowledge check
+            # Users can complete simulations for extra learning, but they're not required for progression
             
             return True
             

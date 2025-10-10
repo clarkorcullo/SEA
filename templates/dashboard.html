@@ -55,6 +55,11 @@
     color: #95a5a6;
 }
 
+.status-badge.not-started {
+    background: #e9ecef;
+    color: #6c757d;
+}
+
 /* Module card improvements */
 .module-card {
     transition: all 0.3s ease;
@@ -139,7 +144,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <p class="card-text mb-3 text-dark" style="font-size: 1.1rem; line-height: 1.6;">
-                                        Welcome! This program, "Cybersecurity Awareness Program," is a project developed by students for students at Mapua Malayan Digital College.
+                                        Welcome! This program, "Social Engineering Awareness Program," is a project developed by students for students at Mapua Malayan Digital College.
                                     </p>
                                 </div>
                                 <div class="col-md-6">
@@ -179,7 +184,7 @@
                             <div class="card h-100 border-left-primary" style="border-left: 4px solid #007bff;">
                                 <div class="card-body">
                                     <h5 class="card-title text-primary">
-                                        <i class="fas fa-user-secret me-2"></i>Module 1: Social Engineering Fundamentals
+                                        <i class="fas fa-user-secret me-2"></i>Module 1: Understanding Social Engineering Fundamentals
                                     </h5>
                                     <p class="card-text text-dark">
                                         We start with the basics, defining social engineering and explaining the psychological tricks that make it so effective.
@@ -192,7 +197,7 @@
                             <div class="card h-100 border-left-info" style="border-left: 4px solid #17a2b8;">
                                 <div class="card-body">
                                     <h5 class="card-title text-info">
-                                        <i class="fas fa-fish me-2"></i>Module 2: Common Attack Vectors
+                                        <i class="fas fa-fish me-2"></i>Module 2: Recognizing Common Attack Vectors
                                     </h5>
                                     <p class="card-text text-dark">
                                         We'll show you how to spot the most common scams, like phishing, pretexting, and baiting, so you can recognize them in your daily life.
@@ -303,14 +308,14 @@
                             <tbody>
                                 <tr>
                                     <td class="text-center fw-bold text-primary">Week 1</td>
-                                    <td><strong>Module 1:</strong> Social Engineering Fundamentals</td>
+                                    <td><strong>Module 1:</strong> Understanding Social Engineering Fundamentals</td>
                                     <td>To educate students on the foundational concepts of social engineering.</td>
                                     <td><strong>Lessons:</strong> Video on what SE is, video on the psychology of deception.<br><strong>Output:</strong> A foundational understanding of human hacking.</td>
                                     <td><strong>Assessment:</strong> Pre-test survey at the start of the week.<br><strong>Flow:</strong> Proceeds to Module 2.</td>
                                 </tr>
                                 <tr>
                                     <td class="text-center fw-bold text-info">Week 2</td>
-                                    <td><strong>Module 2:</strong> Common Attack Vectors</td>
+                                    <td><strong>Module 2:</strong> Recognizing Common Attack Vectors</td>
                                     <td>To equip students with the knowledge to identify common social engineering attacks.</td>
                                     <td><strong>Lessons:</strong> Videos on phishing, pretexting, and baiting.<br><strong>Output:</strong> A checklist of red flags for phishing, and a narrative understanding of pretexting/baiting.</td>
                                     <td><strong>Assessment:</strong> Module 2 Quiz, Reflection, and Simulation.<br><strong>Flow:</strong> Proceeds to Module 3.</td>
@@ -548,7 +553,7 @@
                 <a href="{{ url_for('module', module_id=i) }}" class="text-decoration-none">
             {% endif %}
             <div class="card module-card {% if accessible_modules[i-1] %}
-                {% if i in completed_module_ids %}completed{% elif i == completed_modules + 1 %}current{% else %}locked{% endif %}
+                {% if i in completed_module_ids %}completed{% else %}current{% endif %}
             {% else %}locked{% endif %} h-100 {% if accessible_modules[i-1] %}clickable-module{% endif %}">
                 <div class="card-body d-flex flex-column p-3">
                     <!-- Header: Module number and status icon -->
@@ -589,15 +594,15 @@
                     <!-- Module title -->
                     <h6 class="card-text text-center mb-3 flex-grow-1">
                         {% if i == 1 %}
-                            What is Social Engineering
+                            Understanding Social Engineering Fundamentals
                         {% elif i == 2 %}
-                            Phishing: The Digital Net
+                            Recognizing Common Attack Vectors
                         {% elif i == 3 %}
-                            Fortifying Your Accounts
+                            Proactive Digital Defense Strategies
                         {% elif i == 4 %}
-                            Immediate Action After a Suspected Attack
+                            Incident Response & Reporting
                         {% elif i == 5 %}
-                            The Evolving Threat Landscape
+                            Advanced SE & Continuous Awareness
                         {% elif i == 6 %}
                             Final Assessment
                         {% else %}
@@ -609,17 +614,23 @@
                     <div class="d-flex justify-content-between align-items-center mt-auto">
                         <span class="status-badge 
                             {% if accessible_modules[i-1] %}
-                                {% if i in completed_module_ids %}completed
+                                {% if module_progress_data[i].is_completed %}completed
+                                {% elif module_progress_data[i].status == 'in_progress' %}current
+                                {% elif module_progress_data[i].status == 'not_started' %}not-started
                                 {% else %}current{% endif %}
                             {% else %}locked{% endif %}">
                             {% if accessible_modules[i-1] %}
-                                {% if i in completed_module_ids %}Completed
+                                {% if module_progress_data[i].is_completed %}Completed
+                                {% elif module_progress_data[i].status == 'in_progress' %}In Progress
+                                {% elif module_progress_data[i].status == 'not_started' %}Not Started
                                 {% else %}Current{% endif %}
                             {% else %}Locked{% endif %}
                         </span>
                         {% if accessible_modules[i-1] %}
                             <span class="btn btn-sm btn-primary">
-                                {% if i in completed_module_ids %}Review{% else %}Start{% endif %}
+                                {% if module_progress_data[i].is_completed %}Review
+                                {% elif module_progress_data[i].status == 'in_progress' %}Continue
+                                {% else %}Start{% endif %}
                             </span>
                         {% else %}
                             <span class="text-muted small">Complete previous modules</span>
@@ -646,7 +657,23 @@
                 <div class="card-body">
                     {# Use values provided by the backend: completed_modules, total_modules #}
 
-                    {% if completed_modules >= total_modules %}
+                    {% if final_result %}
+                        <div class="alert alert-success">
+                            <h6><i class="fas fa-trophy"></i> Final Assessment Completed!</h6>
+                            <p class="mb-2">Congratulations! You have successfully passed the Final Assessment with a score of {{ "%.1f"|format((final_result.score / final_result.total_questions * 100)) }}%.</p>
+                            <a href="{{ url_for('final_assessment_result', result_id=final_result.id) }}" class="btn btn-success">
+                                <i class="fas fa-eye"></i> View Your Results
+                            </a>
+                            {% if final_result.passed %}
+                                <a href="{{ url_for('survey') }}" class="btn btn-warning ms-2">
+                                    <i class="fas fa-clipboard-list"></i> Take Survey
+                                </a>
+                                <a href="{{ url_for('certificate') }}" class="btn btn-info ms-2">
+                                    <i class="fas fa-certificate"></i> Generate Certificate
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% elif completed_modules >= total_modules %}
                         <div class="alert alert-success">
                             <h6><i class="fas fa-check-circle"></i> Ready for Final Assessment!</h6>
                             <p class="mb-2">You have completed all modules. You can now take the Final Assessment.</p>
@@ -722,17 +749,23 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="{{ url_for('final_assessment') }}" class="btn btn-outline-primary">
-                            <i class="fas fa-graduation-cap"></i> Take Final Assessment
-                        </a>
-                        <a href="{{ url_for('simulation', simulation_type='phishing') }}" class="btn btn-outline-warning">
-                            <i class="fas fa-gamepad"></i> Start Simulation
+                        {% if final_result %}
+                            <a href="{{ url_for('final_assessment_result', result_id=final_result.id) }}" class="btn btn-outline-success">
+                                <i class="fas fa-eye"></i> View Final Assessment Results
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('final_assessment') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-graduation-cap"></i> Take Final Assessment
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('survey') }}" class="btn btn-outline-warning">
+                            <i class="fas fa-clipboard-list"></i> Take Satisfaction Survey
                         </a>
                         <a href="#" class="btn btn-outline-info">
                             <i class="fas fa-chart-bar"></i> View Analytics
                         </a>
-                        <a href="#" class="btn btn-outline-secondary">
-                            <i class="fas fa-download"></i> Download Certificate
+                        <a href="{{ url_for('certificate') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-certificate"></i> Generate Certificate
                         </a>
                     </div>
                 </div>
@@ -740,4 +773,148 @@
         </div>
     </div>
 </div>
+
+<style>
+/* Enhanced Mobile & Cross-Device Responsiveness for Dashboard */
+@media (max-width: 576px) {
+    .module-card {
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .module-title {
+        font-size: 1.1rem;
+        line-height: 1.3;
+    }
+    
+    .module-description {
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+    
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+        border-radius: 12px;
+    }
+    
+    .clickable-module {
+        transition: all 0.2s ease;
+    }
+    
+    .clickable-module:active {
+        transform: scale(0.98);
+    }
+    
+    /* Touch-friendly progress bars */
+    .progress {
+        height: 12px;
+        border-radius: 6px;
+    }
+    
+    /* Better mobile spacing */
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    /* Mobile-friendly cards */
+    .card {
+        margin-bottom: 15px;
+        border-radius: 12px;
+    }
+    
+    .card-header h5 {
+        font-size: 1rem;
+    }
+    
+    /* Mobile-friendly buttons */
+    .btn {
+        min-height: 44px;
+        font-size: 0.9rem;
+        padding: 10px 15px;
+    }
+    
+    .d-grid .btn {
+        margin-bottom: 8px;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .module-card {
+        margin-bottom: 20px;
+    }
+    
+    .module-title {
+        font-size: 1.3rem;
+    }
+    
+    .module-description {
+        font-size: 0.95rem;
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Tablet Optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .module-card {
+        margin-bottom: 25px;
+    }
+    
+    .module-title {
+        font-size: 1.4rem;
+    }
+    
+    .module-description {
+        font-size: 1rem;
+    }
+    
+    .clickable-module:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+}
+
+/* Desktop Optimizations */
+@media (min-width: 1025px) {
+    .module-card {
+        margin-bottom: 30px;
+    }
+    
+    .clickable-module:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+}
+
+/* Ultra-wide screen support */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px;
+    }
+    
+    .module-card {
+        margin-bottom: 35px;
+    }
+}
+</style>
 {% endblock %} 

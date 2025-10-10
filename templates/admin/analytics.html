@@ -138,24 +138,36 @@
                 <div class="stat-card">
                     <div class="stat-number text-primary">{{ system_stats.total_users if system_stats else 0 }}</div>
                     <div class="stat-label">Total Users</div>
+                    {% if system_stats and system_stats.active_users %}
+                    <small class="text-muted">({{ system_stats.active_users }} active)</small>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-md-3 mb-3">
                 <div class="stat-card">
                     <div class="stat-number text-success">{{ system_stats.total_modules if system_stats else 0 }}</div>
                     <div class="stat-label">Learning Modules</div>
+                    {% if system_stats and system_stats.completion_rate %}
+                    <small class="text-muted">({{ "%.1f"|format(system_stats.completion_rate) }}% completion)</small>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-md-3 mb-3">
                 <div class="stat-card">
                     <div class="stat-number text-warning">{{ system_stats.total_assessments if system_stats else 0 }}</div>
                     <div class="stat-label">Assessments Taken</div>
+                    {% if system_stats and system_stats.pass_rate %}
+                    <small class="text-muted">({{ "%.1f"|format(system_stats.pass_rate) }}% pass rate)</small>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-md-3 mb-3">
                 <div class="stat-card">
                     <div class="stat-number text-danger">{{ system_stats.total_simulations if system_stats else 0 }}</div>
                     <div class="stat-label">Simulations Completed</div>
+                    {% if simulation_analytics %}
+                    <small class="text-muted">({{ simulation_analytics|length }} types)</small>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -194,10 +206,10 @@
                         <div class="mb-2">
                             <div class="d-flex justify-content-between">
                                 <span>Started (1-2 modules)</span>
-                                <span class="badge bg-info">{{ user_performance.completion_distribution.started }}</span>
+                                <span class="badge bg-info">{{ user_performance.completion_distribution.completed_some }}</span>
                             </div>
                             <div class="progress progress-bar-custom mt-1">
-                                <div class="progress-bar bg-info" style="width: {{ (user_performance.completion_distribution.started / system_stats.total_users * 100) if system_stats and system_stats.total_users > 0 else 0 }}%"></div>
+                                <div class="progress-bar bg-info" style="width: {{ (user_performance.completion_distribution.completed_some / system_stats.total_users * 100) if system_stats and system_stats.total_users > 0 else 0 }}%"></div>
                             </div>
                         </div>
                         <div class="mb-2">
@@ -222,29 +234,29 @@
                     {% if user_performance and user_performance.average_scores %}
                         <div class="mb-3">
                             <div class="d-flex justify-content-between">
-                                <span>Knowledge Check Average</span>
-                                <span class="fw-bold">{{ "%.1f"|format(user_performance.average_scores.knowledge_check) }}%</span>
+                                <span>Assessment Average</span>
+                                <span class="fw-bold">{{ "%.1f"|format(user_performance.average_scores.assessment_score) }}%</span>
                             </div>
                             <div class="progress progress-bar-custom mt-1">
-                                <div class="progress-bar bg-primary" style="width: {{ user_performance.average_scores.knowledge_check }}%"></div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between">
-                                <span>Final Assessment Average</span>
-                                <span class="fw-bold">{{ "%.1f"|format(user_performance.average_scores.final_assessment) }}%</span>
-                            </div>
-                            <div class="progress progress-bar-custom mt-1">
-                                <div class="progress-bar bg-success" style="width: {{ user_performance.average_scores.final_assessment }}%"></div>
+                                <div class="progress-bar bg-primary" style="width: {{ user_performance.average_scores.assessment_score }}%"></div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <div class="d-flex justify-content-between">
                                 <span>Simulation Average</span>
-                                <span class="fw-bold">{{ "%.1f"|format(user_performance.average_scores.simulation) }}%</span>
+                                <span class="fw-bold">{{ "%.1f"|format(user_performance.average_scores.simulation_score) }}%</span>
                             </div>
                             <div class="progress progress-bar-custom mt-1">
-                                <div class="progress-bar bg-warning" style="width: {{ user_performance.average_scores.simulation }}%"></div>
+                                <div class="progress-bar bg-success" style="width: {{ user_performance.average_scores.simulation_score }}%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>Completion Average</span>
+                                <span class="fw-bold">{{ "%.1f"|format(user_performance.average_scores.completion_percentage) }}%</span>
+                            </div>
+                            <div class="progress progress-bar-custom mt-1">
+                                <div class="progress-bar bg-warning" style="width: {{ user_performance.average_scores.completion_percentage }}%"></div>
                             </div>
                         </div>
                     {% else %}
@@ -311,6 +323,228 @@
         </div>
     </div>
 
+    <!-- Assessment Analytics -->
+    {% if assessment_analytics %}
+    <div class="analytics-section">
+        <h4 class="section-title">
+            <i class="fas fa-clipboard-check text-primary"></i> Assessment Analytics
+        </h4>
+        <div class="row">
+            {% for assessment_type, data in assessment_analytics.items() %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="analytics-card">
+                    <h6 class="mb-3">
+                        <i class="fas fa-chart-line text-info"></i> {{ assessment_type.replace('_', ' ').title() }}
+                    </h6>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Pass Rate</span>
+                            <span class="fw-bold">{{ "%.1f"|format(data.pass_rate) }}%</span>
+                        </div>
+                        <div class="progress progress-bar-custom mt-1">
+                            <div class="progress-bar bg-success" style="width: {{ data.pass_rate }}%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Average Score</span>
+                            <span class="fw-bold">{{ "%.1f"|format(data.average_score) }}%</span>
+                        </div>
+                        <div class="progress progress-bar-custom mt-1">
+                            <div class="progress-bar bg-primary" style="width: {{ data.average_score }}%"></div>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="fw-bold text-success">{{ data.total_attempts }}</div>
+                            <div class="small text-muted">Attempts</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-bold text-primary">{{ data.passed_attempts }}</div>
+                            <div class="small text-muted">Passed</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-bold text-warning">{{ data.total_participants }}</div>
+                            <div class="small text-muted">Users</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Simulation Analytics -->
+    {% if simulation_analytics %}
+    <div class="analytics-section">
+        <h4 class="section-title">
+            <i class="fas fa-gamepad text-warning"></i> Simulation Analytics
+        </h4>
+        <div class="row">
+            {% for simulation_type, data in simulation_analytics.items() %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="analytics-card">
+                    <h6 class="mb-3">
+                        <i class="fas fa-puzzle-piece text-warning"></i> {{ simulation_type.title() }}
+                    </h6>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Completion Rate</span>
+                            <span class="fw-bold">{{ "%.1f"|format(data.completion_rate) }}%</span>
+                        </div>
+                        <div class="progress progress-bar-custom mt-1">
+                            <div class="progress-bar bg-warning" style="width: {{ data.completion_rate }}%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Average Score</span>
+                            <span class="fw-bold">{{ "%.1f"|format(data.average_score) }}%</span>
+                        </div>
+                        <div class="progress progress-bar-custom mt-1">
+                            <div class="progress-bar bg-info" style="width: {{ data.average_score }}%"></div>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="fw-bold text-success">{{ data.total_attempts }}</div>
+                            <div class="small text-muted">Attempts</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-bold text-primary">{{ data.completed_simulations }}</div>
+                            <div class="small text-muted">Completed</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-bold text-warning">{{ data.total_participants }}</div>
+                            <div class="small text-muted">Users</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Trend Analytics -->
+    {% if trend_analytics %}
+    <div class="analytics-section">
+        <h4 class="section-title">
+            <i class="fas fa-chart-line text-info"></i> Trend Analytics (Last 30 Days)
+        </h4>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="analytics-card">
+                    <h6 class="mb-3">
+                        <i class="fas fa-user-plus text-success"></i> Daily Registrations
+                    </h6>
+                    {% if trend_analytics.daily_registrations %}
+                        {% for date, count in trend_analytics.daily_registrations.items() %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>{{ date }}</span>
+                            <div class="d-flex align-items-center">
+                                <div class="progress" style="width: 100px; height: 8px; margin-right: 10px;">
+                                    <div class="progress-bar bg-success" style="width: {{ (count / trend_analytics.daily_registrations.values()|max * 100) if trend_analytics.daily_registrations.values()|max > 0 else 0 }}%"></div>
+                                </div>
+                                <span class="badge bg-success">{{ count }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No registration data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="analytics-card">
+                    <h6 class="mb-3">
+                        <i class="fas fa-check-circle text-primary"></i> Daily Completions
+                    </h6>
+                    {% if trend_analytics.daily_completions %}
+                        {% for date, count in trend_analytics.daily_completions.items() %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>{{ date }}</span>
+                            <div class="d-flex align-items-center">
+                                <div class="progress" style="width: 100px; height: 8px; margin-right: 10px;">
+                                    <div class="progress-bar bg-primary" style="width: {{ (count / trend_analytics.daily_completions.values()|max * 100) if trend_analytics.daily_completions.values()|max > 0 else 0 }}%"></div>
+                                </div>
+                                <span class="badge bg-primary">{{ count }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No completion data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Feedback Analytics -->
+    {% if feedback_analytics %}
+    <div class="analytics-section">
+        <h4 class="section-title">
+            <i class="fas fa-comments text-secondary"></i> Feedback Analytics
+        </h4>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="analytics-card">
+                    <h6 class="mb-3">
+                        <i class="fas fa-star text-warning"></i> Overall Ratings
+                    </h6>
+                    {% if feedback_analytics.overall %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>Average Rating</span>
+                                <span class="fw-bold">{{ "%.1f"|format(feedback_analytics.overall.average_rating) }}/5</span>
+                            </div>
+                            <div class="progress progress-bar-custom mt-1">
+                                <div class="progress-bar bg-warning" style="width: {{ (feedback_analytics.overall.average_rating / 5 * 100) }}%"></div>
+                            </div>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="fw-bold text-success">{{ feedback_analytics.overall.total_feedback }}</div>
+                                <div class="small text-muted">Total Responses</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="fw-bold text-primary">{{ feedback_analytics.overall.average_rating }}</div>
+                                <div class="small text-muted">Avg Rating</div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No feedback data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="analytics-card">
+                    <h6 class="mb-3">
+                        <i class="fas fa-chart-bar text-info"></i> Rating Distribution
+                    </h6>
+                    {% if feedback_analytics.overall and feedback_analytics.overall.rating_distribution %}
+                        {% for rating, count in feedback_analytics.overall.rating_distribution.items() %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>{{ rating }} Stars</span>
+                            <div class="d-flex align-items-center">
+                                <div class="progress" style="width: 100px; height: 8px; margin-right: 10px;">
+                                    <div class="progress-bar bg-info" style="width: {{ (count / feedback_analytics.overall.total_feedback * 100) if feedback_analytics.overall.total_feedback > 0 else 0 }}%"></div>
+                                </div>
+                                <span class="badge bg-info">{{ count }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No rating distribution available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Export and Reports -->
     <div class="analytics-section">
         <h4 class="section-title">
@@ -363,43 +597,103 @@
 
 <script>
 function exportUserReport() {
-    modalSystem.info(
-        'Export User Report',
-        'User report export functionality will be implemented in the next version.',
-        {
-            confirmText: 'OK'
-        }
-    );
+    // Show loading modal
+    const loadingModal = modalSystem.loading('Exporting User Report', 'Generating user report...');
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = "{{ url_for('export_user_report') }}";
+    link.download = 'user_report.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Close loading modal
+    setTimeout(() => {
+        modalSystem.close();
+        modalSystem.success(
+            'Export Successful',
+            'User report has been downloaded successfully.',
+            {
+                confirmText: 'OK'
+            }
+        );
+    }, 1000);
 }
 
 function exportPerformanceReport() {
-    modalSystem.info(
-        'Export Performance Report',
-        'Performance report export functionality will be implemented in the next version.',
-        {
-            confirmText: 'OK'
-        }
-    );
+    // Show loading modal
+    const loadingModal = modalSystem.loading('Exporting Performance Report', 'Generating performance report...');
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = "{{ url_for('export_performance_report') }}";
+    link.download = 'performance_report.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Close loading modal
+    setTimeout(() => {
+        modalSystem.close();
+        modalSystem.success(
+            'Export Successful',
+            'Performance report has been downloaded successfully.',
+            {
+                confirmText: 'OK'
+            }
+        );
+    }, 1000);
 }
 
 function exportModuleReport() {
-    modalSystem.info(
-        'Export Module Report',
-        'Module report export functionality will be implemented in the next version.',
-        {
-            confirmText: 'OK'
-        }
-    );
+    // Show loading modal
+    const loadingModal = modalSystem.loading('Exporting Module Report', 'Generating module report...');
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = "{{ url_for('export_module_report') }}";
+    link.download = 'module_report.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Close loading modal
+    setTimeout(() => {
+        modalSystem.close();
+        modalSystem.success(
+            'Export Successful',
+            'Module report has been downloaded successfully.',
+            {
+                confirmText: 'OK'
+            }
+        );
+    }, 1000);
 }
 
 function exportFullReport() {
-    modalSystem.info(
-        'Export Full Report',
-        'Full report export functionality will be implemented in the next version.',
-        {
-            confirmText: 'OK'
-        }
-    );
+    // Show loading modal
+    const loadingModal = modalSystem.loading('Exporting Full Report', 'Generating comprehensive report...');
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = "{{ url_for('export_full_report') }}";
+    link.download = 'full_report.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Close loading modal
+    setTimeout(() => {
+        modalSystem.close();
+        modalSystem.success(
+            'Export Successful',
+            'Comprehensive report has been downloaded successfully.',
+            {
+                confirmText: 'OK'
+            }
+        );
+    }, 1000);
 }
 </script>
 {% endblock %}

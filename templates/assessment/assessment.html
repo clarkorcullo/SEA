@@ -305,4 +305,184 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+<style>
+/* Enhanced Mobile & Cross-Device Responsiveness for Assessment */
+@media (max-width: 576px) {
+    .assessment-container {
+        padding: 15px;
+        max-width: 100%;
+    }
+    
+    .assessment-header {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .assessment-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .question-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .question-number {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .question-text {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+    
+    .option {
+        padding: 12px 15px;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .option input[type="radio"] {
+        margin-right: 10px;
+        transform: scale(1.2);
+    }
+    
+    .btn {
+        min-height: 44px;
+        font-size: 0.9rem;
+        padding: 10px 15px;
+        margin-bottom: 10px;
+    }
+    
+    .timer-display {
+        font-size: 1.2rem;
+        padding: 10px 15px;
+    }
+    
+    .progress-bar {
+        height: 8px;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .assessment-container {
+        padding: 20px;
+    }
+    
+    .assessment-header {
+        padding: 1.8rem 1.5rem;
+    }
+    
+    .assessment-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .question-card {
+        padding: 1.2rem;
+    }
+    
+    .option {
+        padding: 15px 18px;
+        font-size: 0.95rem;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Tablet Optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .assessment-container {
+        padding: 25px;
+    }
+    
+    .assessment-header {
+        padding: 2rem 1.8rem;
+    }
+    
+    .question-card {
+        padding: 1.5rem;
+    }
+    
+    .option {
+        padding: 18px 20px;
+        font-size: 1rem;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+}
+
+/* Desktop Optimizations */
+@media (min-width: 1025px) {
+    .assessment-container {
+        padding: 30px;
+    }
+    
+    .assessment-header {
+        padding: 2.5rem 2rem;
+    }
+    
+    .question-card {
+        padding: 2rem;
+    }
+    
+    .option {
+        padding: 20px 25px;
+        font-size: 1.05rem;
+    }
+    
+    .btn {
+        padding: 12px 30px;
+        font-size: 1rem;
+    }
+    
+    /* Enhanced hover effects for desktop */
+    .option:hover {
+        transform: translateX(5px);
+        transition: transform 0.2s ease;
+    }
+}
+
+/* Ultra-wide screen support */
+@media (min-width: 1400px) {
+    .assessment-container {
+        max-width: 900px;
+    }
+}
+
+/* Print optimizations */
+@media print {
+    .btn,
+    .navbar,
+    .footer,
+    .timer-display {
+        display: none !important;
+    }
+    
+    .assessment-container {
+        padding: 0;
+        margin: 0;
+    }
+    
+    .question-card {
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+    }
+    
+    .option {
+        border: 1px solid #ccc;
+        margin-bottom: 5px;
+    }
+}
+</style>
 {% endblock %}
