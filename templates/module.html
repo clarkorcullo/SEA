@@ -102,7 +102,13 @@
                         <div class="progress-stats">
                             <div class="stat-item">
                                 <i class="fas fa-clock"></i>
-                                <span id="timeSpentDisplay">{{ progress.time_spent }} min spent</span>
+                                <span id="timeSpentDisplay">
+                                    {% if progress.time_spent and progress.time_spent > 0 %}
+                                        {{ progress.time_spent }} min spent
+                                    {% else %}
+                                        Starting session...
+                                    {% endif %}
+                                </span>
                             </div>
                             <div class="stat-item">
                                 <i class="fas fa-star"></i>
@@ -1111,28 +1117,32 @@ document.addEventListener('DOMContentLoaded', function() {
     var timeUpdateInterval;
     var metaEl = document.getElementById('moduleMeta');
     
+    // Get existing time spent from database
+    var existingTimeSpent = parseInt(metaEl.getAttribute('data-time-spent') || '0', 10);
+    
     // Start time tracking
     function startTimeTracking() {
         timeUpdateInterval = setInterval(function() {
             var currentTime = new Date().getTime();
-            var timeSpent = Math.floor((currentTime - startTime) / 60000); // Convert to minutes
+            var sessionTimeSpent = Math.floor((currentTime - startTime) / 60000); // Convert to minutes
+            var totalTimeSpent = existingTimeSpent + sessionTimeSpent;
             
-            if (timeSpent > 0) {
-                // Update the display
+            if (sessionTimeSpent > 0) {
+                // Update the display with total time
                 var timeSpentElement = document.getElementById('timeSpentDisplay');
                 if (timeSpentElement) {
-                    timeSpentElement.textContent = timeSpent + ' min spent';
+                    timeSpentElement.textContent = totalTimeSpent + ' min spent';
                 }
                 
-                // Update the meta element
-                metaEl.setAttribute('data-time-spent', timeSpent);
+                // Update the meta element with total time
+                metaEl.setAttribute('data-time-spent', totalTimeSpent);
                 
-                // Auto-save progress every 5 minutes
-                if (timeSpent % 5 === 0 && timeSpent > 0) {
-                    updateProgressOnServer(timeSpent);
+                // Auto-save progress every 2.5 minutes (5 * 30 seconds) with total time
+                if (sessionTimeSpent % 5 === 0 && sessionTimeSpent > 0) {
+                    updateProgressOnServer(totalTimeSpent);
                 }
             }
-        }, 60000); // Update every minute
+        }, 30000); // Update every 30 seconds for better UX
     }
     
     // Load latest public reflections for this module (max 3)
@@ -1194,17 +1204,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Start time tracking
     startTimeTracking();
     
+    // Update display immediately if there's existing time
+    if (existingTimeSpent > 0) {
+        var timeSpentElement = document.getElementById('timeSpentDisplay');
+        if (timeSpentElement) {
+            timeSpentElement.textContent = existingTimeSpent + ' min spent';
+        }
+    }
+    
     // Stop time tracking when page is unloaded
     window.addEventListener('beforeunload', function() {
         if (timeUpdateInterval) {
             clearInterval(timeUpdateInterval);
         }
         
-        // Final time update
+        // Final time update with total accumulated time
         var finalTime = new Date().getTime();
-        var finalTimeSpent = Math.floor((finalTime - startTime) / 60000);
-        if (finalTimeSpent > 0) {
-            updateProgressOnServer(finalTimeSpent);
+        var sessionTimeSpent = Math.floor((finalTime - startTime) / 60000);
+        var totalTimeSpent = existingTimeSpent + sessionTimeSpent;
+        
+        if (sessionTimeSpent > 0) {
+            updateProgressOnServer(totalTimeSpent);
         }
     });
 
