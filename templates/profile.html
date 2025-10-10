@@ -3,186 +3,275 @@
 {% block title %}Profile - Social Engineering Awareness{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-lg">
-                <div class="card-body p-5">
-                    <h2 class="card-title text-center mb-4">
-                        <i class="fas fa-user-circle me-2"></i> User Profile
-                    </h2>
-
-                    <!-- Profile Information Section -->
-                    <h5 class="mb-3">Your Information</h5>
-                    
-                    <!-- Success Message -->
-                    {% if success_message %}
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle me-2"></i>{{ success_message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="profile-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <!-- Enhanced Profile Header -->
+                <div class="profile-header text-center mb-4">
+                    <div class="profile-header-bg"></div>
+                    <div class="profile-header-content">
+                        <h1 class="profile-title">
+                            <i class="fas fa-user-shield me-3"></i>User Profile
+                        </h1>
+                        <p class="profile-subtitle">Manage your account information and security settings</p>
                     </div>
-                    {% endif %}
+                </div>
+
+                <!-- Main Profile Card -->
+                <div class="profile-card">
+                    <div class="profile-card-body">
+                        <!-- Profile Information Section -->
+                        <div class="profile-section">
+                            <div class="section-header">
+                                <h3 class="section-title">
+                                    <i class="fas fa-user-edit me-2"></i>Your Information
+                                </h3>
+                                <p class="section-description">Update your personal details and profile picture</p>
+                            </div>
                     
-                    <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data">
-                        <input type="hidden" name="update_profile" value="1">
-                        
-                        <!-- Profile Picture Section -->
-                        <div class="text-center mb-4">
-                            <div class="position-relative d-inline-block">
-                                {% if user.profile_picture %}
-                                    <img src="{{ url_for('static', filename='profile_pictures/' + user.profile_picture) }}" 
-                                         alt="Profile Picture" 
-                                         class="rounded-circle border border-3 border-primary" 
-                                         style="width: 150px; height: 150px; object-fit: cover;">
-                                {% else %}
-                                    <div class="rounded-circle border border-3 border-secondary d-flex align-items-center justify-content-center bg-light" 
-                                         style="width: 150px; height: 150px;">
-                                        <i class="fas fa-user fa-4x text-secondary"></i>
+                            <!-- Success Message -->
+                            {% if success_message %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>{{ success_message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endif %}
+                            
+                            <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data">
+                                <input type="hidden" name="update_profile" value="1">
+                                
+                                <!-- Enhanced Profile Picture Section -->
+                                <div class="profile-picture-section">
+                                    <div class="profile-picture-container">
+                                        <div class="profile-picture-wrapper">
+                                            {% if user.profile_picture %}
+                                                <img src="{{ url_for('static', filename='profile_pictures/' + user.profile_picture) }}" 
+                                                     alt="Profile Picture" 
+                                                     class="profile-picture" 
+                                                     id="profileImage">
+                                            {% else %}
+                                                <div class="profile-picture-placeholder" id="profileImage">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div class="profile-picture-overlay">
+                                                <label for="profile_picture" class="profile-picture-upload-btn" title="Change Profile Picture">
+                                                    <i class="fas fa-camera"></i>
+                                                </label>
+                                                <input type="file" id="profile_picture" name="profile_picture" 
+                                                       accept="image/*" class="d-none" onchange="previewImage(this)">
+                                            </div>
+                                        </div>
+                                        {% if errors and errors.get('profile_picture') %}
+                                            <div class="profile-picture-error">
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ errors.profile_picture }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="profile-picture-info">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Click the camera icon to upload a new profile picture
+                                            <br><small class="text-muted">Supports: PNG, JPG, JPEG, GIF, WEBP (Max 5MB)</small>
+                                        </div>
                                     </div>
-                                {% endif %}
-                                <div class="position-absolute" style="bottom: 5px; right: 5px;">
-                                    <label for="profile_picture" class="btn btn-sm btn-primary rounded-circle shadow-sm" 
-                                           style="width: 35px; height: 35px; padding: 0; border: 2px solid white;" title="Change Profile Picture">
-                                        <i class="fas fa-camera" style="font-size: 12px;"></i>
-                                    </label>
-                                    <input type="file" id="profile_picture" name="profile_picture" 
-                                           accept="image/*" style="display: none;" onchange="previewImage(this)">
                                 </div>
-                            </div>
-                            {% if errors and errors.get('profile_picture') %}
-                                <div class="text-danger mt-2">
-                                    <i class="fas fa-exclamation-circle me-1"></i>{{ errors.profile_picture }}
-                                </div>
-                            {% endif %}
-                            <p class="text-muted mt-2 mb-0">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Click the camera icon to upload a new profile picture (PNG, JPG, JPEG, GIF, WEBP)
-                            </p>
-                        </div>
                         
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" value="{{ user.username }}" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" value="{{ user.email }}" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="full_name" class="form-label">Full Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control {% if errors and errors.get('full_name') %}is-invalid{% elif form_data and form_data.full_name and not errors %}is-valid{% endif %}" 
-                                id="full_name" name="full_name" value="{{ form_data.full_name if form_data else user.full_name }}" 
-                                required placeholder="Enter your full name (First Last)" title="Your complete name (required for certificate generation)">
-                            <div class="form-text">
-                                <i class="fas fa-info-circle text-primary me-1"></i>
-                                <strong>Required for Certificate:</strong> Your full name will appear on your completion certificate. 
-                                Please enter your first and last name (e.g., "John Smith").
-                            </div>
-                            {% if errors and errors.get('full_name') %}
-                                <div class="invalid-feedback">
-                                    <i class="fas fa-exclamation-circle me-1"></i>{{ errors.full_name }}
-                                </div>
-                            {% elif form_data and form_data.full_name and not errors %}
-                                <div class="valid-feedback">
-                                    <i class="fas fa-check-circle me-1"></i>Perfect! This name will appear on your certificate.
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="mb-3">
-                            <label for="birthday" class="form-label">Birthday</label>
-                            <input type="date" class="form-control" id="birthday" name="birthday" 
-                                value="{{ form_data.birthday if form_data else (user.birthday.isoformat() if user.birthday else '') }}" 
-                                placeholder="Select your birthday" title="Your date of birth (optional)">
-                        </div>
-                        <div class="mb-4">
-                            <label for="address" class="form-label">Address</label>
-                            <input type="text" class="form-control" id="address" name="address" 
-                                value="{{ form_data.address if form_data else user.address }}" 
-                                placeholder="Enter your address" title="Your current address (optional)">
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-save me-2"></i> Update Profile
-                            </button>
-                        </div>
-                    </form>
+                                <!-- Enhanced Form Fields -->
+                                <div class="profile-form-fields">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="username" class="form-label">
+                                                <i class="fas fa-user me-2"></i>Username
+                                            </label>
+                                            <div class="form-control-wrapper">
+                                                <input type="text" class="form-control" id="username" value="{{ user.username }}" readonly>
+                                                <i class="fas fa-lock form-control-icon"></i>
+                                            </div>
+                                            <small class="form-text">Username cannot be changed</small>
+                                        </div>
+                                    </div>
 
-                    <hr class="my-5">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="email" class="form-label">
+                                                <i class="fas fa-envelope me-2"></i>Email Address
+                                            </label>
+                                            <div class="form-control-wrapper">
+                                                <input type="email" class="form-control" id="email" value="{{ user.email }}" readonly>
+                                                <i class="fas fa-lock form-control-icon"></i>
+                                            </div>
+                                            <small class="form-text">Email address cannot be changed</small>
+                                        </div>
+                                    </div>
 
-                    <!-- Change Password Section -->
-                    <h5 class="mb-3">Change Password</h5>
-                    <form method="POST" action="{{ url_for('profile') }}">
-                        <input type="hidden" name="change_password" value="1">
-                        <div class="mb-3">
-                            <label for="old_password" class="form-label">Old Password <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="password" class="form-control {% if errors and errors.get('old_password') %}is-invalid{% endif %}" 
-                                    id="old_password" name="old_password" required 
-                                    placeholder="Enter your old password" title="Your current password (required)">
-                                <button class="btn btn-outline-secondary" type="button" id="toggleOldPassword" title="Show/Hide Password">
-                                    <i class="fas fa-eye" id="eyeIconOld"></i>
-                                </button>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="full_name" class="form-label">
+                                                <i class="fas fa-id-card me-2"></i>Full Name <span class="required">*</span>
+                                            </label>
+                                            <div class="form-control-wrapper">
+                                                <input type="text" class="form-control {% if errors and errors.get('full_name') %}is-invalid{% elif form_data and form_data.full_name and not errors %}is-valid{% endif %}" 
+                                                    id="full_name" name="full_name" value="{{ form_data.full_name if form_data else user.full_name }}" 
+                                                    required placeholder="Enter your full name (First Last)" title="Your complete name (required for certificate generation)">
+                                                <i class="fas fa-user-edit form-control-icon"></i>
+                                            </div>
+                                            <div class="form-help">
+                                                <i class="fas fa-certificate me-1"></i>
+                                                <strong>Required for Certificate:</strong> Your full name will appear on your completion certificate.
+                                            </div>
+                                            {% if errors and errors.get('full_name') %}
+                                                <div class="form-error">
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ errors.full_name }}
+                                                </div>
+                                            {% elif form_data and form_data.full_name and not errors %}
+                                                <div class="form-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Perfect! This name will appear on your certificate.
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="birthday" class="form-label">
+                                                <i class="fas fa-calendar me-2"></i>Birthday
+                                            </label>
+                                            <div class="form-control-wrapper">
+                                                <input type="date" class="form-control" id="birthday" name="birthday" 
+                                                    value="{{ form_data.birthday if form_data else (user.birthday.isoformat() if user.birthday else '') }}" 
+                                                    placeholder="Select your birthday" title="Your date of birth (optional)">
+                                                <i class="fas fa-calendar-alt form-control-icon"></i>
+                                            </div>
+                                            <small class="form-text">Optional - Your date of birth</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="address" class="form-label">
+                                                <i class="fas fa-map-marker-alt me-2"></i>Address
+                                            </label>
+                                            <div class="form-control-wrapper">
+                                                <input type="text" class="form-control" id="address" name="address" 
+                                                    value="{{ form_data.address if form_data else user.address }}" 
+                                                    placeholder="Enter your address" title="Your current address (optional)">
+                                                <i class="fas fa-home form-control-icon"></i>
+                                            </div>
+                                            <small class="form-text">Optional - Your current address</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-save me-2"></i> Update Profile
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Change Password Section -->
+                        <div class="profile-section">
+                            <div class="section-header">
+                                <h3 class="section-title">
+                                    <i class="fas fa-shield-alt me-2"></i>Security Settings
+                                </h3>
+                                <p class="section-description">Change your password to keep your account secure</p>
                             </div>
-                            {% if errors and errors.get('old_password') %}
-                                <div class="invalid-feedback">
-                                    <i class="fas fa-exclamation-circle me-1"></i>{{ errors.old_password }}
+                            
+                            <form method="POST" action="{{ url_for('profile') }}">
+                                <input type="hidden" name="change_password" value="1">
+                                
+                                <div class="profile-form-fields">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="old_password" class="form-label">
+                                                <i class="fas fa-lock me-2"></i>Current Password <span class="required">*</span>
+                                            </label>
+                                            <div class="form-control-wrapper">
+                                                <input type="password" class="form-control {% if errors and errors.get('old_password') %}is-invalid{% endif %}" 
+                                                    id="old_password" name="old_password" required 
+                                                    placeholder="Enter your current password" title="Your current password (required)">
+                                                <button class="password-toggle" type="button" id="toggleOldPassword" title="Show/Hide Password">
+                                                    <i class="fas fa-eye" id="eyeIconOld"></i>
+                                                </button>
+                                            </div>
+                                            {% if errors and errors.get('old_password') %}
+                                                <div class="form-error">
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ errors.old_password }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="new_password" class="form-label">
+                                                <i class="fas fa-key me-2"></i>New Password <span class="required">*</span>
+                                            </label>
+                                            <div class="form-control-wrapper">
+                                                <input type="password" class="form-control {% if errors and errors.get('new_password') %}is-invalid{% elif form_data and form_data.new_password and not errors %}is-valid{% endif %}" 
+                                                    id="new_password" name="new_password" required 
+                                                    minlength="12" 
+                                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]).{12,}"
+                                                    title="Password must be at least 12 characters with: at least 1 capital letter, 1 special character, and 1 number"
+                                                    placeholder="Enter new password">
+                                                <button class="password-toggle" type="button" id="toggleNewPassword" title="Show/Hide Password">
+                                                    <i class="fas fa-eye" id="eyeIconNew"></i>
+                                                </button>
+                                            </div>
+                                            {% if errors and errors.get('new_password') %}
+                                                <div class="form-error">
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ errors.new_password }}
+                                                </div>
+                                            {% elif form_data and form_data.new_password and not errors %}
+                                                <div class="form-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Password meets requirements!
+                                                </div>
+                                            {% else %}
+                                                <div class="form-help">
+                                                    <i class="fas fa-info-circle me-1"></i> 
+                                                    <strong>Requirements:</strong> At least 12 characters with: 1 capital letter, 1 special character, 1 number
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="confirm_new_password" class="form-label">
+                                                <i class="fas fa-check-double me-2"></i>Confirm New Password <span class="required">*</span>
+                                            </label>
+                                            <div class="form-control-wrapper">
+                                                <input type="password" class="form-control {% if errors and errors.get('confirm_new_password') %}is-invalid{% elif form_data and form_data.confirm_new_password and form_data.new_password == form_data.confirm_new_password and not errors %}is-valid{% endif %}" 
+                                                    id="confirm_new_password" name="confirm_new_password" required 
+                                                    placeholder="Confirm new password" title="Re-enter your new password"
+                                                    onpaste="return false;" oncopy="return false;" oncut="return false;">
+                                                <button class="password-toggle" type="button" id="toggleConfirmNewPassword" title="Show/Hide Password">
+                                                    <i class="fas fa-eye" id="eyeIconConfirm"></i>
+                                                </button>
+                                            </div>
+                                            {% if errors and errors.get('confirm_new_password') %}
+                                                <div class="form-error">
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ errors.confirm_new_password }}
+                                                </div>
+                                            {% elif form_data and form_data.confirm_new_password and form_data.new_password == form_data.confirm_new_password and not errors %}
+                                                <div class="form-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Passwords match!
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-warning btn-lg">
+                                            <i class="fas fa-shield-alt me-2"></i> Update Password
+                                        </button>
+                                    </div>
                                 </div>
-                            {% endif %}
+                            </form>
                         </div>
-                        <div class="mb-3">
-                            <label for="new_password" class="form-label">New Password <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="password" class="form-control {% if errors and errors.get('new_password') %}is-invalid{% elif form_data and form_data.new_password and not errors %}is-valid{% endif %}" 
-                                    id="new_password" name="new_password" required 
-                                    minlength="12" 
-                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]).{12,}"
-                                    title="Password must be at least 12 characters with: at least 1 capital letter, 1 special character, and 1 number"
-                                    placeholder="Enter new password">
-                                <button class="btn btn-outline-secondary" type="button" id="toggleNewPassword" title="Show/Hide Password">
-                                    <i class="fas fa-eye" id="eyeIconNew"></i>
-                                </button>
-                            </div>
-                            {% if errors and errors.get('new_password') %}
-                                <div class="invalid-feedback">
-                                    <i class="fas fa-exclamation-circle me-1"></i>{{ errors.new_password }}
-                                </div>
-                            {% elif form_data and form_data.new_password and not errors %}
-                                <div class="valid-feedback">
-                                    <i class="fas fa-check-circle me-1"></i>Password meets requirements!
-                                </div>
-                            {% else %}
-                                <div class="form-text mt-1">
-                                    <i class="fas fa-info-circle text-muted"></i> At least 12 characters with: 1 capital letter, 1 special character, 1 number
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="mb-4">
-                            <label for="confirm_new_password" class="form-label">Confirm New Password <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="password" class="form-control {% if errors and errors.get('confirm_new_password') %}is-invalid{% elif form_data and form_data.confirm_new_password and form_data.new_password == form_data.confirm_new_password and not errors %}is-valid{% endif %}" 
-                                    id="confirm_new_password" name="confirm_new_password" required 
-                                    placeholder="Confirm new password" title="Re-enter your new password"
-                                    onpaste="return false;" oncopy="return false;" oncut="return false;">
-                                <button class="btn btn-outline-secondary" type="button" id="toggleConfirmNewPassword" title="Show/Hide Password">
-                                    <i class="fas fa-eye" id="eyeIconConfirm"></i>
-                                </button>
-                            </div>
-                            {% if errors and errors.get('confirm_new_password') %}
-                                <div class="invalid-feedback">
-                                    <i class="fas fa-exclamation-circle me-1"></i>{{ errors.confirm_new_password }}
-                                </div>
-                            {% elif form_data and form_data.confirm_new_password and form_data.new_password == form_data.confirm_new_password and not errors %}
-                                <div class="valid-feedback">
-                                    <i class="fas fa-check-circle me-1"></i>Passwords match!
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-warning btn-lg">
-                                <i class="fas fa-key me-2"></i> Change Password
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -190,45 +279,586 @@
 </div>
 
 <style>
-    .form-control.is-valid {
-        border-color: #198754;
-        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+/* Enhanced Profile Page Styles */
+.profile-container {
+    background: transparent;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+/* Profile Header */
+.profile-header {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.profile-header-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.profile-header-content {
+    position: relative;
+    z-index: 2;
+    padding: 2rem;
+}
+
+.profile-title {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.profile-subtitle {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+/* Profile Card */
+.profile-card {
+    background: rgba(255,255,255,0.85);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    overflow: hidden;
+}
+
+.profile-card-body {
+    padding: 2.5rem;
+}
+
+/* Profile Sections */
+.profile-section {
+    margin-bottom: 3rem;
+}
+
+.profile-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f8f9fa;
+}
+
+.section-title {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.section-description {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+/* Profile Picture Section */
+.profile-picture-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.profile-picture-container {
+    display: inline-block;
+}
+
+.profile-picture-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-picture {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #3498db;
+    box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+    transition: all 0.3s ease;
+}
+
+.profile-picture-placeholder {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 4px solid #3498db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+    transition: all 0.3s ease;
+}
+
+.profile-picture-placeholder i {
+    font-size: 4rem;
+    color: #6c757d;
+}
+
+.profile-picture-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.profile-picture-wrapper:hover .profile-picture-overlay {
+    opacity: 1;
+}
+
+.profile-picture-upload-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+.profile-picture-upload-btn:hover {
+    background: #2980b9;
+    transform: scale(1.1);
+}
+
+.profile-picture-upload-btn i {
+    font-size: 1.2rem;
+}
+
+.profile-picture-info {
+    margin-top: 1rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.profile-picture-error {
+    margin-top: 0.5rem;
+    color: #dc3545;
+    font-size: 0.9rem;
+}
+
+/* Form Styles */
+.profile-form-fields {
+    max-width: 100%;
+}
+
+.form-row {
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-label i {
+    color: #3498db;
+    width: 20px;
+}
+
+.required {
+    color: #dc3545;
+    margin-left: 0.25rem;
+}
+
+.form-control-wrapper {
+    position: relative;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 45px 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    outline: none;
+    transform: translateY(-2px);
+}
+
+.form-control.is-valid {
+    border-color: #27ae60;
+    box-shadow: 0 0 0 0.2rem rgba(39, 174, 96, 0.25);
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-control-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.password-toggle:hover {
+    color: #3498db;
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.form-text {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.form-help {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(52, 152, 219, 0.1);
+    border: 1px solid rgba(52, 152, 219, 0.2);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #2c3e50;
+}
+
+.form-success {
+    margin-top: 0.5rem;
+    color: #27ae60;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-error {
+    margin-top: 0.5rem;
+    color: #dc3545;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-actions {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.btn {
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+}
+
+.btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(243, 156, 18, 0.6);
+}
+
+.btn-lg {
+    padding: 15px 40px;
+    font-size: 1.1rem;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 10px;
+    border: none;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(39, 174, 96, 0.1) 0%, rgba(39, 174, 96, 0.05) 100%);
+    color: #27ae60;
+    border: 1px solid rgba(39, 174, 96, 0.2);
+}
+
+/* Enhanced Mobile & Cross-Device Responsiveness */
+@media (max-width: 576px) {
+    .profile-container {
+        padding: 1rem 0;
     }
     
-    .valid-feedback {
-        display: block;
-        color: #198754;
-        font-size: 0.875em;
-        margin-top: 0.25rem;
+    .profile-header-content {
+        padding: 1.5rem 1rem;
     }
     
-    .form-control.is-invalid {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    .profile-title {
+        font-size: 2rem;
     }
+    
+    .profile-subtitle {
+        font-size: 1rem;
+    }
+    
+    .profile-card-body {
+        padding: 1.5rem 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+    }
+    
+    .profile-picture {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .profile-picture-placeholder {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .profile-picture-placeholder i {
+        font-size: 3rem;
+    }
+    
+    .profile-picture-upload-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .form-control {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px 40px 12px 12px;
+        min-height: 44px;
+    }
+    
+    .form-label {
+        font-size: 0.9rem;
+    }
+    
+    .btn {
+        min-height: 44px;
+        font-size: 0.9rem;
+        padding: 12px 20px;
+    }
+    
+    .btn-lg {
+        font-size: 1rem;
+        padding: 15px 25px;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .profile-card-body {
+        padding: 2rem 1.5rem;
+    }
+    
+    .profile-title {
+        font-size: 2.2rem;
+    }
+    
+    .profile-picture {
+        width: 160px;
+        height: 160px;
+    }
+    
+    .profile-picture-placeholder {
+        width: 160px;
+        height: 160px;
+    }
+    
+    .form-control {
+        padding: 12px 42px 12px 15px;
+    }
+    
+    .btn {
+        padding: 12px 25px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .profile-card-body {
+        padding: 2.5rem 2rem;
+    }
+    
+    .profile-title {
+        font-size: 2.3rem;
+    }
+    
+    .form-control {
+        padding: 15px 45px 15px 15px;
+    }
+    
+    .btn {
+        padding: 12px 30px;
+        font-size: 1rem;
+    }
+}
+
+@media (min-width: 1025px) {
+    .profile-card-body {
+        padding: 3rem 2.5rem;
+    }
+    
+    .profile-title {
+        font-size: 2.5rem;
+    }
+    
+    .form-control {
+        padding: 15px 45px 15px 15px;
+    }
+    
+    .btn {
+        padding: 12px 30px;
+        font-size: 1rem;
+    }
+    
+    /* Enhanced hover effects for desktop */
+    .profile-picture:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(52, 152, 219, 0.4);
+    }
+    
+    .profile-picture-placeholder:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(52, 152, 219, 0.4);
+    }
+}
+
+/* Ultra-wide screen support */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 900px;
+    }
+}
+
+/* Print optimizations */
+@media print {
+    .profile-container {
+        background: white !important;
+        padding: 0;
+    }
+    
+    .profile-header-bg {
+        background: white !important;
+        border: 1px solid #ccc;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+    
+    .profile-title {
+        color: #2c3e50 !important;
+        text-shadow: none;
+    }
+    
+    .profile-subtitle {
+        color: #6c757d !important;
+    }
+    
+    .profile-card {
+        background: white !important;
+        box-shadow: none;
+        border: 1px solid #ccc;
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+    
+    .btn {
+        display: none;
+    }
+    
+    .profile-picture-overlay {
+        display: none;
+    }
+}
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Image preview functionality
+    // Enhanced image preview functionality
     window.previewImage = function(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const profileContainer = input.closest('.position-relative');
-                const existingImg = profileContainer.querySelector('img');
-                const existingDiv = profileContainer.querySelector('.rounded-circle.border');
+                const profileImage = document.getElementById('profileImage');
                 
-                if (existingImg) {
-                    existingImg.src = e.target.result;
-                } else if (existingDiv) {
-                    // Replace the placeholder div with an image
+                if (profileImage.tagName === 'IMG') {
+                    // Update existing image
+                    profileImage.src = e.target.result;
+                } else {
+                    // Replace placeholder with image
                     const newImg = document.createElement('img');
                     newImg.src = e.target.result;
                     newImg.alt = 'Profile Picture';
-                    newImg.className = 'rounded-circle border border-3 border-primary';
-                    newImg.style.cssText = 'width: 150px; height: 150px; object-fit: cover;';
-                    existingDiv.parentNode.replaceChild(newImg, existingDiv);
+                    newImg.className = 'profile-picture';
+                    newImg.id = 'profileImage';
+                    profileImage.parentNode.replaceChild(newImg, profileImage);
                 }
             };
             reader.readAsDataURL(input.files[0]);

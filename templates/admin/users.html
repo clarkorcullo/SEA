@@ -80,6 +80,10 @@
 .pagination {
     justify-content: center;
 }
+
+.progress-thin {
+    height: 6px;
+}
 </style>
 
 <div class="admin-header text-center">
@@ -177,7 +181,7 @@
                             <!-- Progress -->
                             <div class="d-flex align-items-center mb-2">
                                 <small class="text-muted me-2">Progress:</small>
-                                <div class="progress flex-grow-1" style="height: 6px;">
+                                <div class="progress flex-grow-1 progress-thin">
                                     <div class="progress-bar" style="width: {{ user.completion_percentage }}%"></div>
                                 </div>
                                 <small class="text-muted ms-2">{{ "%.0f"|format(user.completion_percentage) }}%</small>
@@ -203,16 +207,17 @@
                             <!-- Action Buttons -->
                             <div class="d-flex gap-1">
                                 <a href="{{ url_for('admin_user_detail', user_id=user.id) }}" 
-                                   class="btn btn-sm btn-outline-primary">
+                                   class="btn btn-sm btn-outline-primary" title="View User Details">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <a href="{{ url_for('admin_edit_user', user_id=user.id) }}" 
-                                   class="btn btn-sm btn-outline-secondary">
+                                   class="btn btn-sm btn-outline-secondary" title="Edit User">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 {% if user.username != 'administrator' %}
                                 <button type="button" class="btn btn-sm btn-outline-danger" 
-                                        onclick="confirmDelete({{ user.id }}, '{{ user.full_name }}')">
+                                        onclick="confirmDelete({{ user.id }}, '{{ user.full_name }}')"
+                                        title="Delete User">
                                     <i class="fas fa-trash"></i>
                                 </button>
                                 {% endif %}
@@ -239,7 +244,7 @@
         <ul class="pagination">
             {% if users.has_prev %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('admin_users', page=users.prev_num, **request.args) }}">
+                    <a class="page-link" href="{{ url_for('admin_users', page=users.prev_num, search=request.args.get('search', ''), specialization=request.args.get('specialization', ''), year_level=request.args.get('year_level', '')) }}">
                         <i class="fas fa-chevron-left"></i> Previous
                     </a>
                 </li>
@@ -249,7 +254,7 @@
                 {% if page_num %}
                     {% if page_num != users.page %}
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('admin_users', page=page_num, **request.args) }}">{{ page_num }}</a>
+                            <a class="page-link" href="{{ url_for('admin_users', page=page_num, search=request.args.get('search', ''), specialization=request.args.get('specialization', ''), year_level=request.args.get('year_level', '')) }}">{{ page_num }}</a>
                         </li>
                     {% else %}
                         <li class="page-item active">
@@ -265,7 +270,7 @@
             
             {% if users.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('admin_users', page=users.next_num, **request.args) }}">
+                    <a class="page-link" href="{{ url_for('admin_users', page=users.next_num, search=request.args.get('search', ''), specialization=request.args.get('specialization', ''), year_level=request.args.get('year_level', '')) }}">
                         Next <i class="fas fa-chevron-right"></i>
                     </a>
                 </li>
@@ -288,9 +293,9 @@
                 <p class="text-danger">This action cannot be undone and will delete all user data including progress, assessments, and simulations.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteForm" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Delete User</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Cancel Delete Operation">Cancel</button>
+                <form id="deleteForm" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger" title="Confirm Delete User">Delete User</button>
                 </form>
             </div>
         </div>
