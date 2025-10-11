@@ -78,18 +78,26 @@ class User(UserMixin, BaseModel, TimestampMixin):
     @property
     def profile_picture_url(self) -> str:
         """Get profile picture URL - handles both local files and base64 data"""
-        if self.profile_picture_data:
-            # Return base64 data URL for deployment
-            return f"data:image/jpeg;base64,{self.profile_picture_data}"
-        elif self.profile_picture:
-            # Return static file URL for local development
-            return f"/static/profile_pictures/{self.profile_picture}"
-        return None
+        try:
+            if self.profile_picture_data:
+                # Return base64 data URL for deployment
+                return f"data:image/jpeg;base64,{self.profile_picture_data}"
+            elif self.profile_picture:
+                # Return static file URL for local development
+                return f"/static/profile_pictures/{self.profile_picture}"
+            return None
+        except Exception:
+            # Fallback to prevent template crashes
+            return None
     
     @property
     def has_profile_picture(self) -> bool:
         """Check if user has a profile picture"""
-        return bool(self.profile_picture or self.profile_picture_data)
+        try:
+            return bool(self.profile_picture or self.profile_picture_data)
+        except Exception:
+            # Fallback to prevent template crashes
+            return False
     
     def set_password(self, password: str, skip_validation: bool = False) -> bool:
         """Set user password with validation"""

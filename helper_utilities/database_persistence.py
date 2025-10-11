@@ -141,9 +141,9 @@ class DatabasePersistence:
                         cursor.execute("""
                             INSERT OR REPLACE INTO user 
                             (id, username, email, password_hash, full_name, specialization, 
-                             year_level, birthday, address, profile_picture, modules_completed, 
+                             year_level, birthday, address, profile_picture, profile_picture_data, modules_completed, 
                              total_score, simulations_completed, created_at, updated_at)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                             user_data.get('id'),
                             user_data.get('username'),
@@ -155,6 +155,7 @@ class DatabasePersistence:
                             user_data.get('birthday'),
                             user_data.get('address'),
                             user_data.get('profile_picture'),
+                            user_data.get('profile_picture_data'),
                             user_data.get('modules_completed', 0),
                             user_data.get('total_score', 0),
                             user_data.get('simulations_completed', 0),

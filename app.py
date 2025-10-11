@@ -179,6 +179,21 @@ with app.app_context():
             logger.warning(f"[MIGRATION] Could not migrate highest_score column: {e}")
             db.session.rollback()
 
+        # Auto-migrate profile_picture_data column for production deployments
+        try:
+            if inspector.has_table('user'):
+                columns = [col['name'] for col in inspector.get_columns('user')]
+                if 'profile_picture_data' not in columns:
+                    logger.info("[MIGRATION] Adding profile_picture_data column to user table...")
+                    db.session.execute(text(
+                        "ALTER TABLE \"user\" ADD COLUMN profile_picture_data TEXT"
+                    ))
+                    db.session.commit()
+                    logger.info("[MIGRATION] Successfully added profile_picture_data column")
+        except Exception as e:
+            logger.warning(f"[MIGRATION] Could not migrate profile_picture_data column: {e}")
+            db.session.rollback()
+
         # Ensure modules have drawer placeholders so UI renders consistently in production
         try:
             def build_standard_skeleton(module_index: int) -> str:
@@ -2718,22 +2733,29 @@ def handle_profile_update():
                     import os
                     is_deployment = os.environ.get('RENDER') or os.environ.get('FLASK_ENV') == 'production'
                     
-                    if is_deployment:
-                        # In deployment, store as base64 in database
-                        import base64
-                        file_content = file.read()
-                        profile_picture_data = base64.b64encode(file_content).decode('utf-8')
-                    else:
-                        # In local development, save as file
-                        import uuid
-                        filename = f"{current_user.username}_{uuid.uuid4().hex[:8]}.{file.filename.rsplit('.', 1)[1].lower()}"
-                        
-                        upload_folder = os.path.join(app.static_folder, 'profile_pictures')
-                        os.makedirs(upload_folder, exist_ok=True)
-                        file_path = os.path.join(upload_folder, filename)
-                        file.seek(0)  # Reset file pointer after reading for base64
-                        file.save(file_path)
-                        profile_picture = filename
+                    try:
+                        if is_deployment:
+                            # In deployment, store as base64 in database
+                            import base64
+                            file_content = file.read()
+                            # Check file size (max 5MB for base64 storage)
+                            if len(file_content) > 5 * 1024 * 1024:
+                                errors['profile_picture'] = 'File size too large. Maximum size is 5MB.'
+                            else:
+                                profile_picture_data = base64.b64encode(file_content).decode('utf-8')
+                        else:
+                            # In local development, save as file
+                            import uuid
+                            filename = f"{current_user.username}_{uuid.uuid4().hex[:8]}.{file.filename.rsplit('.', 1)[1].lower()}"
+                            
+                            upload_folder = os.path.join(app.static_folder, 'profile_pictures')
+                            os.makedirs(upload_folder, exist_ok=True)
+                            file_path = os.path.join(upload_folder, filename)
+                            file.seek(0)  # Reset file pointer after reading for base64
+                            file.save(file_path)
+                            profile_picture = filename
+                    except Exception as e:
+                        errors['profile_picture'] = f'Error processing file: {str(e)}'
                 else:
                     errors['profile_picture'] = 'Please upload a valid image file (PNG, JPG, JPEG, GIF, WEBP).'
         
