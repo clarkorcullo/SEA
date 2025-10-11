@@ -352,9 +352,9 @@ def create_default_data():
                 admin_user.specialization = 'Information Technology'
                 admin_user.year_level = '4th Year'
                 
-                # Set password from environment or default
+                # Set password from environment or default (skip validation for admin)
                 desired_pw = os.environ.get('ADMIN_PASSWORD', app.config.get('DEFAULT_ADMIN_PASSWORD', 'Admin123!@#2025'))
-                admin_user.set_password(desired_pw)
+                admin_user.set_password(desired_pw, skip_validation=True)
                 admin_user.save()
                 logger.info("[SUCCESS] Admin user credentials updated (administrator)")
             except Exception as pw_e:
@@ -3915,7 +3915,7 @@ def create_admin():
                 admin_user.full_name = 'System Administrator'
                 admin_user.specialization = 'Information Technology'
                 admin_user.year_level = '4th Year'
-                admin_user.set_password('Admin123!@#2025')
+                admin_user.set_password('Admin123!@#2025', skip_validation=True)
                 admin_user.save()
                 return f"✅ Admin user updated successfully<br>Username: administrator<br>Password: Admin123!@#2025<br>Email: admin@mmdc.edu.ph"
             else:
@@ -3938,6 +3938,46 @@ def create_admin():
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
+@app.route('/fix-admin')
+def fix_admin():
+    """Fix admin user - EMERGENCY ADMIN CREATION"""
+    try:
+        with app.app_context():
+            # Ensure database tables exist
+            db.create_all()
+            
+            # Force create/update admin user with direct password hash
+            from werkzeug.security import generate_password_hash
+            
+            admin_user = User.query.filter_by(username='administrator').first()
+            
+            if admin_user:
+                # Update existing admin user with direct password hash
+                admin_user.email = 'admin@mmdc.edu.ph'
+                admin_user.full_name = 'System Administrator'
+                admin_user.specialization = 'Information Technology'
+                admin_user.year_level = '4th Year'
+                admin_user.password_hash = generate_password_hash('Admin123!@#2025')
+                db.session.commit()
+                return f"✅ Admin user FIXED successfully<br>Username: administrator<br>Password: Admin123!@#2025<br>Email: admin@mmdc.edu.ph<br><br><a href='/login'>Click here to login</a>"
+            else:
+                # Create new admin user with direct password hash
+                admin_user = User(
+                    username='administrator',
+                    email='admin@mmdc.edu.ph',
+                    password_hash=generate_password_hash('Admin123!@#2025'),
+                    full_name='System Administrator',
+                    specialization='Information Technology',
+                    year_level='4th Year'
+                )
+                
+                db.session.add(admin_user)
+                db.session.commit()
+                return f"✅ Admin user CREATED successfully<br>Username: administrator<br>Password: Admin123!@#2025<br>Email: admin@mmdc.edu.ph<br><br><a href='/login'>Click here to login</a>"
+                
+    except Exception as e:
+        return f"❌ Error fixing admin: {str(e)}"
+
 @app.route('/create-admin-direct')
 def create_admin_direct():
     """Create admin user using direct SQLAlchemy - BACKUP METHOD"""
@@ -3955,7 +3995,7 @@ def create_admin_direct():
                 admin_user.full_name = 'System Administrator'
                 admin_user.specialization = 'Information Technology'
                 admin_user.year_level = '4th Year'
-                admin_user.set_password('Admin123!@#2025')
+                admin_user.set_password('Admin123!@#2025', skip_validation=True)
                 db.session.commit()
                 return f"✅ Admin user updated successfully (Direct Method)<br>Username: administrator<br>Password: Admin123!@#2025<br>Email: admin@mmdc.edu.ph"
             else:

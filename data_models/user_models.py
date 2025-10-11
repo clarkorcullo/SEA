@@ -91,9 +91,9 @@ class User(UserMixin, BaseModel, TimestampMixin):
         """Check if user has a profile picture"""
         return bool(self.profile_picture or self.profile_picture_data)
     
-    def set_password(self, password: str) -> bool:
+    def set_password(self, password: str, skip_validation: bool = False) -> bool:
         """Set user password with validation"""
-        if self._validate_password(password):
+        if skip_validation or self._validate_password(password):
             self.password_hash = generate_password_hash(password)
             return True
         return False
