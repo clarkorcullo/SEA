@@ -135,8 +135,8 @@
     <div class="user-profile">
         <div class="row">
             <div class="col-md-3 text-center">
-                {% if user.profile_picture %}
-                    <img src="{{ url_for('static', filename='profile_pictures/' + user.profile_picture) }}" 
+                {% if user.has_profile_picture %}
+                    <img src="{{ user.profile_picture_url }}" 
                          alt="Profile" class="user-avatar-large mb-3">
                 {% else %}
                     <div class="user-avatar-large bg-primary d-flex align-items-center justify-content-center text-white mx-auto mb-3">
@@ -293,7 +293,7 @@
                     </div>
                 </div>
                 <small class="text-muted">
-                    Score: {{ max(module_progress.score, module_progress.highest_score) }} (Best: {{ module_progress.highest_score }}) | 
+                    Score: {{ module_progress.score if module_progress.score >= module_progress.highest_score else module_progress.highest_score }} (Best: {{ module_progress.highest_score }}) | 
                     Time: {{ module_progress.time_spent }} min | 
                     Updated: {{ module_progress.updated_at.strftime('%m/%d/%Y') }}
                 </small>

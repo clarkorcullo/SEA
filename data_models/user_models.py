@@ -24,7 +24,8 @@ class User(UserMixin, BaseModel, TimestampMixin):
     year_level = db.Column(db.String(20), nullable=False)
     birthday = db.Column(db.DateTime, nullable=True)
     address = db.Column(db.String(200), nullable=True)
-    profile_picture = db.Column(db.String(200), nullable=True)
+    profile_picture = db.Column(db.String(200), nullable=True)  # Filename for local, base64 for deployment
+    profile_picture_data = db.Column(db.Text, nullable=True)  # Base64 encoded image data
     
     # Progress tracking attributes
     modules_completed = db.Column(db.Integer, default=0)
@@ -55,10 +56,11 @@ class User(UserMixin, BaseModel, TimestampMixin):
     @property
     def completion_percentage(self) -> float:
         """Calculate overall completion percentage"""
-        total_modules = 5  # Total number of modules in the program
+        from data_models.content_models import Module
+        total_modules = Module.count()  # Get actual total number of modules in the system
         if total_modules == 0:
             return 0.0
-        return (self.modules_completed / total_modules) * 100
+        return min(100.0, (self.modules_completed / total_modules) * 100)  # Cap at 100%
     
     @property
     def average_score(self) -> float:
@@ -72,6 +74,22 @@ class User(UserMixin, BaseModel, TimestampMixin):
     def is_admin(self) -> bool:
         """Check if user is an administrator"""
         return self.username == 'administrator'
+    
+    @property
+    def profile_picture_url(self) -> str:
+        """Get profile picture URL - handles both local files and base64 data"""
+        if self.profile_picture_data:
+            # Return base64 data URL for deployment
+            return f"data:image/jpeg;base64,{self.profile_picture_data}"
+        elif self.profile_picture:
+            # Return static file URL for local development
+            return f"/static/profile_pictures/{self.profile_picture}"
+        return None
+    
+    @property
+    def has_profile_picture(self) -> bool:
+        """Check if user has a profile picture"""
+        return bool(self.profile_picture or self.profile_picture_data)
     
     def set_password(self, password: str) -> bool:
         """Set user password with validation"""

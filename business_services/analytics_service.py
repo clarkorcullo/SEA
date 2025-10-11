@@ -135,7 +135,7 @@ class AnalyticsService:
                 modules_completed = len(completed_modules)
                 
                 # Calculate completion percentage based on actual data
-                total_modules = 6  # Total modules including Final Assessment
+                total_modules = Module.count()  # Get actual total number of modules in the system
                 completion_percentage = (modules_completed / total_modules) * 100 if total_modules > 0 else 0
                 
                 # Get assessment data

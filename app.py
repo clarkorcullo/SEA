@@ -2046,12 +2046,14 @@ def final_assessment():
     try:
         # Check if user has completed all modules (admins bypass for review)
         completed_modules = len(user_service.get_user_completed_modules(current_user.id))
-        # Only count modules 1-5 for final assessment eligibility (exclude Final Assessment itself)
-        total_modules = 5
+        # Only count modules for final assessment eligibility (exclude Final Assessment itself)
+        # Count all modules except those with order >= 6 (assuming Final Assessment is order 6 or higher)
+        from data_models.content_models import Module
+        total_modules = Module.query.filter(Module.order < 6).count()
         
         if not getattr(current_user, 'is_admin', False):
             if completed_modules < total_modules:
-                flash('You must complete all 5 modules before taking the Final Assessment.', 'warning')
+                flash(f'You must complete all {total_modules} modules before taking the Final Assessment.', 'warning')
                 return redirect(url_for('dashboard'))
         else:
             # For admins, present as fully completed to unlock UI state
@@ -2705,23 +2707,33 @@ def handle_profile_update():
         
         # Handle profile picture upload
         profile_picture = None
+        profile_picture_data = None
         if 'profile_picture' in request.files:
             file = request.files['profile_picture']
             if file and file.filename:
                 # Validate file type
                 allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
                 if '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in allowed_extensions:
-                    # Generate unique filename
-                    import uuid
-                    filename = f"{current_user.username}_{uuid.uuid4().hex[:8]}.{file.filename.rsplit('.', 1)[1].lower()}"
-                    
-                    # Save file
+                    # Check if we're in deployment (ephemeral filesystem)
                     import os
-                    upload_folder = os.path.join(app.static_folder, 'profile_pictures')
-                    os.makedirs(upload_folder, exist_ok=True)
-                    file_path = os.path.join(upload_folder, filename)
-                    file.save(file_path)
-                    profile_picture = filename
+                    is_deployment = os.environ.get('RENDER') or os.environ.get('FLASK_ENV') == 'production'
+                    
+                    if is_deployment:
+                        # In deployment, store as base64 in database
+                        import base64
+                        file_content = file.read()
+                        profile_picture_data = base64.b64encode(file_content).decode('utf-8')
+                    else:
+                        # In local development, save as file
+                        import uuid
+                        filename = f"{current_user.username}_{uuid.uuid4().hex[:8]}.{file.filename.rsplit('.', 1)[1].lower()}"
+                        
+                        upload_folder = os.path.join(app.static_folder, 'profile_pictures')
+                        os.makedirs(upload_folder, exist_ok=True)
+                        file_path = os.path.join(upload_folder, filename)
+                        file.seek(0)  # Reset file pointer after reading for base64
+                        file.save(file_path)
+                        profile_picture = filename
                 else:
                     errors['profile_picture'] = 'Please upload a valid image file (PNG, JPG, JPEG, GIF, WEBP).'
         
@@ -2746,6 +2758,10 @@ def handle_profile_update():
         
         if profile_picture:
             user.profile_picture = profile_picture
+            user.profile_picture_data = None  # Clear base64 data when using file
+        if profile_picture_data:
+            user.profile_picture_data = profile_picture_data
+            user.profile_picture = None  # Clear filename when using base64
         
         if user.save():
             flash('Profile updated successfully!', 'success')

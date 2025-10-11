@@ -164,8 +164,8 @@
                 <div class="user-card">
                     <div class="d-flex align-items-start">
                         <div class="me-3">
-                            {% if user.profile_picture %}
-                                <img src="{{ url_for('static', filename='profile_pictures/' + user.profile_picture) }}" 
+                            {% if user.has_profile_picture %}
+                                <img src="{{ user.profile_picture_url }}" 
                                      alt="Profile" class="user-avatar">
                             {% else %}
                                 <div class="user-avatar bg-primary d-flex align-items-center justify-content-center text-white">
