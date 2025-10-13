@@ -3,7 +3,7 @@ Progress tracking models for the Social Engineering Awareness Program
 Includes UserProgress, AssessmentResult, SimulationResult, and FeedbackSurvey models
 """
 
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Any, Optional
 from enum import Enum
 import json
@@ -101,7 +101,7 @@ class UserProgress(BaseModel, TimestampMixin):
         # Once completed, always stay completed (never revert)
         if self.status != ProgressStatus.COMPLETED.value:
             self.status = ProgressStatus.COMPLETED.value
-            self.completed_at = datetime.utcnow()
+            self.completed_at = datetime.now(timezone.utc)
         
         return self.save()
     
@@ -118,7 +118,7 @@ class UserProgress(BaseModel, TimestampMixin):
         # If not completed and score >= 80%, mark as completed
         if self.status != ProgressStatus.COMPLETED.value and score >= 80:
             self.status = ProgressStatus.COMPLETED.value
-            self.completed_at = datetime.utcnow()
+            self.completed_at = datetime.now(timezone.utc)
         
         return self.save()
     

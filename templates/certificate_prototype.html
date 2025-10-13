@@ -1,0 +1,1022 @@
+{% extends "base.html" %}
+
+{% block title %}Prototype Certificate - Social Engineering Awareness{% endblock %}
+
+{% block head %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+{% endblock %}
+
+{% block content %}
+<div class="container certificate-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="certificate-page">
+                <div class="certificate-body-wrapper">
+                    <div class="certificate-content certificate-bg">
+                    <img src="/learning_assets/Documents/CertTemplate.png" alt="Certificate Background" class="cert-bg-print"/>
+                    <!-- Certificate Header -->
+                    <div class="text-center mb-4">
+                        <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+                            <img src="{{ url_for('static', filename='MMDCLogo.png') }}" alt="MMDC Logo" class="cert-logo">
+                            <img src="{{ url_for('static', filename='SEALogo.png') }}" alt="SEA Logo" class="cert-logo">
+                        </div>
+                        <div class="cert-title-row mb-1">
+                            <h2 class="text-primary certificate-title mb-0">CERTIFICATE OF COMPLETION</h2>
+                        </div>
+                        <img src="/learning_assets/Documents/CertRibbon.png" alt="Ribbon" class="cert-ribbon-vert" />
+                    </div>
+
+                    <!-- Certificate Content -->
+                    <div class="certificate-inner text-center">
+                        <div class="mb-4">
+                            <p class="mb-2 certificate-intro">This certificate is proudly presented to</p>
+                            <h3 class="text-primary mb-3 certificate-name">{{ certificate.student_name }}</h3>
+                            <p class="lead">for the successful completion of the</p>
+                            <h4 class="text-danger mb-2 certificate-program">Social Engineering Awareness and Defense Mechanisms Learning Program,</h4>
+                            <p class="text-muted">a prototype developed as part of the Capstone Project entitled</p>
+                            <p class="text-dark font-weight-bold mb-3">"An Academic Initiative on Social Engineering Awareness and Defense Mechanisms for IT Students Across All Specializations in MMDC."</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <p class="lead">This certifies their enhanced understanding and skills in identifying, preventing, and responding to social engineering threats through interactive modules, quizzes, reflections, and simulations.</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <p class="certificate-date"><strong>Date of Completion:</strong> {{ certificate.completion_date }}</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="presented-by-section">
+                                <p class="mb-2"><strong>Presented by</strong></p>
+                                <p class="mb-1">Group 4 – Capstone 2 Researchers</p>
+                                <p class="mb-1">Mapúa Malayan Digital College (MMDC)</p>
+                                <p class="mb-0">Bachelor of Science in Information Technology – Network and Cybersecurity</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="note-section">
+                                <hr class="my-3">
+                                <p class="text-muted mb-0 small"><strong>Note:</strong></p>
+                                <p class="text-muted mb-0 small">This certificate is system-generated as part of the MMDC Social Engineering Awareness Prototype and is intended solely for Capstone research purposes.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certificate Verification (rotated vertical on left side) -->
+                    <div class="cert-id-vertical">
+                        <span>Certificate ID: {{ certificate.certificate_id }}</span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary btn-lg me-3" id="printCertBtn">
+                            <i class="fas fa-print me-2"></i>Print Certificate
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-home me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Cache buster: 2025-10-09-18-51 */
+/* Achievement List Styling with Proper Spacing */
+.achievement-item {
+    display: flex !important;
+    align-items: center !important;
+    margin-bottom: 12px !important;
+    gap: 0 !important;
+    padding: 0 !important;
+}
+
+.achievement-icon {
+    color: #28a745 !important;
+    margin-right: 12px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    padding: 0 !important;
+    min-width: 16px !important;
+    font-size: 0.9rem !important;
+    flex-shrink: 0 !important;
+}
+
+.achievement-text {
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: left !important;
+    flex: 1 !important;
+}
+
+/* Mobile-First Responsive Design */
+.certificate-container { 
+    font-family: Georgia, "Times New Roman", Times, serif; 
+    padding: 0 15px;
+    background: transparent; /* No background - let it blend naturally */
+}
+
+.certificate-page { 
+    border: none; 
+    margin: 0;
+    background: transparent; /* No background */
+    box-shadow: none; /* Remove any shadow */
+}
+
+.certificate-body-wrapper {
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 0;
+    margin: 0;
+}
+
+.certificate-content { 
+    position: relative; 
+    border: none; /* Remove border that might be causing white background */
+    border-radius: 0; /* Remove border radius */
+    background: white; /* White background for readability in preview */
+    overflow: visible; /* Allow template to show through */
+    min-height: 800px; /* Match certificate template size */
+    width: 100%; /* Full width */
+}
+
+.certificate-bg { 
+    background-image: url('/learning_assets/Documents/CertTemplate.png');
+    background-size: cover; 
+    background-repeat: no-repeat; 
+    background-position: center; 
+    border: none; 
+    border-radius: 0; 
+    background-color: white; /* White background for readability in preview */
+    /* Mobile-first responsive padding */
+    padding: 20px 15px;
+    min-height: 100%; /* Fill the certificate content area */
+}
+
+.certificate-inner { 
+    background: transparent !important; 
+    background-color: transparent !important;
+}
+
+.cert-bg-print { 
+    display: none; 
+}
+
+/* Mobile Typography */
+.certificate-title { 
+    letter-spacing: 0.3px; 
+    font-size: 1.4rem;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+.cert-title-row { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    justify-content: center;
+}
+
+.cert-ribbon { 
+    height: 24px; 
+    width: auto; 
+    mix-blend-mode: multiply; 
+    filter: contrast(140%) saturate(110%); 
+}
+
+.cert-ribbon-vert {
+    display: none; /* Hide on mobile */
+}
+
+.certificate-subtitle { 
+    font-weight: 500; 
+}
+
+.certificate-intro { 
+    font-style: italic; 
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.certificate-name { 
+    font-weight: 700; 
+    text-decoration: underline; 
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+}
+
+.certificate-program { 
+    font-weight: 600; 
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.certificate-date {
+    font-size: 1rem;
+    margin-bottom: 8px;
+}
+
+.presented-by-section {
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.note-section {
+    font-size: 0.85rem;
+    line-height: 1.3;
+}
+
+.cert-logo { 
+    height: 50px; 
+    width: auto; 
+}
+
+/* Mobile Achievement List */
+.achievement-list { 
+    list-style: none; 
+    padding: 0; 
+    margin: 0; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+}
+
+.achievement-list li { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    margin: 0; 
+    padding: 0; 
+}
+
+.achievement-list .fas { 
+    color: #28a745; 
+    margin-right: 12px; 
+    margin-top: 0; 
+    margin-bottom: 0; 
+    margin-left: 0; 
+    padding: 0; 
+    min-width: 16px; 
+    font-size: 0.9rem; 
+    flex-shrink: 0; 
+}
+
+.achievement-list span { 
+    margin: 0; 
+    padding: 0; 
+    text-align: left; 
+    flex: 1; 
+}
+
+/* Mobile Signature Block */
+.signature-block { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px; 
+    align-items: center; 
+    justify-content: center; 
+    margin: 20px 0; 
+}
+
+.signature-item { 
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 5px; 
+}
+
+.signature-image { 
+    height: 40px; 
+    width: auto; 
+    margin-bottom: 5px; 
+}
+
+.signature-line { 
+    width: 120px; 
+    height: 1px; 
+    background-color: #333; 
+    margin: 5px 0; 
+}
+
+.sig-name { 
+    font-weight: bold; 
+    font-size: 0.9rem; 
+    margin: 0; 
+}
+
+.sig-role { 
+    font-size: 0.8rem; 
+    color: #666; 
+    margin: 0; 
+}
+
+.sig-org { 
+    font-size: 0.75rem; 
+    color: #888; 
+    margin: 0; 
+}
+
+/* Certificate ID (Mobile) */
+.cert-id-vertical { 
+    position: absolute; 
+    left: 10px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    writing-mode: vertical-rl; 
+    text-orientation: mixed; 
+    font-size: 0.7rem; 
+    color: #666; 
+    white-space: nowrap; 
+    z-index: 10; 
+}
+
+/* Tablet Styles (768px to 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .certificate-container {
+        padding: 0 30px;
+        background: transparent;
+        min-height: 100vh;
+    }
+    
+    .certificate-bg {
+        padding: 40px 30px;
+        background-image: url('/learning_assets/Documents/CertTemplate.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-color: white;
+        min-height: 100%;
+    }
+    
+    .cert-ribbon-vert {
+        display: block;
+        position: absolute;
+        right: 30px;
+        top: 80px;
+        height: 140px;
+        width: auto;
+        mix-blend-mode: normal;
+        filter: contrast(100%) saturate(100%);
+        pointer-events: none;
+        opacity: 0.9;
+    }
+    
+    .certificate-title {
+        font-size: 1.8rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .certificate-name {
+        font-size: 1.6rem;
+        margin-bottom: 12px;
+    }
+    
+    .certificate-program {
+        font-size: 1.3rem;
+        margin-bottom: 8px;
+    }
+    
+    .certificate-date {
+        font-size: 1.1rem;
+    }
+    
+    .presented-by-section {
+        font-size: 1rem;
+    }
+    
+    .note-section {
+        font-size: 0.9rem;
+    }
+    
+    .cert-logo {
+        height: 60px;
+    }
+    
+    .achievement-list {
+        gap: 15px;
+    }
+    
+    .achievement-list li {
+        gap: 15px;
+    }
+    
+    .achievement-list .fas {
+        font-size: 1rem;
+        margin-right: 15px;
+    }
+    
+    .signature-block {
+        flex-direction: row;
+        gap: 40px;
+        margin: 30px 0;
+    }
+    
+    .signature-item {
+        gap: 8px;
+    }
+    
+    .signature-image {
+        height: 50px;
+        margin-bottom: 8px;
+    }
+    
+    .signature-line {
+        width: 150px;
+        margin: 8px 0;
+    }
+    
+    .sig-name {
+        font-size: 1rem;
+    }
+    
+    .sig-role {
+        font-size: 0.85rem;
+    }
+    
+    .sig-org {
+        font-size: 0.8rem;
+    }
+    
+    .cert-id-vertical {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        font-size: 0.9rem;
+        letter-spacing: 0.4px;
+    }
+}
+
+/* Desktop Styles (992px to 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .certificate-container {
+        padding: 0 40px;
+        background: transparent;
+        min-height: 100vh;
+    }
+    
+    .certificate-bg {
+        padding: 60px 50px;
+        background-image: url('/learning_assets/Documents/CertTemplate.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-color: white;
+        min-height: 100%;
+    }
+    
+    .cert-ribbon-vert {
+        display: block;
+        position: absolute;
+        right: 70px;
+        top: 100px;
+        height: 180px;
+        width: auto;
+        mix-blend-mode: normal;
+        filter: contrast(100%) saturate(100%);
+        pointer-events: none;
+        opacity: 0.9;
+    }
+    
+    .certificate-title {
+        font-size: 2.2rem;
+        letter-spacing: 0.6px;
+    }
+    
+    .certificate-name {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+    }
+    
+    .certificate-program {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .certificate-date {
+        font-size: 1.2rem;
+    }
+    
+    .presented-by-section {
+        font-size: 1.1rem;
+    }
+    
+    .note-section {
+        font-size: 0.95rem;
+    }
+    
+    .cert-logo {
+        height: 70px;
+    }
+    
+    .achievement-list {
+        gap: 18px;
+    }
+    
+    .achievement-list li {
+        gap: 18px;
+    }
+    
+    .achievement-list .fas {
+        font-size: 1.1rem;
+        margin-right: 18px;
+    }
+    
+    .signature-block {
+        flex-direction: row;
+        gap: 60px;
+        margin: 40px 0;
+    }
+    
+    .signature-item {
+        gap: 10px;
+    }
+    
+    .signature-image {
+        height: 60px;
+        margin-bottom: 10px;
+    }
+    
+    .signature-line {
+        width: 180px;
+        margin: 10px 0;
+    }
+    
+    .sig-name {
+        font-size: 1.1rem;
+    }
+    
+    .sig-role {
+        font-size: 0.9rem;
+    }
+    
+    .sig-org {
+        font-size: 0.85rem;
+    }
+    
+    .cert-id-vertical {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+    }
+}
+
+/* Large Desktop Styles (1200px and up) */
+@media (min-width: 1200px) {
+    .certificate-container {
+        background: transparent; /* No background */
+        min-height: 100vh;
+    }
+    
+    .certificate-bg {
+        padding: 90px 100px;
+        background-image: url('/learning_assets/Documents/CertTemplate.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-color: white; /* White background for readability in preview */
+        min-height: 100%;
+    }
+    
+    .cert-ribbon-vert {
+        right: 110px;
+        top: 120px; /* Moved up from 160px to 120px */
+        height: 220px; /* Reduced from 300px to 220px */
+        mix-blend-mode: normal;
+        filter: contrast(100%) saturate(100%);
+        opacity: 0.9;
+    }
+    
+    .cert-id-vertical {
+        position: absolute;
+        left: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        font-size: 1.1rem;
+        letter-spacing: 0.6px;
+    }
+}
+
+/* Mobile Styles (up to 767px) */
+@media (max-width: 767px) {
+    .certificate-container {
+        padding: 0 10px;
+    }
+    
+    .certificate-bg {
+        padding: 15px 10px;
+        min-height: 600px;
+    }
+    
+    .certificate-title {
+        font-size: 1.2rem;
+        letter-spacing: 0.2px;
+        margin-bottom: 8px;
+    }
+    
+    .certificate-name {
+        font-size: 1.1rem;
+        margin-bottom: 6px;
+    }
+    
+    .certificate-program {
+        font-size: 1rem;
+        margin-bottom: 4px;
+    }
+    
+    .certificate-date {
+        font-size: 0.9rem;
+    }
+    
+    .presented-by-section {
+        font-size: 0.85rem;
+    }
+    
+    .note-section {
+        font-size: 0.75rem;
+    }
+    
+    .cert-logo {
+        height: 40px;
+    }
+    
+    .achievement-list {
+        gap: 8px;
+    }
+    
+    .achievement-list li {
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .achievement-list .fas {
+        font-size: 0.8rem;
+        margin-right: 8px;
+        min-width: 14px;
+    }
+    
+    .signature-block {
+        flex-direction: column;
+        gap: 15px;
+        margin: 15px 0;
+    }
+    
+    .signature-item {
+        gap: 4px;
+    }
+    
+    .signature-image {
+        height: 35px;
+        margin-bottom: 4px;
+    }
+    
+    .signature-line {
+        width: 100px;
+        margin: 4px 0;
+    }
+    
+    .sig-name {
+        font-size: 0.8rem;
+    }
+    
+    .sig-role {
+        font-size: 0.7rem;
+    }
+    
+    .sig-org {
+        font-size: 0.65rem;
+    }
+    
+    .cert-id-vertical {
+        position: absolute;
+        left: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        font-size: 0.6rem;
+    }
+    
+    .btn {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
+    
+    .btn-lg {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+}
+
+/* Extra Small Mobile Styles (up to 575px) */
+@media (max-width: 575px) {
+    .certificate-container {
+        padding: 0 5px;
+    }
+    
+    .certificate-bg {
+        padding: 10px 5px;
+    }
+    
+    .certificate-title {
+        font-size: 1rem;
+        letter-spacing: 0.1px;
+    }
+    
+    .certificate-name {
+        font-size: 1rem;
+    }
+    
+    .certificate-program {
+        font-size: 0.9rem;
+    }
+    
+    .certificate-date {
+        font-size: 0.8rem;
+    }
+    
+    .presented-by-section {
+        font-size: 0.8rem;
+    }
+    
+    .note-section {
+        font-size: 0.7rem;
+    }
+    
+    .cert-logo {
+        height: 35px;
+    }
+    
+    .achievement-list li {
+        margin-bottom: 6px;
+    }
+    
+    .achievement-list .fas {
+        font-size: 0.7rem;
+        margin-right: 6px;
+        min-width: 12px;
+    }
+    
+    .signature-image {
+        height: 30px;
+    }
+    
+    .signature-line {
+        width: 80px;
+    }
+    
+    .sig-name {
+        font-size: 0.75rem;
+    }
+    
+    .sig-role {
+        font-size: 0.65rem;
+    }
+    
+    .sig-org {
+        font-size: 0.6rem;
+    }
+    
+    .cert-id-vertical {
+        position: absolute;
+        left: 3px;
+        top: 50%;
+        transform: translateY(-50%);
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        font-size: 0.55rem;
+    }
+}
+
+/* Print Styles */
+@page { 
+    size: A4 landscape; 
+    margin: 8mm; 
+}
+
+@media print {
+    /* Force landscape orientation */
+    @page {
+        size: A4 landscape;
+        margin: 8mm;
+    }
+    
+    /* Hide navigation and buttons */
+    .navbar, .footer, .btn { display: none !important; }
+    
+    /* Reset body and html for print */
+    html, body { 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        width: 100% !important; 
+        height: 100% !important; 
+        overflow: hidden; 
+        font-size: 12pt;
+    }
+    
+    /* Print-specific certificate styling */
+    .certificate-container { 
+        width: 100% !important; 
+        max-width: 100% !important; 
+        margin: 0 !important; 
+        padding: 0 !important;
+        page-break-inside: avoid; 
+    }
+    
+    .certificate-page, .certificate-content, .certificate-inner { 
+        box-shadow: none !important; 
+        background: transparent !important; 
+        background-color: transparent !important;
+        -webkit-print-color-adjust: exact; 
+        print-color-adjust: exact; 
+    }
+    
+    .certificate-content { 
+        border: none !important; /* Remove border for print */
+        width: 100% !important; 
+        height: auto !important; 
+        overflow: visible !important; 
+        position: relative; 
+        page-break-inside: avoid;
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+    
+    .certificate-bg { 
+        background: none !important; 
+        padding: 15mm 10mm !important;
+    }
+    
+    .cert-bg-print { 
+        display: block; 
+        position: absolute; 
+        inset: 0; 
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover; 
+        z-index: -1; 
+    }
+    
+    /* Landscape print optimizations */
+    .certificate-bg {
+        padding: 14mm 18mm !important;
+    }
+    
+    /* Print typography adjustments */
+    .certificate-title { 
+        font-size: 18pt !important; 
+        margin-bottom: 8pt !important;
+    }
+    
+    .certificate-name { 
+        font-size: 16pt !important; 
+        margin-bottom: 6pt !important;
+    }
+    
+    .certificate-program { 
+        font-size: 14pt !important; 
+        margin-bottom: 6pt !important;
+    }
+    
+    .certificate-date {
+        font-size: 12pt !important;
+    }
+    
+    .presented-by-section {
+        font-size: 11pt !important;
+    }
+    
+    .note-section {
+        font-size: 10pt !important;
+    }
+    
+    .cert-logo { 
+        height: 60pt !important; 
+    }
+    
+    .achievement-list { 
+        gap: 8pt !important; 
+    }
+    
+    .achievement-list li { 
+        margin-bottom: 6pt !important; 
+    }
+    
+    .achievement-list .fas { 
+        font-size: 10pt !important; 
+        margin-right: 8pt !important; 
+        min-width: 12pt !important; 
+    }
+    
+    .signature-block { 
+        flex-direction: row !important; 
+        gap: 40pt !important; 
+        margin: 20pt 0 !important; 
+        align-items: flex-end !important; 
+    }
+    
+    .signature-item { 
+        gap: 6pt !important; 
+    }
+    
+    .signature-image { 
+        height: 50pt !important; 
+        margin-bottom: 6pt !important; 
+    }
+    
+    .signature-line { 
+        width: 150pt !important; 
+        margin: 6pt 0 !important; 
+    }
+    
+    .sig-name { 
+        font-size: 12pt !important; 
+    }
+    
+    .sig-role { 
+        font-size: 10pt !important; 
+    }
+    
+    .sig-org { 
+        font-size: 9pt !important; 
+    }
+    
+    .cert-id-vertical { 
+        position: absolute !important;
+        left: 6mm !important; 
+        top: 50% !important; 
+        transform: translateY(-50%) !important; 
+        writing-mode: vertical-rl !important; 
+        text-orientation: mixed !important; 
+        font-size: 11pt !important; 
+        margin: 0 !important;
+        letter-spacing: 0.6px;
+    }
+    
+    .cert-ribbon-vert {
+        display: block !important;
+        position: absolute !important;
+        right: 18mm !important;
+        top: 25mm !important;
+        height: 200px !important;
+        width: auto !important;
+    }
+}
+
+/* Explicit named page to force landscape across PDF/Printer drivers */
+@page a4land { size: 297mm 210mm; margin: 6mm; }
+@media print {
+  body.page-a4-land { page: a4land; }
+  /* Ensure the certificate fills the page area without unexpected shrinking */
+  .certificate-container, .certificate-page, .card-body, .certificate-content { width: 100% !important; max-width: 100% !important; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const printBtn = document.getElementById('printCertBtn');
+    
+    if (printBtn) {
+        printBtn.addEventListener('click', function() {
+            // Add landscape class to body for print
+            document.body.classList.add('page-a4-land');
+            
+            // Hide action buttons before printing
+            const buttons = document.querySelector('.text-center.mt-3');
+            if (buttons) {
+                buttons.style.display = 'none';
+            }
+            
+            // Print the page
+            window.print();
+            
+            // Remove landscape class and show buttons again after printing
+            setTimeout(() => {
+                document.body.classList.remove('page-a4-land');
+                if (buttons) {
+                    buttons.style.display = 'block';
+                }
+            }, 1000);
+        });
+    }
+});
+</script>
+{% endblock %}

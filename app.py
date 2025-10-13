@@ -38,7 +38,7 @@ import os
 import sys
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import random
 import json
 import secrets
@@ -2543,7 +2543,7 @@ def certificate():
             'username': getattr(current_user, 'username', 'student'),
             'specialization': getattr(current_user, 'specialization', None) or '—',
             'year_level': getattr(current_user, 'year_level', None) or '—',
-            'completion_date': datetime.utcnow().strftime('%B %d, %Y, %I:%M %p'),
+            'completion_date': datetime.now(timezone(timedelta(hours=8))).strftime('%B %d, %Y, %I:%M %p'),
             'modules_completed': completed_modules,
             'score': avg_score,
             # Certificate ID format: MMDCSEA-[MMDDYYYY]0000001 (use user id zero-padded to 7 digits)
@@ -2555,6 +2555,101 @@ def certificate():
     except Exception as e:
         flash(f'Error generating certificate: {e}', 'error')
         logger.error(f"Error generating certificate: {e}")
+        return redirect(url_for('dashboard'))
+
+@app.route('/certificate_prototype')
+@login_required
+def certificate_prototype():
+    """
+    Prototype Certificate generation route for Capstone research purposes.
+    
+    This route generates a certificate with modified content for prototype testing,
+    maintaining the same format and style as the real certificate but with research-specific text.
+    
+    Returns:
+        str: Rendered prototype certificate template
+    """
+    try:
+        # Admin bypass: allow viewing the certificate page for testing
+        is_admin = getattr(current_user, 'is_admin', False)
+
+        # Enforce profile full name requirement (non-admins)
+        try:
+            full_name = (getattr(current_user, 'full_name', None) or '').strip()
+        except Exception:
+            full_name = ''
+        
+        def _is_valid_full_name(name: str) -> bool:
+            """Validate that the full name is properly formatted for certificate generation"""
+            if not name or len(name) < 2:
+                return False
+            # Check if it's not just the default "User username" format
+            if name.startswith('User '):
+                return False
+            # Check if it contains at least first and last name (space required)
+            if ' ' not in name:
+                return False
+            # Check minimum length for a proper name
+            if len(name) < 5:
+                return False
+            return True
+        
+        if not is_admin and not _is_valid_full_name(full_name):
+            flash('Please update your full name in your Profile section before generating a certificate. Your certificate will display your real name instead of your username.', 'warning')
+            return redirect(url_for('profile'))
+
+        # Check eligibility only for non-admins
+        # Admins can view for QA even without prerequisites
+        final_result = AssessmentResult.query.filter_by(
+            user_id=current_user.id,
+            assessment_type='final_assessment',
+            passed=True
+        ).first()
+        
+        survey_completed = FeedbackSurvey.query.filter_by(user_id=current_user.id).first()
+        
+        if not is_admin and not final_result:
+            flash('You must pass the Final Assessment to generate a certificate.', 'warning')
+            return redirect(url_for('dashboard'))
+        
+        if not is_admin and not survey_completed:
+            flash('You must complete the survey to generate a certificate.', 'warning')
+            return redirect(url_for('survey'))
+
+        # Build minimal certificate context to avoid undefined errors
+        try:
+            completed_modules = len(user_service.get_user_completed_modules(current_user.id))
+        except Exception:
+            completed_modules = 0
+
+        try:
+            results = AssessmentResult.query.filter_by(user_id=current_user.id).all()
+            total_q = sum((r.total_questions or 0) for r in results)
+            total_s = sum((r.score or 0) for r in results)
+            avg_score = int((total_s / total_q) * 100) if total_q else 0
+        except Exception:
+            avg_score = 0
+
+        # Use real name for certificate (already validated above)
+        display_name = full_name if _is_valid_full_name(full_name) else getattr(current_user, 'username', 'Student')
+
+        certificate_data = {
+            'student_name': display_name,
+            'username': getattr(current_user, 'username', 'student'),
+            'specialization': getattr(current_user, 'specialization', None) or '—',
+            'year_level': getattr(current_user, 'year_level', None) or '—',
+            'completion_date': datetime.now(timezone(timedelta(hours=8))).strftime('%B %d, %Y, %I:%M %p'),
+            'modules_completed': completed_modules,
+            'score': avg_score,
+            # Certificate ID format: MMDCSEA-PROT-[MMDDYYYY]0000001 (use user id zero-padded to 7 digits)
+            'certificate_id': f"MMDCSEA-PROT-{datetime.now(timezone(timedelta(hours=8))).strftime('%m%d%Y')}{str(getattr(current_user, 'id', 1)).zfill(7)}"
+        }
+
+        return render_template('certificate_prototype.html', certificate=certificate_data)
+        
+    except Exception as e:
+        flash(f'Error generating prototype certificate: {e}', 'error')
+        logger.error(f"Error generating prototype certificate: {e}")
         return redirect(url_for('dashboard'))
 
 # =============================================================================

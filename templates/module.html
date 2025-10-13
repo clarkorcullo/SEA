@@ -91,11 +91,11 @@
                         <div class="progress-item">
                             <div class="progress-label">
                                 <span>Completion Status</span>
-                                <span class="progress-percentage">{{ knowledge_check_score }}%</span>
+                                <span class="progress-percentage">{{ 100 if progress.status == 'completed' else knowledge_check_score }}%</span>
                             </div>
                             <div class="progress-bar-container">
-                            <div class="progress-bar {% if knowledge_check_score >= 80 %}completed{% elif knowledge_check_score > 0 %}in-progress{% else %}not-started{% endif %}"
-                                 data-progress="{{ 100 if knowledge_check_score >= 80 else knowledge_check_score }}">
+                            <div class="progress-bar {% if progress.status == 'completed' %}completed{% elif knowledge_check_score >= 80 %}completed{% elif knowledge_check_score > 0 %}in-progress{% else %}not-started{% endif %}"
+                                 data-progress="{{ 100 if progress.status == 'completed' else (100 if knowledge_check_score >= 80 else knowledge_check_score) }}">
                                 </div>
                             </div>
                         </div>
@@ -1271,13 +1271,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 certBtn.classList && certBtn.classList.remove('disabled');
                 // Remove any inline handlers that show placeholder alerts
                 certBtn.removeAttribute('onclick');
-                // Route to certificate page; server enforces eligibility and full-name policy
+                // Route to prototype certificate page; server enforces eligibility and full-name policy
                 certBtn.addEventListener('click', function(ev){
                     ev.preventDefault();
-                    window.location.href = '/certificate';
+                    window.location.href = '/certificate_prototype';
                 });
                 if (certBtn.tagName === 'A') {
-                    certBtn.setAttribute('href', '/certificate');
+                    certBtn.setAttribute('href', '/certificate_prototype');
                 }
             }
         }
