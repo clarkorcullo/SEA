@@ -158,7 +158,8 @@
                             <span>Back to Dashboard</span>
                         </a>
                 
-                <!-- Module Reflections (public, capped to 3 with scroll) -->
+                <!-- Module Reflections (public, capped to 3 with scroll) - Hidden for Module 6 -->
+                {% if module.id != 6 %}
                 <div class="sidebar-card" style="margin-top: 1rem;">
                     <div class="card-header">
                         <i class="fas fa-comments"></i>
@@ -168,6 +169,7 @@
                         <div class="text-muted">Loading reflections…</div>
                     </div>
                 </div>
+                {% endif %}
                     </div>
                 </div>
             </div>

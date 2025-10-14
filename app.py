@@ -2638,7 +2638,7 @@ def certificate_prototype():
             'username': getattr(current_user, 'username', 'student'),
             'specialization': getattr(current_user, 'specialization', None) or '—',
             'year_level': getattr(current_user, 'year_level', None) or '—',
-            'completion_date': datetime.now(timezone(timedelta(hours=8))).strftime('%B %d, %Y, %I:%M %p'),
+            'completion_date': datetime.now(timezone(timedelta(hours=8))).strftime('%B %d, %Y'),
             'modules_completed': completed_modules,
             'score': avg_score,
             # Certificate ID format: MMDCSEA-PROT-[MMDDYYYY]0000001 (use user id zero-padded to 7 digits)
