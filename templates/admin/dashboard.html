@@ -2,95 +2,160 @@
 
 {% block title %}Admin Dashboard - Social Engineering Awareness{% endblock %}
 
+{% block body_class %}admin-dashboard{% endblock %}
+
 {% block content %}
 <style>
 .admin-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: rgba(7, 12, 24, 0.78);
     color: white;
     padding: 2rem 0;
     margin-bottom: 2rem;
-    border-radius: 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 30px 80px rgba(5, 8, 16, 0.5);
 }
 
 .stat-card {
-    background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-    border-left: 4px solid;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.22);
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
+    box-shadow: 0 45px 90px rgba(15, 23, 42, 0.28);
 }
 
-.stat-card.users { border-left-color: #007bff; }
-.stat-card.modules { border-left-color: #28a745; }
-.stat-card.assessments { border-left-color: #ffc107; }
-.stat-card.simulations { border-left-color: #dc3545; }
-
 .stat-number {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: var(--brand-navy);
 }
 
 .stat-label {
-    color: #6c757d;
-    font-size: 0.9rem;
+    color: var(--brand-text-muted);
+    font-size: 0.85rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.05em;
 }
 
 .admin-nav {
-    background: white;
-    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 20px;
     padding: 1rem;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.2);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.5);
 }
 
 .admin-nav .nav-link {
-    color: #495057;
-    font-weight: 500;
+    color: var(--brand-text);
+    font-weight: 600;
     padding: 0.75rem 1rem;
-    border-radius: 5px;
-    transition: all 0.3s ease;
+    border-radius: 12px;
+    transition: all 0.25s ease;
 }
 
 .admin-nav .nav-link:hover {
-    background: #f8f9fa;
-    color: #007bff;
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--brand-blue);
 }
 
 .admin-nav .nav-link.active {
-    background: #007bff;
+    background: var(--brand-blue);
     color: white;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.3);
 }
 
-.recent-activity {
-    background: white;
-    border-radius: 10px;
+.recent-activity,
+.chart-container {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 20px;
     padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.2);
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    margin-bottom: 2rem;
 }
 
 .activity-item {
     padding: 0.75rem 0;
-    border-bottom: 1px solid #f8f9fa;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.7);
 }
 
 .activity-item:last-child {
     border-bottom: none;
 }
 
-.chart-container {
-    background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    margin-bottom: 2rem;
+.metric-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--brand-blue);
+}
+
+.metric-icon.alt {
+    background: rgba(13, 148, 136, 0.08);
+    color: var(--brand-teal);
+}
+
+.metric-icon.warn {
+    background: rgba(249, 115, 22, 0.08);
+    color: var(--brand-orange);
+}
+
+.metric-icon.neutral {
+    background: rgba(15, 23, 42, 0.08);
+    color: var(--brand-text);
+}
+
+.section-icon {
+    color: var(--brand-blue);
+}
+
+.section-icon.alt {
+    color: var(--brand-teal);
+}
+
+.section-icon.warn {
+    color: var(--brand-orange);
+}
+
+.section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: rgba(4, 7, 15, 0.78);
+    color: #fff;
+    box-shadow: 0 18px 36px rgba(4, 7, 15, 0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.section-label i {
+    color: var(--brand-blue);
 }
 </style>
 
@@ -127,38 +192,48 @@
 
     <!-- Statistics Cards -->
     <div class="row mb-4">
+        <div class="col-12 mb-3">
+            <div class="section-label">
+                <i class="fas fa-sitemap section-icon"></i> System Overview
+            </div>
+        </div>
         <div class="col-md-3 mb-3">
             <div class="stat-card users">
-                <div class="stat-number text-primary">{{ total_users }}</div>
+                <div class="stat-number">{{ total_users }}</div>
                 <div class="stat-label">Total Users</div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="stat-card modules">
-                <div class="stat-number text-success">{{ total_modules }}</div>
+                <div class="stat-number">{{ total_modules }}</div>
                 <div class="stat-label">Learning Modules</div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="stat-card assessments">
-                <div class="stat-number text-warning">{{ total_assessments }}</div>
+                <div class="stat-number">{{ total_assessments }}</div>
                 <div class="stat-label">Assessments</div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="stat-card simulations">
-                <div class="stat-number text-danger">{{ total_simulations }}</div>
+                <div class="stat-number">{{ total_simulations }}</div>
                 <div class="stat-label">Simulations</div>
             </div>
         </div>
     </div>
 
     <div class="row">
+        <div class="col-12 mb-3">
+            <div class="section-label">
+                <i class="fas fa-chart-line section-icon alt"></i> User Performance Analytics
+            </div>
+        </div>
         <!-- Recent Users -->
         <div class="col-md-6 mb-4">
             <div class="recent-activity">
                 <h5 class="mb-3">
-                    <i class="fas fa-user-plus text-primary"></i> Recent Users
+                    <i class="fas fa-user-plus section-icon"></i> Recent Users
                 </h5>
                 <div style="max-height: 420px; overflow-y: auto;">
                     {% if recent_users %}
@@ -191,7 +266,7 @@
         <div class="col-md-6 mb-4">
             <div class="recent-activity">
                 <h5 class="mb-3">
-                    <i class="fas fa-clipboard-check text-success"></i> Recent Assessments
+                    <i class="fas fa-clipboard-check section-icon alt"></i> Recent Assessments
                 </h5>
                 <div style="max-height: 420px; overflow-y: auto;">
                     {% if recent_assessments %}
@@ -225,6 +300,11 @@
     </div>
 
     <div class="row">
+        <div class="col-12 mb-3">
+            <div class="section-label">
+                <i class="fas fa-database section-icon alt"></i> Feedback & Survey Insights
+            </div>
+        </div>
         <!-- Users Module Reflections -->
         <div class="col-md-6 mb-4">
             <div class="recent-activity">
@@ -255,7 +335,7 @@
         <div class="col-md-6 mb-4">
             <div class="recent-activity">
                 <h5 class="mb-3">
-                    <i class="fas fa-poll text-success"></i> Program Survey Snapshot
+                    <i class="fas fa-poll section-icon alt"></i> Program Survey Snapshot
                 </h5>
                 <div>
                     {% if survey_summary %}
@@ -285,7 +365,7 @@
                 </div>
 
                 <hr>
-                <h6 class="mb-2"><i class="fas fa-lightbulb text-warning"></i> Latest Suggestions (optional)</h6>
+                <h6 class="mb-2"><i class="fas fa-lightbulb section-icon warn"></i> Latest Suggestions (optional)</h6>
                 <div style="max-height: 220px; overflow-y: auto;">
                     {% if latest_suggestions %}
                         {% for s in latest_suggestions %}
@@ -304,10 +384,15 @@
 
     <!-- User Statistics Charts -->
     <div class="row">
+        <div class="col-12 mb-3">
+            <div class="section-label">
+                <i class="fas fa-users section-icon"></i> Learner Distribution
+            </div>
+        </div>
         <div class="col-md-6 mb-4">
             <div class="chart-container">
                 <h5 class="mb-3">
-                    <i class="fas fa-chart-pie text-info"></i> Users by Specialization
+                    <i class="fas fa-chart-pie section-icon"></i> Users by Specialization
                 </h5>
                 {% if users_by_specialization %}
                     {% for spec, count in users_by_specialization %}
@@ -330,7 +415,7 @@
         <div class="col-md-6 mb-4">
             <div class="chart-container">
                 <h5 class="mb-3">
-                    <i class="fas fa-chart-bar text-warning"></i> Users by Year Level
+                    <i class="fas fa-chart-bar section-icon warn"></i> Users by Year Level
                 </h5>
                 {% if users_by_year %}
                     {% for year, count in users_by_year %}
@@ -353,11 +438,14 @@
 
     <!-- Quick Actions -->
     <div class="row">
+        <div class="col-12 mb-3">
+            <div class="section-label" style="background: rgba(120, 53, 15, 0.85); box-shadow: 0 18px 36px rgba(120, 53, 15, 0.45);">
+                <i class="fas fa-bolt section-icon warn"></i> Quick Actions
+            </div>
+        </div>
         <div class="col-12">
             <div class="recent-activity">
-                <h5 class="mb-3">
-                    <i class="fas fa-bolt text-warning"></i> Quick Actions
-                </h5>
+                <h5 class="mb-3 text-uppercase text-muted" style="letter-spacing: 0.08em;">Administrative Shortcuts</h5>
                 <div class="row">
                     <div class="col-md-3 mb-2">
                         <a href="{{ url_for('admin_users') }}" class="btn btn-outline-primary w-100">

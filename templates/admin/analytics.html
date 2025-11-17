@@ -2,98 +2,129 @@
 
 {% block title %}Analytics - Admin Dashboard{% endblock %}
 
+{% block body_class %}admin-dashboard{% endblock %}
+
 {% block content %}
 <style>
 .admin-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: rgba(7, 12, 24, 0.78);
     color: white;
     padding: 2rem 0;
     margin-bottom: 2rem;
-    border-radius: 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 30px 80px rgba(5, 8, 16, 0.5);
+}
+
+.admin-nav {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 20px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.2);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.admin-nav .nav-link {
+    color: var(--brand-text);
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    transition: all 0.25s ease;
+}
+
+.admin-nav .nav-link:hover {
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--brand-blue);
+}
+
+.admin-nav .nav-link.active {
+    background: var(--brand-blue);
+    color: white;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.3);
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.2);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+}
+
+.stat-card {
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 45px 90px rgba(15, 23, 42, 0.25);
+}
+
+.stat-number {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--brand-navy);
+}
+
+.stat-label {
+    color: var(--brand-text-muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .analytics-card {
-    background: white;
-    border-radius: 10px;
     padding: 1.5rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     margin-bottom: 2rem;
 }
 
 .chart-container {
-    background: #f8f9fa;
-    border-radius: 8px;
+    background: rgba(244, 247, 254, 0.9);
+    border-radius: 14px;
     padding: 1rem;
     margin-bottom: 1rem;
-}
-
-.stat-card {
-    background: white;
-    border-radius: 8px;
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-2px);
-}
-
-.stat-number {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.stat-label {
-    color: #6c757d;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.admin-nav {
-    background: white;
-    border-radius: 10px;
-    padding: 1rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.admin-nav .nav-link {
-    color: #495057;
-    font-weight: 500;
-    padding: 0.75rem 1rem;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-}
-
-.admin-nav .nav-link:hover {
-    background: #f8f9fa;
-    color: #007bff;
-}
-
-.admin-nav .nav-link.active {
-    background: #007bff;
-    color: white;
 }
 
 .progress-bar-custom {
     height: 8px;
     border-radius: 4px;
+    background: rgba(226, 232, 240, 0.6);
+}
+
+.progress-bar-custom .progress-bar {
+    border-radius: 4px;
+}
+
+.section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: rgba(4, 7, 15, 0.78);
+    color: #fff;
+    box-shadow: 0 18px 36px rgba(4, 7, 15, 0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.section-label i {
+    color: var(--brand-blue);
 }
 
 .analytics-section {
-    margin-bottom: 2rem;
-}
-
-.section-title {
-    color: #495057;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 2.5rem;
 }
 </style>
 
@@ -130,12 +161,12 @@
 
     <!-- System Statistics -->
     <div class="analytics-section">
-        <h4 class="section-title">
-            <i class="fas fa-tachometer-alt text-primary"></i> System Overview
-        </h4>
+        <div class="section-label mb-3">
+            <i class="fas fa-tachometer-alt"></i> System Overview
+        </div>
         <div class="row">
             <div class="col-md-3 mb-3">
-                <div class="stat-card">
+                <div class="glass-card stat-card">
                     <div class="stat-number text-primary">{{ system_stats.total_users if system_stats else 0 }}</div>
                     <div class="stat-label">Total Users</div>
                     {% if system_stats and system_stats.active_users %}
@@ -144,7 +175,7 @@
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <div class="stat-card">
+                <div class="glass-card stat-card">
                     <div class="stat-number text-success">{{ system_stats.total_modules if system_stats else 0 }}</div>
                     <div class="stat-label">Learning Modules</div>
                     {% if system_stats and system_stats.completion_rate %}
@@ -153,7 +184,7 @@
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <div class="stat-card">
+                <div class="glass-card stat-card">
                     <div class="stat-number text-warning">{{ system_stats.total_assessments if system_stats else 0 }}</div>
                     <div class="stat-label">Assessments Taken</div>
                     {% if system_stats and system_stats.pass_rate %}
@@ -162,7 +193,7 @@
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <div class="stat-card">
+                <div class="glass-card stat-card">
                     <div class="stat-number text-danger">{{ system_stats.total_simulations if system_stats else 0 }}</div>
                     <div class="stat-label">Simulations Completed</div>
                     {% if simulation_analytics %}
@@ -175,12 +206,12 @@
 
     <!-- User Performance Analytics -->
     <div class="analytics-section">
-        <h4 class="section-title">
-            <i class="fas fa-users text-success"></i> User Performance Analytics
-        </h4>
+        <div class="section-label mb-3">
+            <i class="fas fa-users"></i> User Performance Analytics
+        </div>
         <div class="row">
             <div class="col-md-6 mb-4">
-                <div class="analytics-card">
+                <div class="glass-card analytics-card">
                     <h6 class="mb-3">
                         <i class="fas fa-chart-pie text-info"></i> Completion Distribution
                     </h6>
@@ -227,7 +258,7 @@
                 </div>
             </div>
             <div class="col-md-6 mb-4">
-                <div class="analytics-card">
+                <div class="glass-card analytics-card">
                     <h6 class="mb-3">
                         <i class="fas fa-chart-bar text-warning"></i> Average Scores
                     </h6>
@@ -269,14 +300,14 @@
 
     <!-- Module Analytics -->
     <div class="analytics-section">
-        <h4 class="section-title">
-            <i class="fas fa-book text-info"></i> Module Performance Analytics
-        </h4>
+        <div class="section-label mb-3">
+            <i class="fas fa-book"></i> Module Performance Analytics
+        </div>
         <div class="row">
             {% if module_analytics %}
                 {% for module_id, data in module_analytics.items() %}
                 <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="analytics-card">
+                    <div class="glass-card analytics-card">
                         <h6 class="mb-3">
                             <i class="fas fa-book text-primary"></i> Module {{ module_id }}
                         </h6>
@@ -326,13 +357,13 @@
     <!-- Assessment Analytics -->
     {% if assessment_analytics %}
     <div class="analytics-section">
-        <h4 class="section-title">
-            <i class="fas fa-clipboard-check text-primary"></i> Assessment Analytics
-        </h4>
+        <div class="section-label mb-3">
+            <i class="fas fa-clipboard-check"></i> Assessment Analytics
+        </div>
         <div class="row">
             {% for assessment_type, data in assessment_analytics.items() %}
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="analytics-card">
+                <div class="glass-card analytics-card">
                     <h6 class="mb-3">
                         <i class="fas fa-chart-line text-info"></i> {{ assessment_type.replace('_', ' ').title() }}
                     </h6>
@@ -378,13 +409,13 @@
     <!-- Simulation Analytics -->
     {% if simulation_analytics %}
     <div class="analytics-section">
-        <h4 class="section-title">
-            <i class="fas fa-gamepad text-warning"></i> Simulation Analytics
-        </h4>
+        <div class="section-label mb-3">
+            <i class="fas fa-gamepad"></i> Simulation Analytics
+        </div>
         <div class="row">
             {% for simulation_type, data in simulation_analytics.items() %}
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="analytics-card">
+                <div class="glass-card analytics-card">
                     <h6 class="mb-3">
                         <i class="fas fa-puzzle-piece text-warning"></i> {{ simulation_type.title() }}
                     </h6>
@@ -430,12 +461,12 @@
     <!-- Trend Analytics -->
     {% if trend_analytics %}
     <div class="analytics-section">
-        <h4 class="section-title">
-            <i class="fas fa-chart-line text-info"></i> Trend Analytics (Last 30 Days)
-        </h4>
+        <div class="section-label mb-3">
+            <i class="fas fa-chart-line"></i> Trend Analytics (Last 30 Days)
+        </div>
         <div class="row">
             <div class="col-md-6 mb-4">
-                <div class="analytics-card">
+                <div class="glass-card analytics-card">
                     <h6 class="mb-3">
                         <i class="fas fa-user-plus text-success"></i> Daily Registrations
                     </h6>
@@ -457,7 +488,7 @@
                 </div>
             </div>
             <div class="col-md-6 mb-4">
-                <div class="analytics-card">
+                <div class="glass-card analytics-card">
                     <h6 class="mb-3">
                         <i class="fas fa-check-circle text-primary"></i> Daily Completions
                     </h6>
@@ -485,12 +516,12 @@
     <!-- Feedback Analytics -->
     {% if feedback_analytics %}
     <div class="analytics-section">
-        <h4 class="section-title">
-            <i class="fas fa-comments text-secondary"></i> Feedback Analytics
-        </h4>
+        <div class="section-label mb-3">
+            <i class="fas fa-comments"></i> Feedback Analytics
+        </div>
         <div class="row">
             <div class="col-md-6 mb-4">
-                <div class="analytics-card">
+                <div class="glass-card analytics-card">
                     <h6 class="mb-3">
                         <i class="fas fa-star text-warning"></i> Overall Ratings
                     </h6>
@@ -520,7 +551,7 @@
                 </div>
             </div>
             <div class="col-md-6 mb-4">
-                <div class="analytics-card">
+                <div class="glass-card analytics-card">
                     <h6 class="mb-3">
                         <i class="fas fa-chart-bar text-info"></i> Rating Distribution
                     </h6>
@@ -547,12 +578,12 @@
 
     <!-- Export and Reports -->
     <div class="analytics-section">
-        <h4 class="section-title">
-            <i class="fas fa-download text-success"></i> Reports & Export
-        </h4>
+        <div class="section-label mb-3">
+            <i class="fas fa-download"></i> Reports & Export
+        </div>
         <div class="row">
             <div class="col-md-3 mb-3">
-                <div class="analytics-card text-center">
+                <div class="glass-card analytics-card text-center">
                     <i class="fas fa-file-excel fa-2x text-success mb-3"></i>
                     <h6>User Report</h6>
                     <p class="text-muted small">Export user data and progress</p>
@@ -562,7 +593,7 @@
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <div class="analytics-card text-center">
+                <div class="glass-card analytics-card text-center">
                     <i class="fas fa-chart-line fa-2x text-primary mb-3"></i>
                     <h6>Performance Report</h6>
                     <p class="text-muted small">Detailed performance analytics</p>
@@ -572,7 +603,7 @@
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <div class="analytics-card text-center">
+                <div class="glass-card analytics-card text-center">
                     <i class="fas fa-book fa-2x text-info mb-3"></i>
                     <h6>Module Report</h6>
                     <p class="text-muted small">Module completion statistics</p>
@@ -582,7 +613,7 @@
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <div class="analytics-card text-center">
+                <div class="glass-card analytics-card text-center">
                     <i class="fas fa-file-pdf fa-2x text-danger mb-3"></i>
                     <h6>Full Report</h6>
                     <p class="text-muted small">Comprehensive system report</p>

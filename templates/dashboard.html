@@ -2,74 +2,53 @@
 
 {% block title %}Dashboard - Social Engineering Awareness{% endblock %}
 
+{% block body_class %}dashboard-page{% endblock %}
+
 {% block content %}
 <style>
+.dashboard-card {
+    border: 1px solid var(--brand-border);
+    border-radius: 22px;
+    padding: 1.75rem;
+    background: rgba(255, 255, 255, 0.9);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 25px 55px rgba(15, 23, 42, 0.18);
+}
+
+.dashboard-card.accent-primary {
+    border-left: 6px solid var(--brand-blue);
+}
+
+.dashboard-card.accent-teal {
+    border-left: 6px solid var(--brand-teal);
+}
+
+.dashboard-card.accent-orange {
+    border-left: 6px solid var(--brand-orange);
+}
+
+.module-highlight {
+    border-left: 6px solid var(--brand-blue);
+}
+
 .clickable-module {
     transition: all 0.3s ease;
     cursor: pointer;
 }
 
 .clickable-module:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transform: translateY(-6px);
+    box-shadow: 0 24px 50px rgba(15, 23, 42, 0.12);
 }
 
 .clickable-module:hover .card-body {
-    background-color: rgba(0,123,255,0.05);
+    background-color: rgba(37, 99, 235, 0.08);
 }
 
 .module-card.locked {
-    opacity: 0.7;
+    opacity: 0.8;
     cursor: not-allowed;
-}
-
-.module-card.completed {
-    border-color: #28a745;
-    background-color: #f8fff9;
-}
-
-.module-card.current {
-    border-color: #ffc107;
-    background-color: #fffbf0;
-}
-
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8em;
-    font-weight: 500;
-}
-
-.status-badge.completed {
-    background: #d5f4e6;
-    color: #28a745;
-}
-
-.status-badge.current {
-    background: #fef5e7;
-    color: #ffc107;
-}
-
-.status-badge.locked {
-    background: #ecf0f1;
-    color: #95a5a6;
-}
-
-.status-badge.not-started {
-    background: #e9ecef;
-    color: #6c757d;
-}
-
-/* Module card improvements */
-.module-card {
-    transition: all 0.3s ease;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.module-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
 .module-card .card-body {
@@ -77,29 +56,65 @@
 }
 
 .module-card h6.card-text {
-    font-size: 0.9rem;
-    line-height: 1.3;
+    font-size: 0.95rem;
+    line-height: 1.4;
     min-height: 2.6rem;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Neon pulse animation for module icons */
-@keyframes neonPulse {
-    0%, 100% { 
-        text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
-    }
-    50% { 
-        text-shadow: 0 0 15px currentColor, 0 0 25px currentColor, 0 0 35px currentColor;
-    }
+.status-badge.completed {
+    background: #DCFCE7;
+    color: var(--brand-teal);
+}
+
+.status-badge.current {
+    background: #FFE4D6;
+    color: var(--brand-orange);
+}
+
+.status-badge.not-started,
+.status-badge.locked {
+    background: #E2E8F0;
+    color: var(--brand-text-muted);
+}
+
+.insight-card {
+    border-radius: 18px;
+    border: 1px solid var(--brand-border);
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    padding: 1.25rem;
+}
+
+.journey-card {
+    border: 1px solid var(--brand-border);
+    border-radius: 18px;
+    height: 100%;
+    padding: 1.5rem;
+    border-left: 6px solid var(--brand-blue);
+    background: rgba(255, 255, 255, 0.88);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 22px 48px rgba(15, 23, 42, 0.16);
+}
+
+.journey-card h5 {
+    color: var(--brand-blue);
+    font-weight: 700;
+}
+
+.journey-card p {
+    color: var(--brand-text-muted);
 }
 </style>
 <div class="container-fluid p-4">
         <!-- Welcome Section -->
         <div class="row mb-4">
             <div class="col-12">
-                <div class="card" style="background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 4px solid #007bff;">
+                <div class="card dashboard-card accent-primary">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-md-8">
@@ -132,7 +147,7 @@
     <!-- Program Introduction Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card" style="background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 4px solid #28a745;">
+            <div class="card dashboard-card accent-teal">
                 <div class="card-body" style="max-height: 320px; overflow-y: auto;">
                     <div class="row align-items-center">
                         <div class="col-12">
@@ -163,7 +178,7 @@
     <!-- Our Modules Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card" style="background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 4px solid #ffc107;">
+            <div class="card dashboard-card accent-orange">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-4">
                         <h4 class="mb-0 text-warning fw-bold">
@@ -181,12 +196,12 @@
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-left-primary" style="border-left: 4px solid #007bff;">
+                            <div class="card journey-card">
                                 <div class="card-body">
-                                    <h5 class="card-title text-primary">
+                                    <h5 class="card-title">
                                         <i class="fas fa-user-secret me-2"></i>Module 1: Understanding Social Engineering Fundamentals
                                     </h5>
-                                    <p class="card-text text-dark">
+                                    <p class="card-text">
                                         We start with the basics, defining social engineering and explaining the psychological tricks that make it so effective.
                                     </p>
                                 </div>
@@ -194,12 +209,12 @@
                         </div>
                         
                         <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-left-info" style="border-left: 4px solid #17a2b8;">
+                            <div class="card journey-card">
                                 <div class="card-body">
-                                    <h5 class="card-title text-info">
+                                    <h5 class="card-title">
                                         <i class="fas fa-fish me-2"></i>Module 2: Recognizing Common Attack Vectors
                                     </h5>
-                                    <p class="card-text text-dark">
+                                    <p class="card-text">
                                         We'll show you how to spot the most common scams, like phishing, pretexting, and baiting, so you can recognize them in your daily life.
                                     </p>
                                 </div>
@@ -207,12 +222,12 @@
                         </div>
                         
                         <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-left-success" style="border-left: 4px solid #28a745;">
+                            <div class="card journey-card">
                                 <div class="card-body">
-                                    <h5 class="card-title text-success">
+                                    <h5 class="card-title">
                                         <i class="fas fa-lock me-2"></i>Module 3: Proactive Digital Defense Strategies
                                     </h5>
-                                    <p class="card-text text-dark">
+                                    <p class="card-text">
                                         You'll learn the essential habits to protect your accounts, from creating strong passwords and enabling MFA to safeguarding your social media.
                                     </p>
                                 </div>
@@ -220,12 +235,12 @@
                         </div>
                         
                         <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-left-warning" style="border-left: 4px solid #ffc107;">
+                            <div class="card journey-card">
                                 <div class="card-body">
-                                    <h5 class="card-title text-warning">
+                                    <h5 class="card-title">
                                         <i class="fas fa-exclamation-triangle me-2"></i>Module 4: Incident Response & Reporting
                                     </h5>
-                                    <p class="card-text text-dark">
+                                    <p class="card-text">
                                         In this module, you'll learn what to do if a scam happens to you. You'll get a clear, step-by-step action plan for recovery and reporting.
                                     </p>
                                 </div>
@@ -233,12 +248,12 @@
                         </div>
                         
                         <div class="col-md-12 mb-3">
-                            <div class="card h-100 border-left-danger" style="border-left: 4px solid #dc3545;">
+                            <div class="card journey-card">
                                 <div class="card-body">
-                                    <h5 class="card-title text-danger">
+                                    <h5 class="card-title">
                                         <i class="fas fa-robot me-2"></i>Module 5: Advanced SE & Continuous Awareness
                                     </h5>
-                                    <p class="card-text text-dark">
+                                    <p class="card-text">
                                         We'll go beyond the basics, introducing you to next-gen threats like AI-powered scams and deepfakes, and giving you the tools to stay ahead of the curve.
                                     </p>
                                 </div>
@@ -253,14 +268,14 @@
     <!-- Professional Review Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card" style="background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 4px solid #dc3545;">
+            <div class="card dashboard-card accent-teal">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h4 class="card-title mb-0 text-danger fw-bold">
+                        <h4 class="card-title mb-0 text-primary fw-bold">
                             <i class="fas fa-award me-2"></i>Professional Review & Validation
                         </h4>
-                        <div class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
-                            <i class="fas fa-check-circle me-2"></i>Expert Validated
+                        <div class="badge bg-white text-success px-3 py-2 rounded-pill shadow-sm" style="border: 1px solid rgba(13, 148, 136, 0.2);">
+                            <i class="fas fa-check-circle me-2"></i><span class="fw-semibold">Expert Validated</span>
                         </div>
                     </div>
                     <div class="row">
@@ -269,7 +284,7 @@
                                 To ensure the accuracy and relevance of this program, all content has been reviewed and validated by a certified cybersecurity professional. We extend our thanks to <strong>Miss Thea Patrice Tajonera</strong>, <strong>SANS GIAC GCFA</strong>, from <strong>ANZ</strong>, for providing their expertise and guidance.
                             </p>
                             <div class="d-flex justify-content-start">
-                                <a href="/learning_assets/Documents/Validator_Certification_SocialEngineeringAwareness.pdf" target="_blank" rel="noopener" class="btn btn-outline-danger">
+                                <a href="/learning_assets/Documents/Validator_Certification_SocialEngineeringAwareness.pdf" target="_blank" rel="noopener" class="btn btn-outline-primary">
                                     <i class="fas fa-file-pdf me-2"></i>View Content Validator’s Certification
                                 </a>
                             </div>
@@ -279,15 +294,11 @@
             </div>
         </div>
     </div>
-    </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Curriculum Overview Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card" style="background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 4px solid #6f42c1;">
+            <div class="card dashboard-card accent-primary">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-4">
                         <h4 class="card-title mb-0 text-dark fw-bold">
@@ -352,7 +363,7 @@
     <!-- Master Reference List Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card" style="background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 4px solid #17a2b8;">
+            <div class="card dashboard-card accent-teal">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-4">
                         <h4 class="card-title mb-0 text-dark fw-bold">

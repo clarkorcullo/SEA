@@ -87,7 +87,8 @@ CapstoneProject/
 │   └── static/                   # Static assets
 │       ├── MMDCLogo.png         # MMDC logo
 │       ├── SEALogo.png          # Social Engineering Awareness logo
-│       ├── Background.png       # Background image
+│       ├── securitybackground.mp4 # Animated security-themed backdrop
+│       ├── Background.png       # Static fallback background image
 │       └── profile_pictures/    # User profile pictures
 │
 ├── 📄 DOCUMENTATION

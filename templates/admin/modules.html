@@ -2,87 +2,63 @@
 
 {% block title %}Module Management - Admin Dashboard{% endblock %}
 
+{% block body_class %}admin-dashboard{% endblock %}
+
 {% block content %}
 <style>
 .admin-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: rgba(7, 12, 24, 0.78);
     color: white;
     padding: 2rem 0;
     margin-bottom: 2rem;
-    border-radius: 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 30px 80px rgba(5, 8, 16, 0.5);
 }
-
-.module-card {
-    background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-    margin-bottom: 1.5rem;
-    border-left: 4px solid;
-}
-
-.module-card:hover {
-    transform: translateY(-2px);
-}
-
-.module-card.module-1 { border-left-color: #007bff; }
-.module-card.module-2 { border-left-color: #28a745; }
-.module-card.module-3 { border-left-color: #ffc107; }
-.module-card.module-4 { border-left-color: #dc3545; }
-.module-card.module-5 { border-left-color: #6f42c1; }
-.module-card.final-assessment { border-left-color: #6f42c1; }
-
-.module-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    color: white;
-    margin-bottom: 1rem;
-}
-
-.module-1 .module-icon { background: #007bff; }
-.module-2 .module-icon { background: #28a745; }
-.module-3 .module-icon { background: #ffc107; }
-.module-4 .module-icon { background: #dc3545; }
-.module-5 .module-icon { background: #6f42c1; }
-.final-assessment .module-icon { background: #6f42c1; }
 
 .admin-nav {
-    background: white;
-    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 20px;
     padding: 1rem;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.2);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.5);
 }
 
 .admin-nav .nav-link {
-    color: #495057;
-    font-weight: 500;
+    color: var(--brand-text);
+    font-weight: 600;
     padding: 0.75rem 1rem;
-    border-radius: 5px;
-    transition: all 0.3s ease;
+    border-radius: 12px;
+    transition: all 0.25s ease;
 }
 
 .admin-nav .nav-link:hover {
-    background: #f8f9fa;
-    color: #007bff;
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--brand-blue);
 }
 
 .admin-nav .nav-link.active {
-    background: #007bff;
+    background: var(--brand-blue);
     color: white;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.3);
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.2);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
 }
 
 .stats-section {
-    background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 1.75rem;
     margin-bottom: 2rem;
 }
 
@@ -93,15 +69,75 @@
 
 .stat-number {
     font-size: 2rem;
-    font-weight: bold;
-    color: #007bff;
+    font-weight: 700;
+    color: var(--brand-navy);
 }
 
 .stat-label {
-    color: #6c757d;
-    font-size: 0.9rem;
+    color: var(--brand-text-muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+}
+
+.module-card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 45px 90px rgba(15, 23, 42, 0.25);
+}
+
+.module-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--brand-blue);
+    background: rgba(37, 99, 235, 0.12);
+}
+
+.module-card.final-assessment .module-icon {
+    color: var(--brand-orange);
+    background: rgba(249, 115, 22, 0.12);
+}
+
+.module-meta {
+    font-size: 0.85rem;
+    color: var(--brand-text-muted);
+}
+
+.section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: rgba(4, 7, 15, 0.78);
+    color: #fff;
+    box-shadow: 0 18px 36px rgba(4, 7, 15, 0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.section-label i {
+    color: var(--brand-blue);
+}
+
+.badge-soft {
+    border-radius: 999px;
+    padding: 0.3rem 0.8rem;
+    background: rgba(37, 99, 235, 0.15);
+    color: var(--brand-blue);
+    font-size: 0.75rem;
 }
 </style>
 
@@ -137,10 +173,10 @@
     </div>
 
     <!-- Module Statistics -->
-    <div class="stats-section">
-        <h5 class="mb-3">
-            <i class="fas fa-chart-bar text-primary"></i> Module Statistics
-        </h5>
+    <div class="section-label mb-3">
+        <i class="fas fa-chart-bar"></i> Module Statistics
+    </div>
+    <div class="glass-card stats-section">
         <div class="row">
             <div class="col-md-3">
                 <div class="stat-item">
@@ -170,10 +206,13 @@
     </div>
 
     <!-- Modules List -->
+    <div class="section-label mb-3">
+        <i class="fas fa-layer-group"></i> Modules Overview
+    </div>
     <div class="row">
         {% for module in modules %}
         <div class="col-md-6 col-lg-4 mb-4">
-            <div class="module-card {% if module.id == 6 %}final-assessment{% else %}module-{{ module.id }}{% endif %}">
+            <div class="glass-card module-card {% if module.id == 6 %}final-assessment{% else %}module-{{ module.id }}{% endif %}">
                 <div class="d-flex align-items-start">
                     <div class="module-icon">
                         <i class="fas fa-{{ 'shield-alt' if module.id == 1 else 'user-shield' if module.id == 2 else 'envelope' if module.id == 3 else 'phone' if module.id == 4 else 'handshake' if module.id == 5 else 'graduation-cap' if module.id == 6 else 'bullseye' }}"></i>

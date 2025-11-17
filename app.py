@@ -1457,19 +1457,26 @@ def dashboard():
         # Get survey completion status
         survey_completed = FeedbackSurvey.query.filter_by(user_id=current_user.id).first()
         
+        # Track completion map by module number (1..total_modules)
+        completion_map = {}
+        for i in range(1, total_modules + 1):
+            completion_map[i] = False
+        for module_id in completed_module_ids:
+            completion_map[module_id] = True
+
         # Calculate accessible modules (modules 1 to total_modules)
         accessible_modules = []
-        for i in range(1, total_modules + 1):  # Modules 1 to total_modules
-            if i == 1:
-                # First module is always accessible
+        for i in range(1, total_modules + 1):
+            module_completed = completion_map.get(i, False)
+
+            if getattr(current_user, 'is_admin', False):
                 accessible_modules.append(True)
-            elif current_user.is_admin:
-                # Administrators can access all modules for testing and review
+            elif i == 1:
                 accessible_modules.append(True)
             else:
-                # Other modules are accessible if previous module is fully completed
-                previous_module_completed = user_service.is_module_fully_completed(current_user.id, i-1)
-                accessible_modules.append(previous_module_completed)
+                previous_module_completed = completion_map.get(i - 1, False)
+                # Allow access if the previous module is complete OR this module is already complete
+                accessible_modules.append(module_completed or previous_module_completed)
         
         # Build recent activity feed (simulations, assessments, module completions, surveys)
         recent_activities = []

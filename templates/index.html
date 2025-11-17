@@ -4,317 +4,136 @@
 
 {% block content %}
 <style>
-/* Cache busting - v2.0 */
-/* Cybersecurity Theme Styles */
-:root {
-    --neon-blue: #00d4ff;
-    --neon-green: #00ff88;
-    --neon-purple: #8a2be2;
-    --light-bg: #f8f9fa;
-    --dark-text: #2c3e50;
-    --cyber-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --matrix-gradient: linear-gradient(45deg, #0a0a0a, #1a1a1a, #0a0a0a);
-}
-
-body {
-    color: var(--dark-text);
-    font-family: 'Arial', 'Helvetica', sans-serif;
-    line-height: 1.6;
-}
-
-/* Animated Background */
-.cyber-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-        radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(138, 43, 226, 0.05) 0%, transparent 50%);
-    z-index: -1;
-    animation: cyberPulse 8s ease-in-out infinite;
-}
-
-@keyframes cyberPulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.6; }
-}
-
-/* Learning Modules now use the same styling as Program Features */
-
-/* Matrix Rain Effect */
-.matrix-rain {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-}
-
-.matrix-rain::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 255, 0, 0.03) 2px,
-            rgba(0, 255, 0, 0.03) 4px
-        );
-    animation: matrixMove 20s linear infinite;
-}
-
-@keyframes matrixMove {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100%); }
-}
-
-/* Hero Section */
-.hero-section {
-    position: relative;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
-    border-radius: 20px;
-    border: 2px solid rgba(0, 212, 255, 0.5);
-    box-shadow: 
-        0 8px 32px rgba(0, 212, 255, 0.2),
-        inset 0 0 20px rgba(0, 212, 255, 0.05);
-    overflow: hidden;
-}
-
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, transparent 30%, rgba(0, 212, 255, 0.1) 50%, transparent 70%);
-    animation: cyberScan 3s ease-in-out infinite;
-}
-
-@keyframes cyberScan {
-    0%, 100% { transform: translateX(-100%); }
-    50% { transform: translateX(100%); }
-}
-
-/* Clean Text Effects */
-.neon-text {
-    color: var(--dark-text);
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.neon-green {
-    color: #2c3e50;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-/* Readable Text Classes */
-.text-light {
-    color: #495057 !important;
-    font-weight: 400;
-}
-
-.text-justify {
-    text-align: justify;
-    text-justify: inter-word;
-}
-
-.lead {
-    color: #495057 !important;
-    font-weight: 400;
-    text-align: justify;
-    text-justify: inter-word;
-}
-
-.small {
-    color: #6c757d !important;
-    font-weight: 400;
-}
-
-/* General Cyber Cards (for other sections) */
-.cyber-card:not(.modules-container .cyber-card) {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
-    border: 2px solid var(--neon-blue);
-    border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.cyber-card:not(.modules-container .cyber-card)::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
-    transition: left 0.5s ease;
-}
-
-.cyber-card:not(.modules-container .cyber-card):hover::before {
-    left: 100%;
-}
-
-.cyber-card:not(.modules-container .cyber-card):hover {
-    transform: translateY(-5px);
-    box-shadow: 
-        0 10px 30px rgba(0, 212, 255, 0.3),
-        0 0 20px rgba(0, 212, 255, 0.2);
-}
-
-/* Feature Icons */
-.feature-icon {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-    background: linear-gradient(45deg, var(--neon-blue), var(--neon-green));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: iconGlow 3s ease-in-out infinite;
-}
-
-@keyframes iconGlow {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.3) drop-shadow(0 0 10px var(--neon-blue)); }
-}
-
-/* Animated Buttons */
-.cyber-btn {
-    background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
-    border: none;
-    border-radius: 25px;
-    padding: 10px 25px;
-    color: white;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
-    text-decoration: none;
-}
-
-.cyber-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s ease;
-}
-
-.cyber-btn:hover::before {
-    left: 100%;
-}
-
-.cyber-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.5);
-    text-decoration: none;
-}
-
-/* Progress Bars */
-.cyber-progress {
-    height: 6px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 3px;
-    overflow: hidden;
-    position: relative;
-}
-
-.cyber-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
-    border-radius: 3px;
-    animation: progressGlow 2s ease-in-out infinite;
-}
-
-@keyframes progressGlow {
-    0%, 100% { box-shadow: 0 0 10px var(--neon-blue); }
-    50% { box-shadow: 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue); }
-}
-
-/* Floating Elements */
-.floating {
-    animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-}
-
-/* Glitch Effect */
-.glitch {
-    position: relative;
-    animation: glitch 2s infinite;
-}
-
-@keyframes glitch {
-    0% { transform: translate(0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(-2px, -2px); }
-    60% { transform: translate(2px, 2px); }
-    80% { transform: translate(2px, -2px); }
-    100% { transform: translate(0); }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero-section {
-        margin: 5px;
-        padding: 15px;
+    .home-page {
+        color: var(--brand-text);
+        line-height: 1.6;
     }
-    
-    .feature-icon {
-        font-size: 1.8rem;
+
+    .cyber-card {
+        background: var(--brand-surface);
+        border-radius: 24px;
+        border: 1px solid var(--brand-border);
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    
-    .text-justify {
-        text-align: left;
+
+    .cyber-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 30px 60px rgba(15, 23, 42, 0.12);
     }
-    
+
+    .home-hero-card {
+        min-height: 400px;
+        background: linear-gradient(135deg, #FFFFFF, #EFF6FF);
+    }
+
+    .neon-text {
+        color: var(--brand-navy);
+        letter-spacing: 0.5px;
+        font-weight: 700;
+    }
+
+    .neon-green {
+        color: var(--brand-text);
+        font-weight: 600;
+    }
+
+    .text-light {
+        color: var(--brand-text-muted) !important;
+    }
+
     .lead {
-        text-align: left;
+        color: var(--brand-text-muted) !important;
     }
-}
 
-/* Neon pulse animation for module icons */
-@keyframes neonPulse {
-    0%, 100% { 
-        text-shadow: 0 0 2px currentColor;
+    .feature-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(37, 99, 235, 0.12);
+        color: var(--brand-blue);
+        font-size: 1.75rem;
+        margin-bottom: 0.75rem;
     }
-    50% { 
-        text-shadow: 0 0 3px currentColor;
+
+    .cyber-btn {
+        background: linear-gradient(135deg, var(--brand-blue), #3B82F6);
+        border: none;
+        border-radius: 999px;
+        padding: 12px 28px;
+        color: #fff;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
-}
+
+    .cyber-btn.secondary {
+        background: linear-gradient(135deg, var(--brand-teal), #14B8A6);
+    }
+
+    .cyber-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+        text-decoration: none;
+    }
+
+    .cyber-progress {
+        height: 6px;
+        background: var(--brand-surface-muted);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .cyber-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--brand-teal), var(--brand-blue));
+        border-radius: 4px;
+    }
+
+    .floating {
+        animation: subtleFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes subtleFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
+    }
+
+    .glitch {
+        animation: none;
+    }
+
+    .section-heading {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 15px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .impact-card h3 {
+        font-weight: 800;
+        color: var(--brand-navy);
+    }
+
+    @media (max-width: 768px) {
+        .home-hero-card {
+            min-height: auto;
+        }
+    }
 </style>
 
-<!-- Animated Background -->
-<div class="cyber-bg"></div>
-<div class="matrix-rain"></div>
-
-<div class="container-fluid p-3">
+<div class="container-fluid p-3 home-page">
     <!-- Hero Section -->
     <div class="row align-items-stretch mb-4">
         <div class="col-lg-6">
-            <div class="cyber-card p-4 text-center h-100" style="min-height: 400px; display: flex; flex-direction: column; justify-content: center;">
+            <div class="cyber-card home-hero-card p-4 text-center h-100 d-flex flex-column justify-content-center">
                 <div class="d-flex justify-content-center align-items-center gap-3 mb-3 floating">
                     <img src="{{ url_for('static', filename='MMDCLogo.png') }}" alt="MMDC Logo" style="height: 100px; width: auto; object-fit: contain; max-width: 200px;">
                     <img src="{{ url_for('static', filename='SEALogo.png') }}" alt="Social Engineering Awareness Logo" style="height: 120px; width: auto; object-fit: contain; max-width: 240px;">
@@ -337,7 +156,7 @@ body {
                         <a href="{{ url_for('register') }}" class="cyber-btn">
                             <i class="fas fa-user-plus"></i> Get Started
                         </a>
-                        <a href="{{ url_for('login') }}" class="cyber-btn" style="background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));">
+                        <a href="{{ url_for('login') }}" class="cyber-btn secondary">
                             <i class="fas fa-sign-in-alt"></i> Login
                         </a>
                     {% endif %}
@@ -345,7 +164,7 @@ body {
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="cyber-card p-4 floating h-100" style="min-height: 400px; display: flex; flex-direction: column; justify-content: center;">
+            <div class="cyber-card home-hero-card floating p-4 h-100 d-flex flex-column justify-content-center">
                 <h3 class="text-center mb-3 neon-text">
                     <i class="fas fa-shield-alt"></i> Program Overview
                 </h3>
@@ -405,7 +224,7 @@ body {
     <!-- Features Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="text-center mb-4 neon-text" style="background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <h2 class="text-center mb-4 neon-text section-heading">
                 <img src="{{ url_for('static', filename='SEALogo.png') }}" alt="SEA Logo" style="height: 60px; width: auto; margin-right: 15px; vertical-align: middle; object-fit: contain; max-width: 120px;">
                 <i class="fas fa-cogs"></i> Program Features
             </h2>
@@ -460,7 +279,7 @@ body {
     <!-- Learning Modules Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="text-center mb-4 neon-text" style="background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <h2 class="text-center mb-4 neon-text section-heading">
                 <img src="{{ url_for('static', filename='SEALogo.png') }}" alt="SEA Logo" style="height: 60px; width: auto; margin-right: 15px; vertical-align: middle; object-fit: contain; max-width: 120px;">
                 <i class="fas fa-book"></i> Learning Modules
             </h2>
@@ -563,7 +382,7 @@ body {
     <!-- Program Impact Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="text-center mb-4 neon-text" style="background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <h2 class="text-center mb-4 neon-text section-heading">
                 <img src="{{ url_for('static', filename='MMDCLogo.png') }}" alt="MMDC Logo" style="height: 50px; width: auto; margin-right: 15px; vertical-align: middle; object-fit: contain; max-width: 100px;">
                 <i class="fas fa-chart-line"></i> Program Impact
             </h2>
@@ -621,7 +440,7 @@ body {
                         <a href="{{ url_for('register') }}" class="cyber-btn">
                             <i class="fas fa-user-plus"></i> Get Started Now
                         </a>
-                        <a href="{{ url_for('login') }}" class="cyber-btn" style="background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));">
+                        <a href="{{ url_for('login') }}" class="cyber-btn secondary">
                             <i class="fas fa-sign-in-alt"></i> Login
                         </a>
                     {% endif %}

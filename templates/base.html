@@ -23,26 +23,60 @@
     
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --light-bg: #f8f9fa;
+            --brand-navy: #1E3A8A;
+            --brand-blue: #2563EB;
+            --brand-blue-light: #DBEAFE;
+            --brand-teal: #0D9488;
+            --brand-orange: #F97316;
+            --brand-surface: #FFFFFF;
+            --brand-surface-muted: #F1F5F9;
+            --brand-border: #E2E8F0;
+            --brand-text: #1E293B;
+            --brand-text-muted: #475569;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: url("{{ url_for('static', filename='Background.png', v='1.0') }}") no-repeat center center fixed;
-            background-size: cover;
+            background: #010817;
+            color: var(--brand-text);
             min-height: 100vh;
             padding-top: 80px; /* Space for fixed navbar */
             padding-bottom: 100px; /* Space for fixed footer */
+            position: relative;
+        }
+
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -2;
+        }
+
+        .video-background video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: none;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: -1;
+            pointer-events: none;
         }
 
         .navbar {
-            background: rgb(224, 247, 250) !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: var(--brand-surface) !important;
+            box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08);
+            border-bottom: 1px solid var(--brand-border);
         }
 
         .navbar-brand {
@@ -66,118 +100,152 @@
         }
 
         .logo-text {
-            color: #111;
+            color: var(--brand-text);
             font-weight: 600;
             font-size: 1.2em;
         }
 
         .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            transition: transform 0.3s ease;
+            border: 1px solid var(--brand-border);
+            border-radius: 16px;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
-            -webkit-backdrop-filter: blur(5px);
-            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
         }
 
         .card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.12);
         }
 
         .btn-primary {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
+            background: var(--brand-blue);
+            border-color: var(--brand-blue);
+            color: #fff;
         }
 
         .btn-primary:hover {
-            background: #2980b9;
-            border-color: #2980b9;
+            background: var(--brand-navy);
+            border-color: var(--brand-navy);
+        }
+
+        .btn-success {
+            background: var(--brand-teal);
+            border-color: var(--brand-teal);
+        }
+
+        .btn-success:hover {
+            background: #0b6f63;
+            border-color: #0b6f63;
+        }
+
+        .btn-warning {
+            background: var(--brand-orange);
+            border-color: var(--brand-orange);
+            color: #fff;
         }
 
         .progress {
             height: 10px;
-            border-radius: 5px;
+            border-radius: 6px;
+            background-color: var(--brand-surface-muted);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--brand-teal), var(--brand-blue));
         }
 
         .alert {
-            border-radius: 10px;
-            border: none;
+            border-radius: 12px;
+            border: 1px solid var(--brand-border);
+            background-color: var(--brand-surface-muted);
+            color: var(--brand-text);
         }
 
         .form-control {
-            border-radius: 8px;
-            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            border: 1px solid var(--brand-border);
+            background: var(--brand-surface);
+            color: var(--brand-text);
         }
 
         .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            border-color: var(--brand-blue);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
         }
 
         .sidebar {
-            background: var(--light-bg);
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
             padding: 20px;
+            border: 1px solid var(--brand-border);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
         }
 
         .nav-link {
-            color: #111;
-            border-radius: 8px;
+            color: var(--brand-text);
+            border-radius: 12px;
             margin-bottom: 5px;
             transition: all 0.3s ease;
-            font-weight: 500;
-            background: none;
+            font-weight: 600;
+            background: transparent;
         }
 
         .nav-link:hover,
         .nav-link.active {
-            background: none;
-            color: #111;
-            text-decoration: underline;
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--brand-blue);
         }
 
         .module-card {
-            border: 2px solid #e1e8ed;
-            border-radius: 12px;
+            border: 1px solid var(--brand-border);
+            border-radius: 16px;
             transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.88);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
         }
 
         .module-card:hover {
-            border-color: var(--primary-color);
+            border-color: var(--brand-blue);
             transform: translateY(-2px);
+            box-shadow: 0 25px 50px rgba(15, 23, 42, 0.08);
         }
 
         .module-card.completed {
-            border-color: var(--success-color);
-            background: #f8fff9;
+            border-color: var(--brand-teal);
+            background: #ECFDF5;
         }
 
         .module-card.current {
-            border-color: var(--warning-color);
-            background: #fffbf0;
+            border-color: var(--brand-orange);
+            background: #FFF7ED;
         }
 
         .status-badge {
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.8em;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .status-badge.completed {
-            background: #d5f4e6;
-            color: var(--success-color);
+            background: #D1FAE5;
+            color: var(--brand-teal);
         }
 
         .status-badge.current {
-            background: #fef5e7;
-            color: var(--warning-color);
+            background: #FFE4D6;
+            color: var(--brand-orange);
         }
 
-        .status-badge.locked {
-            background: #ecf0f1;
-            color: #95a5a6;
+        .status-badge.locked,
+        .status-badge.not-started {
+            background: #E2E8F0;
+            color: var(--brand-text-muted);
         }
 
         .footer-logos {
@@ -195,9 +263,43 @@
         }
 
         .footer {
-            background: rgb(224, 247, 250) !important;
+            background: var(--brand-surface) !important;
             padding: 15px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.06);
+            border-top: 1px solid var(--brand-border);
+        }
+
+        .text-primary {
+            color: var(--brand-blue) !important;
+        }
+
+        .text-success {
+            color: var(--brand-teal) !important;
+        }
+
+        .text-warning {
+            color: var(--brand-orange) !important;
+        }
+
+        .text-muted {
+            color: var(--brand-text-muted) !important;
+        }
+
+        .bg-primary {
+            background-color: var(--brand-blue) !important;
+        }
+
+        .bg-success {
+            background-color: var(--brand-teal) !important;
+        }
+
+        .bg-warning {
+            background-color: var(--brand-orange) !important;
+        }
+
+        .badge.bg-primary {
+            color: #fff;
+            background-color: rgba(37, 99, 235, 0.15) !important;
         }
 
         .footer-text {
@@ -355,7 +457,13 @@
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
+    <div class="video-background" aria-hidden="true">
+        <video autoplay muted loop playsinline poster="{{ url_for('static', filename='Background.png') }}">
+            <source src="{{ url_for('static', filename='securitybackground.mp4') }}" type="video/mp4">
+        </video>
+    </div>
+    <div class="background-overlay" aria-hidden="true"></div>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">

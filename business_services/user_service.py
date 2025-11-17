@@ -307,18 +307,7 @@ class UserService:
             if not module:
                 return False
             
-            # Check UserProgress table for completion status
-            progress = UserProgress.get_module_progress(user_id, module_id)
-            if not progress:
-                return False
-            
-            # Check if module is marked as completed in UserProgress
-            # The database uses 'status' column, not 'is_completed'
-            if progress.status != 'completed':
-                return False
-            
-            # POLICY: Check highest score achieved, not current score
-            # Get all assessment results for this module to find highest score
+            # Fetch assessment results to evaluate best score
             if module_id == 6:
                 # Final Assessment (stored with module_id=None)
                 assessment_results = AssessmentResult.query.filter_by(
@@ -334,7 +323,6 @@ class UserService:
                     assessment_type='knowledge_check'
                 ).all()
             
-            # Calculate highest percentage score achieved
             highest_percentage = 0
             if assessment_results:
                 for result in assessment_results:
@@ -343,14 +331,24 @@ class UserService:
                         if percentage > highest_percentage:
                             highest_percentage = percentage
             
-            # Check if the highest score meets the 80% threshold
-            if highest_percentage < 80:
-                return False
+            # Check UserProgress table for completion status
+            progress = UserProgress.get_module_progress(user_id, module_id)
+            if progress and progress.status == 'completed':
+                return True
             
-            # Note: Simulations are optional - modules are considered complete with just knowledge check
-            # Users can complete simulations for extra learning, but they're not required for progression
+            # If learner achieved passing score but progress wasn't updated, auto-heal the record
+            if highest_percentage >= 80:
+                if not progress:
+                    progress = UserProgress(
+                        user_id=user_id,
+                        module_id=module_id,
+                        status='not_started'
+                    )
+                progress.complete_progress(highest_percentage)
+                return True
             
-            return True
+            # Highest score is below passing threshold
+            return False
             
         except Exception as e:
             print(f"Error checking module completion: {e}")

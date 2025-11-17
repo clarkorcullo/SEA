@@ -2,6 +2,20 @@
 
 {% block title %}{{ module.name }} - Social Engineering Awareness Program{% endblock %}
 
+{% block body_class %}module-page{% endblock %}
+
+{% block extra_css %}
+<style>
+body.module-page .module-container,
+body.module-page .sidebar-card {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.7);
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
     <div class="row">
@@ -180,19 +194,17 @@
 <style>
 /* ===== MODULE CONTAINER ===== */
 .module-container {
-    background: white;
+    background: var(--brand-surface);
     border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.12);
     padding: 2.5rem;
     margin-bottom: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    border: 1px solid var(--brand-border);
 }
 
 /* ===== MODULE HEADER ===== */
 .module-header {
-    border-bottom: 3px solid #f8f9fa;
+    border-bottom: 3px solid var(--brand-surface-muted);
     padding-bottom: 2rem;
     margin-bottom: 2.5rem;
 }
@@ -205,8 +217,8 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--brand-navy), var(--brand-blue));
+    color: #fff;
     padding: 0.5rem 1rem;
     border-radius: 25px;
     font-size: 0.85rem;
@@ -217,7 +229,7 @@
 }
 
 .module-title {
-    color: #2c3e50;
+    color: var(--brand-text);
     font-weight: 800;
     font-size: 2.2rem;
     margin-bottom: 0.75rem;
@@ -225,7 +237,7 @@
 }
 
 .module-description {
-    color: #6c757d;
+    color: var(--brand-text-muted);
     font-size: 1.2rem;
     margin-bottom: 0;
     line-height: 1.5;
@@ -244,18 +256,18 @@
 }
 
 .status-badge.completed {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: white;
+    background: linear-gradient(135deg, var(--brand-teal), #34d399);
+    color: #0f5132;
 }
 
 .status-badge.in-progress {
-    background: linear-gradient(135deg, #ffc107, #fd7e14);
-    color: white;
+    background: linear-gradient(135deg, var(--brand-orange), #fb923c);
+    color: #7c2d12;
 }
 
 .status-badge.not-started {
-    background: linear-gradient(135deg, #6c757d, #495057);
-    color: white;
+    background: linear-gradient(135deg, #94a3b8, #64748b);
+    color: #1e293b;
 }
 
 /* ===== INFO CARDS ===== */
@@ -267,7 +279,7 @@
 }
 
 .info-card {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-muted) 100%);
     border-radius: 12px;
     padding: 1.5rem;
     display: flex;
@@ -285,7 +297,7 @@
 .info-icon {
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, var(--brand-navy), var(--brand-blue));
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -300,7 +312,7 @@
 
 .info-label {
     display: block;
-    color: #6c757d;
+    color: var(--brand-text-muted);
     font-size: 0.85rem;
     font-weight: 500;
     text-transform: uppercase;
@@ -310,7 +322,7 @@
 
 .info-value {
     display: block;
-    color: #2c3e50;
+    color: var(--brand-text);
     font-size: 1.1rem;
     font-weight: 700;
 }
@@ -327,18 +339,16 @@
 }
 
 .sidebar-card {
-    background: white;
+    background: var(--brand-surface);
     border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
     margin-bottom: 2rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    border: 1px solid var(--brand-border);
     overflow: hidden;
 }
 
 .card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--brand-navy), var(--brand-blue));
     color: white;
     padding: 1.5rem;
     display: flex;
@@ -373,20 +383,20 @@
 }
 
 .progress-label span:first-child {
-    color: #495057;
+    color: var(--brand-text-muted);
     font-weight: 500;
     font-size: 0.9rem;
 }
 
 .progress-percentage {
-    color: #667eea;
+    color: var(--brand-blue);
     font-weight: 700;
     font-size: 1.1rem;
 }
 
 .progress-bar-container {
     height: 8px;
-    background: #e9ecef;
+    background: var(--brand-surface-muted);
     border-radius: 10px;
     overflow: hidden;
 }
@@ -398,15 +408,15 @@
 }
 
 .progress-bar.completed {
-    background: linear-gradient(90deg, #28a745, #20c997);
+    background: linear-gradient(90deg, var(--brand-teal), #34d399);
 }
 
 .progress-bar.in-progress {
-    background: linear-gradient(90deg, #ffc107, #fd7e14);
+    background: linear-gradient(90deg, var(--brand-orange), #fb923c);
 }
 
 .progress-bar.not-started {
-    background: linear-gradient(90deg, #6c757d, #495057);
+    background: linear-gradient(90deg, #94a3b8, #64748b);
 }
 
 .progress-stats {
@@ -415,20 +425,20 @@
     gap: 1rem;
     margin-top: 1.5rem;
     padding-top: 1.5rem;
-    border-top: 1px solid #f8f9fa;
+    border-top: 1px solid var(--brand-surface-muted);
 }
 
 .stat-item {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #6c757d;
+    color: var(--brand-text-muted);
     font-size: 0.85rem;
     font-weight: 500;
 }
 
 .stat-item i {
-    color: #667eea;
+    color: var(--brand-blue);
     width: 16px;
 }
 
@@ -464,35 +474,35 @@
 }
 
 .simulation-btn {
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, var(--brand-teal), #34d399);
     color: white;
 }
 
 .simulation-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 8px 25px rgba(13, 148, 136, 0.35);
     color: white;
 }
 
 .assessment-btn {
-    background: linear-gradient(135deg, #007bff, #6610f2);
+    background: linear-gradient(135deg, var(--brand-blue), #0ea5e9);
     color: white;
 }
 
 .assessment-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
     color: white;
 }
 
 .dashboard-btn {
-    background: linear-gradient(135deg, #6c757d, #495057);
+    background: linear-gradient(135deg, #94a3b8, #64748b);
     color: white;
 }
 
 .dashboard-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+    box-shadow: 0 8px 25px rgba(100, 116, 139, 0.35);
     color: white;
 }
 
@@ -535,7 +545,7 @@
 
 /* Main Topic Drawers */
 .accordion-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--brand-navy), var(--brand-blue));
     color: white;
     border: none;
     border-radius: 16px !important;
@@ -567,13 +577,13 @@
 }
 
 .accordion-button:not(.collapsed) {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    background: linear-gradient(135deg, var(--brand-blue), var(--brand-navy));
     color: white;
     box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
 }
 
 .accordion-button:focus {
-    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+    box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.25);
 }
 
 .accordion-button::after {
@@ -609,8 +619,8 @@
 }
 
 .sub-accordion-button {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    color: #495057;
+    background: linear-gradient(135deg, var(--brand-surface), var(--brand-surface-muted));
+    color: var(--brand-text-muted);
     border: none;
     border-radius: 0;
     font-weight: 600;
@@ -624,13 +634,13 @@
 }
 
 .sub-accordion-button:hover {
-    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
-    color: #2c3e50;
+    background: linear-gradient(135deg, var(--brand-surface-muted), #e0e7ff);
+    color: var(--brand-text);
 }
 
 .sub-accordion-button:not(.collapsed) {
-    background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--brand-blue), var(--brand-navy));
+    color: #fff;
     box-shadow: none;
 }
 
@@ -648,7 +658,7 @@
 }
 
 .sub-accordion-body {
-    background: #fafbfc;
+    background: var(--brand-surface-muted);
     padding: 0;
     border-radius: 0;
 }
@@ -665,8 +675,8 @@
 }
 
 .sub-sub-topic:hover {
-    background: rgba(102, 126, 234, 0.05);
-    color: #667eea;
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--brand-blue);
 }
 
 .sub-sub-topic:last-child {
@@ -676,8 +686,8 @@
 .sub-sub-topic-number {
     width: 24px;
     height: 24px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
+    background: linear-gradient(135deg, var(--brand-navy), var(--brand-blue));
+    color: #fff;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -695,54 +705,54 @@
 }
 
 .sub-sub-topic-icon {
-    color: #6c757d;
+    color: var(--brand-text-muted);
     font-size: 0.9rem;
     opacity: 0.7;
     transition: all 0.3s ease;
 }
 
 .sub-sub-topic:hover .sub-sub-topic-icon {
-    color: #667eea;
+    color: var(--brand-blue);
     opacity: 1;
 }
 
 /* Special Topic Styles */
 .reflection-topic .accordion-button {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, var(--brand-teal), #2dd4bf);
 }
 
 .knowledge-check-topic .accordion-button {
-    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    background: linear-gradient(135deg, var(--brand-orange), #fdba74);
 }
 
 .references-topic .accordion-button {
-    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    background: linear-gradient(135deg, #cbd5f5, #94a3b8);
 }
 
 .simulation-topic .accordion-button {
-    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    background: linear-gradient(135deg, #0ea5e9, var(--brand-blue));
 }
 
 .conclusion-topic .accordion-button {
-    background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+    background: linear-gradient(135deg, var(--brand-navy), #312e81);
 }
 
 /* Content Styling */
 .accordion-content {
     padding: 2rem;
     line-height: 1.7;
-    color: #495057;
+    color: var(--brand-text);
 }
 
 .accordion-content h3 {
-    color: #2c3e50;
+    color: var(--brand-text);
     font-weight: 700;
     margin-bottom: 1rem;
     font-size: 1.3rem;
 }
 
 .accordion-content h4 {
-    color: #495057;
+    color: var(--brand-text-muted);
     font-weight: 600;
     margin-bottom: 0.75rem;
     font-size: 1.1rem;
@@ -789,7 +799,7 @@
 .video-caption {
     text-align: center;
     font-style: italic;
-    color: #6c757d;
+    color: var(--brand-text-muted);
     margin-top: 1rem;
     font-size: 0.95rem;
     font-weight: 500;
@@ -810,8 +820,8 @@
 
 /* Enhanced Content Sections */
 .lesson-intro {
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-    border-left: 5px solid #2196f3;
+    background: linear-gradient(135deg, #E0F2FE 0%, #C7D2FE 100%);
+    border-left: 5px solid var(--brand-blue);
     padding: 2rem;
     border-radius: 0 16px 16px 0;
     margin: 2rem 0;
@@ -819,13 +829,13 @@
 }
 
 .lesson-intro h2 {
-    color: #1976d2;
+    color: var(--brand-blue);
     font-weight: 700;
     margin-bottom: 1rem;
 }
 
 .resources-section {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, var(--brand-surface), var(--brand-surface-muted));
     border-radius: 16px;
     padding: 2rem;
     margin: 2rem 0;
@@ -841,32 +851,32 @@
 .resource-list li {
     margin-bottom: 1rem;
     padding: 1.25rem;
-    background: white;
+    background: var(--brand-surface);
     border-radius: 12px;
-    border-left: 4px solid #007bff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid var(--brand-blue);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
     transition: all 0.3s ease;
 }
 
 .resource-list li:hover {
     transform: translateX(5px);
-    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.15);
+    box-shadow: 0 20px 35px rgba(37, 99, 235, 0.15);
 }
 
 .resource-link {
-    color: #007bff;
+    color: var(--brand-blue);
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
 }
 
 .resource-link:hover {
-    color: #0056b3;
+    color: var(--brand-navy);
     text-decoration: none;
 }
 
 .next-steps {
-    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    background: linear-gradient(135deg, #ECFDF5 0%, #DCFCE7 100%);
     border-radius: 16px;
     padding: 2rem;
     margin: 2rem 0;
@@ -874,7 +884,7 @@
 }
 
 .next-steps h4 {
-    color: #2e7d32;
+    color: var(--brand-teal);
     margin-bottom: 1rem;
     font-weight: 700;
 }
@@ -889,21 +899,21 @@
 }
 
 .alert-info {
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-    color: #1976d2;
-    border-left: 4px solid #2196f3;
+    background: linear-gradient(135deg, #E0F2FE 0%, #C7D2FE 100%);
+    color: var(--brand-blue);
+    border-left: 4px solid var(--brand-blue);
 }
 
 .alert-warning {
-    background: linear-gradient(135deg, #fff3e0 0%, #ffcc02 100%);
-    color: #f57c00;
-    border-left: 4px solid #ff9800;
+    background: linear-gradient(135deg, #FFF7ED 0%, #FEE2C5 100%);
+    color: var(--brand-orange);
+    border-left: 4px solid var(--brand-orange);
 }
 
 .alert-success {
-    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
-    color: #2e7d32;
-    border-left: 4px solid #4caf50;
+    background: linear-gradient(135deg, #ECFDF5 0%, #DCFCE7 100%);
+    color: var(--brand-teal);
+    border-left: 4px solid var(--brand-teal);
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
@@ -1074,12 +1084,12 @@ html {
 /* ===== ACCESSIBILITY ===== */
 .accordion-button:focus,
 .sub-accordion-button:focus {
-    outline: 2px solid #667eea;
+    outline: 2px solid var(--brand-blue);
     outline-offset: 2px;
 }
 
 .sub-sub-topic:focus {
-    outline: 2px solid #667eea;
+    outline: 2px solid var(--brand-blue);
     outline-offset: 2px;
 }
 
@@ -1091,7 +1101,7 @@ html {
     
     .accordion-button,
     .sub-accordion-button {
-        background: #f8f9fa !important;
+        background: var(--brand-surface-muted) !important;
         color: #000 !important;
     }
     
@@ -1439,7 +1449,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 wrap.innerHTML = ''+
                     '<div class="accordion-content">'+
                       '<h3 class="mb-3">Knowledge Check — Module 2</h3>'+
-                      '<div class="knowledge-check-rules" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 20px; border-radius: 12px; border-left: 5px solid #007bff;">'+
+                     '<div class="knowledge-check-rules" style="background: linear-gradient(135deg, #E0F2FE 0%, #C7D2FE 100%); padding: 20px; border-radius: 12px; border-left: 5px solid #2563EB;">'+
                         '<ul style="font-size: 1.05rem; line-height: 1.7; margin: 0; color: #333;">'+
                           '<li><strong>Unlimited attempts</strong></li>'+
                           '<li><strong>5 questions per attempt</strong></li>'+
