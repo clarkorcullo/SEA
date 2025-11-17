@@ -216,6 +216,25 @@ with app.app_context():
             logger.warning(f"[MIGRATION] Could not migrate profile_picture_data column: {e}")
             db.session.rollback()
 
+        # Auto-migrate profile_completed column for production deployments
+        try:
+            if inspector.has_table('user'):
+                columns = [col['name'] for col in inspector.get_columns('user')]
+                if 'profile_completed' not in columns:
+                    logger.info("[MIGRATION] Adding profile_completed column to user table...")
+                    db.session.execute(text(
+                        "ALTER TABLE \"user\" ADD COLUMN profile_completed BOOLEAN DEFAULT FALSE"
+                    ))
+                    # Ensure existing users have a deterministic value
+                    db.session.execute(text(
+                        "UPDATE \"user\" SET profile_completed = FALSE WHERE profile_completed IS NULL"
+                    ))
+                    db.session.commit()
+                    logger.info("[MIGRATION] Successfully added profile_completed column")
+        except Exception as e:
+            logger.warning(f"[MIGRATION] Could not migrate profile_completed column: {e}")
+            db.session.rollback()
+
         # Ensure modules have drawer placeholders so UI renders consistently in production
         try:
             def build_standard_skeleton(module_index: int) -> str:
