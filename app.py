@@ -1395,17 +1395,20 @@ def google_auth_callback():
         return redirect(url_for('login'))
     
     user = User.get_by_email(email)
+    new_user_created = False
     if not user:
         try:
             user = _provision_google_user(user_info)
             flash('Account created using your Google profile.', 'success')
+            new_user_created = True
         except Exception as provisioning_error:
             logger.error(f"[OAUTH] Failed to provision Google user ({email}): {provisioning_error}")
             flash('Unable to create an account from your Google profile. Please contact support.', 'error')
             return redirect(url_for('login'))
     
     login_user(user)
-    flash('Login successful!', 'success')
+    if not new_user_created:
+        flash('Login successful with Google.', 'success')
     logger.info(f"[OAUTH] User {user.username} logged in via Google.")
     if getattr(user, 'needs_profile_completion', False):
         flash('Before continuing, please complete your student details.', 'info')
