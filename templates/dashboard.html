@@ -145,30 +145,57 @@
 </style>
 </style>
 <div class="container-fluid p-4">
-        <!-- Welcome Section -->
+        <!-- Welcome + Metrics Section -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card dashboard-card accent-primary">
                     <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-md-8">
-                                <h2 class="card-title text-primary">
-                                    <i class="fas fa-user-circle"></i> Welcome back, {{ current_user.username }}!
+                        <div class="row g-4 align-items-center">
+                            <div class="col-lg-4">
+                                <h2 class="card-title text-primary mb-2">
+                                    <i class="fas fa-user-circle me-2"></i>Welcome back, {{ current_user.username }}!
                                 </h2>
-                                <p class="card-text text-dark">
-                                    Continue your journey in social engineering awareness. 
-                                    You've completed {{ completed_modules }} modules so far.
+                                <p class="card-text text-dark mb-0">
+                                    Continue your journey in social engineering awareness. You've completed {{ completed_modules }} modules so far.
                                 </p>
                             </div>
-                            <div class="col-md-4 text-end">
-                                <div class="d-flex justify-content-end">
-                                    <div class="text-center me-4">
-                                        <h4 class="mb-0 text-primary">{{ completed_modules }}</h4>
-                                        <small class="text-muted">Modules Completed</small>
+                            <div class="col-lg-8">
+                                <div class="row text-center">
+                                    <div class="col-md-3 mb-3 mb-md-0">
+                                        <div class="d-flex flex-column h-100 justify-content-center">
+                                            <i class="fas fa-graduation-cap text-primary mb-2"></i>
+                                            <h5 class="mb-1">Learning Progress</h5>
+                                            <div class="progress mb-1">
+                                                <div class="progress-bar" role="progressbar"
+                                                     style="width: {{ (completed_modules * 100 // (total_modules if total_modules else 1)) }}%">
+                                                </div>
+                                            </div>
+                                            <small>{{ completed_modules }} of {{ total_modules }} modules</small>
+                                        </div>
                                     </div>
-                                    <div class="text-center">
-                                        <h4 class="mb-0 text-primary">{{ user_stats.total_score if user_stats else 0 }}</h4>
-                                        <small class="text-muted">Total Score</small>
+                                    <div class="col-md-3 mb-3 mb-md-0">
+                                        <div class="d-flex flex-column h-100 justify-content-center">
+                                            <i class="fas fa-gamepad text-warning mb-2"></i>
+                                            <h5 class="mb-1">Simulations</h5>
+                                            <h4 class="text-warning mb-0">{{ user_stats.simulation_statistics.completed_simulations if user_stats and user_stats.simulation_statistics else 0 }}</h4>
+                                            <small>completed</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3 mb-md-0">
+                                        <div class="d-flex flex-column h-100 justify-content-center">
+                                            <i class="fas fa-chart-line text-success mb-2"></i>
+                                            <h5 class="mb-1">Average Score</h5>
+                                            <h4 class="text-success mb-0">{{ average_score }}%</h4>
+                                            <small>overall performance</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="d-flex flex-column h-100 justify-content-center">
+                                            <i class="fas fa-clock text-info mb-2"></i>
+                                            <h5 class="mb-1">Time Spent</h5>
+                                            <h4 class="text-info mb-0">{{ total_time_spent }} min</h4>
+                                            <small>learning time</small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -545,57 +572,6 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Progress Overview -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body d-flex flex-column">
-                    <i class="fas fa-graduation-cap fa-2x text-primary mb-2"></i>
-                    <h5 class="card-title">Learning Progress</h5>
-                    <div class="progress mb-2">
-                        <div class="progress-bar" role="progressbar" aria-label="Module completion progress"
-                             style="width: {{ (completed_modules * 100 // (total_modules if total_modules else 1)) }}%">
-                        </div>
-                    </div>
-                    <p class="card-text mt-auto">{{ completed_modules }} of {{ total_modules }} modules completed</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body d-flex flex-column">
-                    <i class="fas fa-gamepad fa-2x text-warning mb-2"></i>
-                    <h5 class="card-title">Simulations</h5>
-                    <h3 class="text-warning">{{ user_stats.simulation_statistics.completed_simulations if user_stats and user_stats.simulation_statistics else 0 }}</h3>
-                    <p class="card-text mt-auto">Simulations completed</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body d-flex flex-column">
-                    <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
-                    <h5 class="card-title">Average Score</h5>
-                    <h3 class="text-success">{{ average_score }}%</h3>
-                    <p class="card-text mt-auto">Overall performance</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body d-flex flex-column">
-                    <i class="fas fa-clock fa-2x text-info mb-2"></i>
-                    <h5 class="card-title">Time Spent</h5>
-                    <h3 class="text-info">{{ total_time_spent }} min</h3>
-                    <p class="card-text mt-auto">Total learning time</p>
                 </div>
             </div>
         </div>
