@@ -138,11 +138,6 @@ class ProductionConfig(Config):
     FLASK_ENV = 'production'
     LOG_LEVEL = 'WARNING'
     
-    # Enhanced production security
-    SESSION_COOKIE_SECURE = True
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax'
-    
     # Production database settings
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
