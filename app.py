@@ -42,12 +42,14 @@ from datetime import datetime, timedelta, timezone
 import random
 import json
 import secrets
+import re
 
 # Third-party imports
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy import text
+from authlib.integrations.flask_client import OAuth
 
 # Local application imports
 from data_models.base_models import db
@@ -290,6 +292,31 @@ with app.app_context():
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+oauth = None
+def _configure_google_oauth(app_instance):
+    """Initialize Google OAuth client if credentials are configured."""
+    if not (app_instance.config.get('GOOGLE_CLIENT_ID') and app_instance.config.get('GOOGLE_CLIENT_SECRET')):
+        logger.info("Google OAuth credentials not configured; skipping Google login setup.")
+        return None
+    try:
+        oauth_client = OAuth(app_instance)
+        oauth_client.register(
+            name='google',
+            client_id=app_instance.config['GOOGLE_CLIENT_ID'],
+            client_secret=app_instance.config['GOOGLE_CLIENT_SECRET'],
+            server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+            client_kwargs={
+                'scope': app_instance.config.get('GOOGLE_OAUTH_SCOPES', 'openid email profile')
+            }
+        )
+        logger.info("Google OAuth client registered successfully.")
+        return oauth_client
+    except Exception as oauth_error:
+        logger.warning(f"Failed to configure Google OAuth: {oauth_error}")
+        return None
+
+oauth = _configure_google_oauth(app)
 
 # Initialize business services
 user_service = UserService()
@@ -1173,6 +1200,50 @@ def register():
     
     return render_template('register.html')
 
+
+def is_google_login_available() -> bool:
+    """Check if Google OAuth login is configured."""
+    try:
+        return oauth is not None and hasattr(oauth, '_clients') and 'google' in oauth._clients
+    except Exception:
+        return False
+
+
+def _generate_unique_username(seed_value: str) -> str:
+    """Generate a unique username based on seed (typically email prefix)."""
+    base = re.sub(r'[^a-zA-Z0-9]', '', (seed_value or '').lower())
+    if not base:
+        base = 'googleuser'
+    candidate = base[:30]
+    suffix = 1
+    while User.get_by_username(candidate):
+        candidate = f"{base[:25]}{suffix}"
+        suffix += 1
+    return candidate
+
+
+def _provision_google_user(user_info: dict) -> User:
+    """Create a new user account using Google profile information."""
+    email = user_info.get('email')
+    username = _generate_unique_username(email.split('@')[0] if email else user_info.get('sub', 'googleuser'))
+    temp_password = secrets.token_urlsafe(16) + "Aa1!"
+    full_name = user_info.get('name') or username.title()
+    specialization = 'Information Technology'
+    year_level = 'Google OAuth'
+    
+    new_user = User(
+        username=username,
+        email=email,
+        password=temp_password,
+        full_name=full_name,
+        specialization=specialization,
+        year_level=year_level
+    )
+    new_user.save()
+    logger.info(f"[OAUTH] Provisioned new Google user {username} ({email})")
+    return new_user
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """
@@ -1202,6 +1273,7 @@ def login():
     except Exception as e:
         logger.error(f"[ERROR] Auto-database init during login failed: {e}")
     
+    google_available = is_google_login_available()
     if request.method == 'POST':
         try:
             username = request.form['username']
@@ -1221,7 +1293,66 @@ def login():
             flash(f'Login error: {e}', 'error')
             logger.error(f"Login failed: {e}")
     
-    return render_template('login.html')
+    return render_template('login.html', google_login_enabled=google_available)
+
+
+@app.route('/login/google')
+def login_with_google():
+    """Initiate Google OAuth login flow."""
+    if not is_google_login_available():
+        flash('Google login is not available right now.', 'error')
+        return redirect(url_for('login'))
+    try:
+        redirect_uri = url_for('google_auth_callback', _external=True, _scheme=request.scheme)
+        nonce = secrets.token_urlsafe(16)
+        session['google_oauth_nonce'] = nonce
+        session['google_oauth_nonce'] = nonce
+        return oauth.google.authorize_redirect(
+            redirect_uri,
+            prompt='select_account',
+            nonce=nonce
+        )
+    except Exception as oauth_error:
+        logger.error(f"[OAUTH] Error initiating Google login: {oauth_error}")
+        flash('Unable to start Google login. Please try again later.', 'error')
+        return redirect(url_for('login'))
+
+
+@app.route('/auth/google/callback')
+def google_auth_callback():
+    """Handle Google OAuth callback."""
+    if not is_google_login_available():
+        flash('Google login is not available right now.', 'error')
+        return redirect(url_for('login'))
+    try:
+        token = oauth.google.authorize_access_token()
+        stored_nonce = session.pop('google_oauth_nonce', None)
+        user_info = oauth.google.parse_id_token(token, nonce=stored_nonce)
+    except Exception as oauth_error:
+        logger.error(f"[OAUTH] Error completing Google login: {oauth_error}")
+        flash('Google login failed. Please try again.', 'error')
+        return redirect(url_for('login'))
+    
+    email = user_info.get('email')
+    if not email:
+        flash('Unable to retrieve your Google email address.', 'error')
+        logger.warning("[OAUTH] Google login missing email claim.")
+        return redirect(url_for('login'))
+    
+    user = User.get_by_email(email)
+    if not user:
+        try:
+            user = _provision_google_user(user_info)
+            flash('Account created using your Google profile.', 'success')
+        except Exception as provisioning_error:
+            logger.error(f"[OAUTH] Failed to provision Google user ({email}): {provisioning_error}")
+            flash('Unable to create an account from your Google profile. Please contact support.', 'error')
+            return redirect(url_for('login'))
+    
+    login_user(user)
+    flash('Login successful!', 'success')
+    logger.info(f"[OAUTH] User {user.username} logged in via Google.")
+    return redirect(url_for('dashboard'))
 
 @app.route('/logout')
 def logout():

@@ -98,6 +98,14 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     
+    # OAuth Configuration
+    GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+    GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+    GOOGLE_OAUTH_SCOPES = os.environ.get(
+        'GOOGLE_OAUTH_SCOPES',
+        'openid email profile'
+    )
+    
     # Application Information
     APP_NAME = 'Social Engineering Awareness Program'
     APP_VERSION = '1.0.0'

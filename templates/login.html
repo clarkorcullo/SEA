@@ -68,6 +68,16 @@
                             </div>
                         </form>
 
+                    {% if google_login_enabled %}
+                    <div class="text-center my-3">
+                        <div class="text-muted small mb-2">or</div>
+                        <a href="{{ url_for('login_with_google') }}" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2">
+                            <i class="fab fa-google text-danger"></i>
+                            <span>Continue with Google</span>
+                        </a>
+                    </div>
+                    {% endif %}
+
                         <div class="text-center">
                             <p class="mb-0">Don't have an account? <a href="{{ url_for('register') }}" class="text-decoration-none">Sign up here</a></p>
                             <p class="mt-2 mb-0">
