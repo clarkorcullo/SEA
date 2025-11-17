@@ -66,6 +66,25 @@ from business_services import (
 from config import config
 
 # =============================================================================
+# 1.1 DOMAIN CONSTANTS
+# =============================================================================
+
+SPECIALIZATION_OPTIONS = [
+    "BSIT - Network & Cybersecurity",
+    "BSIT - Software Devs",
+    "BSIT - Data Analytics",
+    "BSIT - Marketing Technology",
+    "BSIT - Entrep Technology"
+]
+
+YEAR_LEVEL_OPTIONS = [
+    "1st Year",
+    "2nd Year",
+    "3rd Year",
+    "4th Year"
+]
+
+# =============================================================================
 # 2. LOGGING CONFIGURATION
 # =============================================================================
 
@@ -1146,6 +1165,8 @@ def register():
     except Exception as e:
         logger.error(f"[ERROR] Auto-database init during registration failed: {e}")
     
+    google_available = is_google_login_available()
+    
     if request.method == 'POST':
         try:
             # Get and validate form data
@@ -1163,13 +1184,13 @@ def register():
             if not all([username, email, password, confirm_password, specialization, year_level]):
                 flash('All fields are required.', 'error')
                 logger.warning(f"Registration failed: Missing required fields for user {username}")
-                return render_template('register.html', form_data=request.form)
+                return render_template('register.html', form_data=request.form, google_login_enabled=google_available)
             
             # Validate password confirmation
             if password != confirm_password:
                 flash('Passwords do not match.', 'error')
                 logger.warning(f"Registration failed: Password mismatch for user {username}")
-                return render_template('register.html', form_data=request.form)
+                return render_template('register.html', form_data=request.form, google_login_enabled=google_available)
             
             # Create user data
             user_data = {
@@ -1198,7 +1219,7 @@ def register():
             flash(f'Registration error: {e}', 'error')
             logger.error(f"Registration failed: {e}")
     
-    return render_template('register.html')
+    return render_template('register.html', google_login_enabled=google_available)
 
 
 def is_google_login_available() -> bool:
@@ -1228,8 +1249,8 @@ def _provision_google_user(user_info: dict) -> User:
     username = _generate_unique_username(email.split('@')[0] if email else user_info.get('sub', 'googleuser'))
     temp_password = secrets.token_urlsafe(16) + "Aa1!"
     full_name = user_info.get('name') or username.title()
-    specialization = 'Information Technology'
-    year_level = 'Google OAuth'
+    specialization = 'Pending Selection'
+    year_level = 'Pending Selection'
     
     new_user = User(
         username=username,
@@ -1237,7 +1258,8 @@ def _provision_google_user(user_info: dict) -> User:
         password=temp_password,
         full_name=full_name,
         specialization=specialization,
-        year_level=year_level
+        year_level=year_level,
+        profile_completed=False
     )
     new_user.save()
     logger.info(f"[OAUTH] Provisioned new Google user {username} ({email})")
@@ -1284,6 +1306,9 @@ def login():
                 login_user(user)
                 flash('Login successful!', 'success')
                 logger.info(f"User {username} logged in successfully")
+                if getattr(user, 'needs_profile_completion', False):
+                    flash('Please complete your student profile to personalize the experience.', 'info')
+                    return redirect(url_for('profile', onboarding=1))
                 return redirect(url_for('dashboard'))
             else:
                 flash('Invalid username or password.', 'error')
@@ -1352,6 +1377,9 @@ def google_auth_callback():
     login_user(user)
     flash('Login successful!', 'success')
     logger.info(f"[OAUTH] User {user.username} logged in via Google.")
+    if getattr(user, 'needs_profile_completion', False):
+        flash('Before continuing, please complete your student details.', 'info')
+        return redirect(url_for('profile', onboarding=1))
     return redirect(url_for('dashboard'))
 
 @app.route('/logout')
@@ -2889,6 +2917,20 @@ def submit_simulation():
 # 10.7 PROGRESS AND ANALYTICS ROUTES
 # =============================================================================
 
+def _render_profile_page(**context):
+    """Helper to render profile page with shared context."""
+    onboarding_flag = (request.args.get('onboarding', '') or '').lower()
+    onboarding_active = onboarding_flag in ('1', 'true', 'yes')
+    base_context = {
+        'user': current_user,
+        'specialization_options': SPECIALIZATION_OPTIONS,
+        'year_level_options': YEAR_LEVEL_OPTIONS,
+        'show_profile_completion_banner': onboarding_active or getattr(current_user, 'needs_profile_completion', False)
+    }
+    base_context.update(context)
+    return render_template('profile.html', **base_context)
+
+
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
@@ -2897,7 +2939,7 @@ def profile():
     
     Features:
     - Profile information display
-    - Edit capabilities (full name, birthday, address)
+    - Edit capabilities (full name, specialization, year level, birthday, address)
     - Password change functionality
     - Profile picture upload
     - Progress overview
@@ -2915,7 +2957,7 @@ def profile():
             elif request.form.get('change_password'):
                 return handle_password_change()
         
-        return render_template('profile.html', user=current_user)
+        return _render_profile_page()
         
     except Exception as e:
         flash(f'Error loading profile: {e}', 'error')
@@ -2932,6 +2974,8 @@ def handle_profile_update():
         full_name = request.form.get('full_name', '').strip()
         birthday = request.form.get('birthday', '').strip()
         address = request.form.get('address', '').strip()
+        specialization = request.form.get('specialization', '').strip()
+        year_level = request.form.get('year_level', '').strip()
         
         # Validate full name (required)
         if not full_name:
@@ -2940,6 +2984,14 @@ def handle_profile_update():
             errors['full_name'] = 'Full name must be at least 2 characters long.'
         elif len(full_name) > 100:
             errors['full_name'] = 'Full name must be less than 100 characters.'
+        
+        # Validate specialization (required)
+        if specialization not in SPECIALIZATION_OPTIONS:
+            errors['specialization'] = 'Please select your BSIT specialization.'
+        
+        # Validate year level (required)
+        if year_level not in YEAR_LEVEL_OPTIONS:
+            errors['year_level'] = 'Please select your current year level.'
         
         # Validate birthday (optional)
         if birthday:
@@ -2997,9 +3049,11 @@ def handle_profile_update():
             form_data = {
                 'full_name': full_name,
                 'birthday': birthday,
-                'address': address
+                'address': address,
+                'specialization': specialization,
+                'year_level': year_level
             }
-            return render_template('profile.html', user=current_user, errors=errors, form_data=form_data)
+            return _render_profile_page(errors=errors, form_data=form_data)
         
         # Update user profile
         user = current_user
@@ -3010,6 +3064,9 @@ def handle_profile_update():
         else:
             user.birthday = None
         user.address = address if address else None
+        user.specialization = specialization or user.specialization
+        user.year_level = year_level or user.year_level
+        user.profile_completed = True
         
         if profile_picture:
             user.profile_picture = profile_picture
@@ -3074,7 +3131,7 @@ def handle_password_change():
                 'new_password': new_password,
                 'confirm_new_password': confirm_new_password
             }
-            return render_template('profile.html', user=current_user, errors=errors, form_data=form_data)
+            return _render_profile_page(errors=errors, form_data=form_data)
         
         # Update password
         user = current_user

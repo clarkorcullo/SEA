@@ -74,6 +74,14 @@
         justify-content: center;
         padding: 20px 0;
     }
+
+.google-highlight {
+    border-radius: 12px;
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    background: rgba(219, 234, 254, 0.6);
+    color: #0f172a;
+    font-size: 0.95rem;
+}
 </style>
 
 <div class="register-container">
@@ -87,6 +95,15 @@
                             <img src="{{ url_for('static', filename='SEALogo.png') }}" alt="SEA Logo" class="img-fluid mb-2" style="height: 60px; max-width: 150px; object-fit: contain;">
                             <h2 class="card-title">Create Account</h2>
                             <p class="text-muted">Join the Social Engineering Awareness Program</p>
+                            {% if google_login_enabled %}
+                            <div class="google-highlight alert alert-info d-flex align-items-center gap-2">
+                                <i class="fab fa-google fa-lg text-danger"></i>
+                                <div class="text-start">
+                                    <strong>Tip:</strong> Already have an MMDC Google account? 
+                                    <a href="{{ url_for('login_with_google') }}" class="alert-link">Continue with Google</a> for a one-click sign-in.
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
 
                         <form method="POST" action="{{ url_for('register') }}">
@@ -150,11 +167,11 @@
                                     <select class="form-select {% if errors and errors.get('specialization') %}is-invalid{% elif form_data and form_data.specialization and not errors %}is-valid{% endif %}" 
                                         id="specialization" name="specialization" required>
                                         <option value="">Select specialization</option>
-                                        <option value="Software Development" {% if form_data and form_data.specialization == 'Software Development' %}selected{% endif %}>Software Development</option>
-                                        <option value="Network & Cybersecurity" {% if form_data and form_data.specialization == 'Network & Cybersecurity' %}selected{% endif %}>Network & Cybersecurity</option>
-                                        <option value="Data Analytics" {% if form_data and form_data.specialization == 'Data Analytics' %}selected{% endif %}>Data Analytics</option>
-                                        <option value="Entrepreneurship Technology" {% if form_data and form_data.specialization == 'Entrepreneurship Technology' %}selected{% endif %}>Entrepreneurship Technology</option>
-                                        <option value="Marketing Technology" {% if form_data and form_data.specialization == 'Marketing Technology' %}selected{% endif %}>Marketing Technology</option>
+                                        <option value="BSIT - Network & Cybersecurity" {% if form_data and form_data.specialization == 'BSIT - Network & Cybersecurity' %}selected{% endif %}>BSIT - Network & Cybersecurity</option>
+                                        <option value="BSIT - Software Devs" {% if form_data and form_data.specialization == 'BSIT - Software Devs' %}selected{% endif %}>BSIT - Software Devs</option>
+                                        <option value="BSIT - Data Analytics" {% if form_data and form_data.specialization == 'BSIT - Data Analytics' %}selected{% endif %}>BSIT - Data Analytics</option>
+                                        <option value="BSIT - Marketing Technology" {% if form_data and form_data.specialization == 'BSIT - Marketing Technology' %}selected{% endif %}>BSIT - Marketing Technology</option>
+                                        <option value="BSIT - Entrep Technology" {% if form_data and form_data.specialization == 'BSIT - Entrep Technology' %}selected{% endif %}>BSIT - Entrep Technology</option>
                                     </select>
                                     {% if errors and errors.get('specialization') %}
                                         <div class="invalid-feedback">

@@ -21,6 +21,15 @@
                 <!-- Main Profile Card -->
                 <div class="profile-card">
                     <div class="profile-card-body">
+                        {% if show_profile_completion_banner %}
+                        <div class="alert alert-info profile-alert d-flex align-items-center gap-2">
+                            <i class="fas fa-clipboard-check fa-lg"></i>
+                            <div>
+                                <strong>Complete Your Student Details</strong><br>
+                                Fill in your full name, specialization, and year level so we can personalize the modules and generate your certificate.
+                            </div>
+                        </div>
+                        {% endif %}
                         <!-- Profile Information Section -->
                         <div class="profile-section">
                             <div class="section-header">
@@ -130,6 +139,62 @@
                                             {% endif %}
                                         </div>
                                     </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="specialization" class="form-label">
+                                            <i class="fas fa-graduation-cap me-2"></i>IT Specialization <span class="required">*</span>
+                                        </label>
+                                        <div class="form-control-wrapper">
+                                            {% set current_specialization = form_data.specialization if form_data else user.specialization %}
+                                            <select class="form-select {% if errors and errors.get('specialization') %}is-invalid{% elif form_data and form_data.specialization and not errors %}is-valid{% endif %}"
+                                                    id="specialization" name="specialization" required>
+                                                <option value="" disabled {% if not current_specialization %}selected{% endif %}>Select specialization</option>
+                                                {% for option in specialization_options %}
+                                                <option value="{{ option }}" {% if current_specialization == option %}selected{% endif %}>{{ option }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <i class="fas fa-list-ul form-control-icon"></i>
+                                        </div>
+                                        <div class="form-help">
+                                            <i class="fas fa-lightbulb me-1"></i>
+                                            Choose the BSIT track that matches your MMDC program so dashboard insights stay relevant.
+                                        </div>
+                                        {% if errors and errors.get('specialization') %}
+                                        <div class="form-error">
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ errors.specialization }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="year_level" class="form-label">
+                                            <i class="fas fa-layer-group me-2"></i>Year Level <span class="required">*</span>
+                                        </label>
+                                        <div class="form-control-wrapper">
+                                            {% set current_year = form_data.year_level if form_data else user.year_level %}
+                                            <select class="form-select {% if errors and errors.get('year_level') %}is-invalid{% elif form_data and form_data.year_level and not errors %}is-valid{% endif %}"
+                                                    id="year_level" name="year_level" required>
+                                                <option value="" disabled {% if not current_year %}selected{% endif %}>Select year level</option>
+                                                {% for option in year_level_options %}
+                                                <option value="{{ option }}" {% if current_year == option %}selected{% endif %}>{{ option }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <i class="fas fa-sitemap form-control-icon"></i>
+                                        </div>
+                                        <div class="form-help">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            We tailor module pacing and recommendations based on your current year level.
+                                        </div>
+                                        {% if errors and errors.get('year_level') %}
+                                        <div class="form-error">
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ errors.year_level }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
 
                                     <div class="form-row">
                                         <div class="form-group">
@@ -338,6 +403,15 @@
 
 .profile-card-body {
     padding: 2.5rem;
+}
+
+.profile-alert {
+    border-radius: 16px;
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    background: rgba(219, 234, 254, 0.85);
+    color: #0f172a;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
 }
 
 /* Profile Sections */

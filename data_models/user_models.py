@@ -22,6 +22,7 @@ class User(UserMixin, BaseModel, TimestampMixin):
     full_name = db.Column(db.String(120), nullable=False)
     specialization = db.Column(db.String(50), nullable=False)
     year_level = db.Column(db.String(20), nullable=False)
+    profile_completed = db.Column(db.Boolean, default=False)
     birthday = db.Column(db.DateTime, nullable=True)
     address = db.Column(db.String(200), nullable=True)
     profile_picture = db.Column(db.String(200), nullable=True)  # Filename for local, base64 for deployment
@@ -98,6 +99,28 @@ class User(UserMixin, BaseModel, TimestampMixin):
         except Exception:
             # Fallback to prevent template crashes
             return False
+    
+    @property
+    def needs_profile_completion(self) -> bool:
+        """Determine if the user must complete profile details."""
+        required_fields = [self.full_name, self.specialization, self.year_level]
+        placeholder_values = {
+            'pending selection',
+            'google oauth',
+            'pending',
+            'n/a',
+            'not set'
+        }
+
+        def _is_placeholder(field_value):
+            if not field_value:
+                return True
+            normalized = field_value.strip().lower()
+            return normalized.startswith('user ') or normalized in placeholder_values
+
+        return (not self.profile_completed) or any(
+            _is_placeholder(field) for field in required_fields
+        )
     
     def set_password(self, password: str, skip_validation: bool = False) -> bool:
         """Set user password with validation"""

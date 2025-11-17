@@ -48,6 +48,9 @@ class UserService:
         if User.get_by_email(user_data['email']):
             raise ValueError("Email already exists")
         
+        # Users who complete the full registration form can be treated as profile-complete
+        user_data['profile_completed'] = True
+
         # Create user
         try:
             user = User(**user_data)
