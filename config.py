@@ -52,9 +52,9 @@ class Config:
     
     # Session Configuration
     PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
-    SESSION_COOKIE_SECURE = os.environ.get('RENDER', False)
+    SESSION_COOKIE_SECURE = bool(os.environ.get('RENDER'))
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SAMESITE = 'None' if os.environ.get('RENDER') else 'Lax'
     SESSION_COOKIE_NAME = 'social_engineering_session'
     
     # Security Configuration

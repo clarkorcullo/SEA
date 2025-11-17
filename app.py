@@ -50,6 +50,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy import text
 from authlib.integrations.flask_client import OAuth
+from authlib.integrations.base_client import OAuthError
 
 # Local application imports
 from data_models.base_models import db
@@ -1353,8 +1354,18 @@ def google_auth_callback():
         token = oauth.google.authorize_access_token()
         stored_nonce = session.pop('google_oauth_nonce', None)
         user_info = oauth.google.parse_id_token(token, nonce=stored_nonce)
+    except OAuthError as oauth_error:
+        error_code = getattr(oauth_error, 'error', '')
+        logger.error(f"[OAUTH] Error completing Google login ({error_code}): {oauth_error}")
+        session.pop('google_oauth_nonce', None)
+        if error_code == 'mismatching_state':
+            session.modified = True
+            flash('Your Google login session expired. Please try again.', 'warning')
+            return redirect(url_for('login'))
+        flash('Google login failed. Please try again.', 'error')
+        return redirect(url_for('login'))
     except Exception as oauth_error:
-        logger.error(f"[OAUTH] Error completing Google login: {oauth_error}")
+        logger.error(f"[OAUTH] Unexpected error completing Google login: {oauth_error}")
         flash('Google login failed. Please try again.', 'error')
         return redirect(url_for('login'))
     
