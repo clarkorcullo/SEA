@@ -7,29 +7,33 @@
 {% block content %}
 <style>
 .dashboard-card {
-    border: 1px solid var(--brand-border);
+    border: 1px solid rgba(226, 232, 240, 0.7);
     border-radius: 22px;
     padding: 1.75rem;
-    background: rgba(255, 255, 255, 0.9);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 25px 55px rgba(15, 23, 42, 0.18);
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 25px 55px rgba(15, 23, 42, 0.14);
+}
+
+.dashboard-card[class*="accent-"] {
+    border-left: 4px solid rgba(15, 23, 42, 0.12);
 }
 
 .dashboard-card.accent-primary {
-    border-left: 6px solid var(--brand-blue);
+    border-left-color: rgba(30, 58, 138, 0.35);
 }
 
 .dashboard-card.accent-teal {
-    border-left: 6px solid var(--brand-teal);
+    border-left-color: rgba(13, 148, 136, 0.35);
 }
 
 .dashboard-card.accent-orange {
-    border-left: 6px solid var(--brand-orange);
+    border-left-color: rgba(100, 116, 139, 0.35);
 }
 
 .module-highlight {
-    border-left: 6px solid var(--brand-blue);
+    border-left: 4px solid rgba(15, 23, 42, 0.12);
 }
 
 .clickable-module {
@@ -64,20 +68,26 @@
     justify-content: center;
 }
 
+.status-badge {
+    border-radius: 999px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0.2rem 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--brand-text);
+}
+
 .status-badge.completed {
-    background: #DCFCE7;
+    border-color: rgba(13, 148, 136, 0.35);
     color: var(--brand-teal);
 }
 
 .status-badge.current {
-    background: #FFE4D6;
-    color: var(--brand-orange);
-}
-
-.status-badge.not-started,
-.status-badge.locked {
-    background: #E2E8F0;
-    color: var(--brand-text-muted);
+    border-color: rgba(37, 99, 235, 0.35);
+    color: var(--brand-blue);
 }
 
 .insight-card {
@@ -90,25 +100,49 @@
 }
 
 .journey-card {
-    border: 1px solid var(--brand-border);
+    border: 1px solid rgba(226, 232, 240, 0.8);
     border-radius: 18px;
     height: 100%;
-    padding: 1.5rem;
-    border-left: 6px solid var(--brand-blue);
-    background: rgba(255, 255, 255, 0.88);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 22px 48px rgba(15, 23, 42, 0.16);
+    padding: 1.35rem;
+    background: rgba(248, 250, 252, 0.9);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
 }
 
 .journey-card h5 {
-    color: var(--brand-blue);
-    font-weight: 700;
+    color: var(--brand-text);
+    font-weight: 600;
 }
 
 .journey-card p {
     color: var(--brand-text-muted);
 }
+
+.section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: rgba(15, 23, 42, 0.75);
+    color: #fff;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 15px 40px rgba(15, 23, 42, 0.35);
+}
+
+.soft-badge {
+    background: rgba(15, 23, 42, 0.05);
+    color: var(--brand-text);
+    border-radius: 999px;
+    font-weight: 600;
+    padding: 0.35rem 1.5rem;
+}
+</style>
 </style>
 <div class="container-fluid p-4">
         <!-- Welcome Section -->
@@ -146,13 +180,18 @@
 
     <!-- Program Introduction Section -->
     <div class="row mb-4">
+        <div class="col-12 mb-3">
+            <div class="section-label">
+                <i class="fas fa-seedling"></i> Program Orientation
+            </div>
+        </div>
         <div class="col-12">
             <div class="card dashboard-card accent-teal">
                 <div class="card-body" style="max-height: 320px; overflow-y: auto;">
                     <div class="row align-items-center">
                         <div class="col-12">
                             <div class="d-flex align-items-center mb-4">
-                                <h2 class="card-title mb-0 text-success fw-bold">
+                                <h2 class="card-title mb-0 text-dark fw-bold">
                                     <i class="fas fa-star me-2"></i>Welcome to the Program
                                 </h2>
                             </div>
@@ -177,16 +216,21 @@
 
     <!-- Our Modules Section -->
     <div class="row mb-4">
+        <div class="col-12 mb-3">
+            <div class="section-label">
+                <i class="fas fa-map-marked-alt"></i> Learner Journey
+            </div>
+        </div>
         <div class="col-12">
             <div class="card dashboard-card accent-orange">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-4">
-                        <h4 class="mb-0 text-warning fw-bold">
+                        <h4 class="mb-0 text-dark fw-bold">
                             <i class="fas fa-map-marked-alt me-2"></i>Our Modules: Your Journey to Becoming a Cyber Defender
                         </h4>
                     </div>
                     <div class="text-center mb-4">
-                        <div class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3">
+                        <div class="soft-badge mb-3">
                             <i class="fas fa-calendar-alt me-2"></i>5-Week Journey
                         </div>
                         <p class="card-text text-dark fw-medium" style="font-size: 1.1rem; line-height: 1.6;">
@@ -267,11 +311,16 @@
 
     <!-- Professional Review Section -->
     <div class="row mb-4">
+        <div class="col-12 mb-3">
+            <div class="section-label">
+                <i class="fas fa-award"></i> Validation
+            </div>
+        </div>
         <div class="col-12">
             <div class="card dashboard-card accent-teal">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h4 class="card-title mb-0 text-primary fw-bold">
+                        <h4 class="card-title mb-0 text-dark fw-bold">
                             <i class="fas fa-award me-2"></i>Professional Review & Validation
                         </h4>
                         <div class="badge bg-white text-success px-3 py-2 rounded-pill shadow-sm" style="border: 1px solid rgba(13, 148, 136, 0.2);">
@@ -297,6 +346,11 @@
 
     <!-- Curriculum Overview Section -->
     <div class="row mb-4">
+        <div class="col-12 mb-3">
+            <div class="section-label">
+                <i class="fas fa-graduation-cap"></i> Curriculum Overview
+            </div>
+        </div>
         <div class="col-12">
             <div class="card dashboard-card accent-primary">
                 <div class="card-body">
@@ -318,35 +372,35 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="text-center fw-bold text-primary">Week 1</td>
+                                    <td class="text-center fw-bold text-muted">Week 1</td>
                                     <td><strong>Module 1:</strong> Understanding Social Engineering Fundamentals</td>
                                     <td>To educate students on the foundational concepts of social engineering.</td>
                                     <td><strong>Lessons:</strong> Video on what SE is, video on the psychology of deception.<br><strong>Output:</strong> A foundational understanding of human hacking.</td>
                                     <td><strong>Assessment:</strong> Pre-test survey at the start of the week.<br><strong>Flow:</strong> Proceeds to Module 2.</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center fw-bold text-info">Week 2</td>
+                                    <td class="text-center fw-bold text-muted">Week 2</td>
                                     <td><strong>Module 2:</strong> Recognizing Common Attack Vectors</td>
                                     <td>To equip students with the knowledge to identify common social engineering attacks.</td>
                                     <td><strong>Lessons:</strong> Videos on phishing, pretexting, and baiting.<br><strong>Output:</strong> A checklist of red flags for phishing, and a narrative understanding of pretexting/baiting.</td>
                                     <td><strong>Assessment:</strong> Module 2 Quiz, Reflection, and Simulation.<br><strong>Flow:</strong> Proceeds to Module 3.</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center fw-bold text-success">Week 3</td>
+                                    <td class="text-center fw-bold text-muted">Week 3</td>
                                     <td><strong>Module 3:</strong> Proactive Digital Defense Strategies</td>
                                     <td>To empower students with practical skills to fortify their online accounts and secure their privacy.</td>
                                     <td><strong>Lessons:</strong> Text on passwords, video on MFA, text/infographic on oversharing.<br><strong>Output:</strong> A personal digital defense checklist.</td>
                                     <td><strong>Assessment:</strong> Module 3 Quiz, Reflection, and Simulation.<br><strong>Flow:</strong> Proceeds to Module 4.</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center fw-bold text-warning">Week 4</td>
+                                    <td class="text-center fw-bold text-muted">Week 4</td>
                                     <td><strong>Module 4:</strong> Incident Response & Reporting</td>
                                     <td>To educate students on the appropriate actions to take when encountering a social engineering attack.</td>
                                     <td><strong>Lessons:</strong> Video on immediate response, text/infographic on reporting, video on account recovery.<br><strong>Output:</strong> A clear MMDC reporting protocol and recovery plan.</td>
                                     <td><strong>Assessment:</strong> Module 4 Quiz, Reflection, and Simulation.<br><strong>Flow:</strong> Proceeds to Module 5.</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center fw-bold text-danger">Week 5</td>
+                                    <td class="text-center fw-bold text-muted">Week 5</td>
                                     <td><strong>Module 5:</strong> Advanced SE & Continuous Awareness</td>
                                     <td>To foster a mindset of continuous vigilance against evolving social engineering threats.</td>
                                     <td><strong>Lessons:</strong> Video on evolving threats (AI, deepfakes), text on cybersecurity habits, video on becoming a cyber defender.<br><strong>Output:</strong> A personal cybersecurity learning toolkit.</td>
@@ -362,6 +416,11 @@
 
     <!-- Master Reference List Section -->
     <div class="row mb-4">
+        <div class="col-12 mb-3">
+            <div class="section-label">
+                <i class="fas fa-book"></i> Master Reference List
+            </div>
+        </div>
         <div class="col-12">
             <div class="card dashboard-card accent-teal">
                 <div class="card-body">
@@ -386,14 +445,14 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="text-center fw-bold text-primary">1</td>
+                                    <td class="text-center fw-bold text-muted">1</td>
                                     <td class="fw-medium">Proofpoint</td>
                                     <td class="text-dark" style="font-size: 0.9rem; line-height: 1.4;">
                                         Proofpoint. (n.d.). <em>Pretexting</em>. Threat Reference. <a href="https://www.proofpoint.com/us/threat-reference/pretexting" target="_blank" rel="noopener" class="text-primary text-decoration-none">https://www.proofpoint.com/us/threat-reference/pretexting</a>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center fw-bold text-primary">2</td>
+                                    <td class="text-center fw-bold text-muted">2</td>
                                     <td class="fw-medium">IT Governance</td>
                                     <td class="text-dark" style="font-size: 0.9rem; line-height: 1.4;">
                                         IT Governance. (n.d.). <em>5 ways to detect a phishing email</em>. IT Governance Blog. <a href="https://www.itgovernance.co.uk/blog/5-ways-to-detect-a-phishing-email" target="_blank" rel="noopener" class="text-primary text-decoration-none">https://www.itgovernance.co.uk/blog/5-ways-to-detect-a-phishing-email</a>
