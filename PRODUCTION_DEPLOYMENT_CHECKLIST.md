@@ -1,163 +1,119 @@
 # 🚀 Production Deployment Checklist
 
-## ✅ Pre-Deployment Verification
-
-### 1. **Code Changes Pushed to GitHub**
-- ✅ All fixes committed and pushed to main branch
-- ✅ Commit hash: `1626d5b`
-- ✅ 11 files modified with comprehensive fixes
-
-### 2. **Critical Fixes Included**
-
-#### ✅ Final Assessment Progress Tracking
-- ✅ Fixed Final Assessment showing 0% completion → now shows 88%
-- ✅ Fixed "Your Progress" box displaying correct scores
-- ✅ Fixed Final Assessment route 404 errors
-- ✅ Fixed Final Assessment submission and result display
-- ✅ Added professional modal system for assessment submission
-
-#### ✅ Module Progress Tracking
-- ✅ Fixed module status indicators (Not Started → In Progress → Completed)
-- ✅ Fixed progress bar updates across all modules
-- ✅ Fixed module access policy (progressive unlocking)
-- ✅ Fixed total score calculation (sum of highest scores per module)
-
-#### ✅ Profile & Certificate System
-- ✅ Fixed profile update functionality (Method Not Allowed error)
-- ✅ Added real name requirement for certificate generation
-- ✅ Fixed certificate generation with proper name validation
-- ✅ Fixed profile picture alignment and upload functionality
-
-#### ✅ Content & UI Improvements
-- ✅ Updated module titles to longer, descriptive names
-- ✅ Fixed Module 2 reflection submission errors
-- ✅ Fixed Final Assessment drawer button routing
-- ✅ Improved error handling and user feedback
-
-### 3. **Deployment Configuration**
-
-#### ✅ Render Configuration
-- ✅ `Procfile`: Gunicorn configuration with proper workers and timeout
-- ✅ `requirements.txt`: All dependencies specified with versions
-- ✅ `runtime.txt`: Python 3.11.9 specified
-- ✅ `config.py`: Production-ready with PostgreSQL support
-
-#### ✅ Database Configuration
-- ✅ PostgreSQL connection string handling
-- ✅ SSL mode configuration for managed databases
-- ✅ Connection pooling and timeout settings
-- ✅ Fallback to SQLite for development
-
-### 4. **Expected Production Behavior**
-
-#### ✅ Final Assessment Module (Module 6)
-- ✅ Shows "COMPLETED" status badge
-- ✅ "Your Progress" box displays: "Completion Status: 88%"
-- ✅ Score shows: "88% score" (not "Not taken")
-- ✅ Progress bar fills to 88%
-- ✅ "Review Your Answers" button works correctly
-
-#### ✅ Module Progress Tracking
-- ✅ All modules show correct status indicators
-- ✅ Progress bars update correctly
-- ✅ Module access policy works (progressive unlocking)
-- ✅ Total score calculation shows sum of best scores
-
-#### ✅ Profile & Certificate System
-- ✅ Profile updates work without "Method Not Allowed" errors
-- ✅ Real name validation for certificate generation
-- ✅ Certificate generation works with proper name display
-- ✅ Profile picture upload and alignment work correctly
-
-### 5. **Post-Deployment Verification Steps**
-
-1. **Test Final Assessment Module**
-   - Navigate to Module 6 (Final Assessment)
-   - Verify "Your Progress" box shows 88% completion
-   - Verify score displays "88% score"
-   - Test "Review Your Answers" button
-
-2. **Test Module Progress**
-   - Check all module status indicators
-   - Verify progress bars are filled correctly
-   - Test module access policy
-
-3. **Test Profile System**
-   - Update profile information
-   - Test real name validation
-   - Generate certificate with proper name
-
-4. **Test Assessment System**
-   - Take a new assessment
-   - Verify progress tracking works
-   - Test submission and results display
-
-### 6. **Database Migration Notes**
-
-#### ✅ Existing Data Compatibility
-- ✅ All existing user progress records are compatible
-- ✅ Final Assessment progress records will be automatically updated
-- ✅ Module completion status will be correctly calculated
-- ✅ No data migration required
-
-#### ✅ New User Experience
-- ✅ New users will have proper progress tracking from the start
-- ✅ All module status indicators will work correctly
-- ✅ Final Assessment progress will be tracked properly
-
-### 7. **Performance Considerations**
-
-#### ✅ Optimized Database Queries
-- ✅ UserService methods optimized for production
-- ✅ Progress tracking queries are efficient
-- ✅ Assessment result retrieval is optimized
-
-#### ✅ Frontend Performance
-- ✅ Custom modal system is lightweight
-- ✅ JavaScript functionality is optimized
-- ✅ Responsive design works across devices
-
-## 🎯 Success Criteria
-
-After deployment, the following should work correctly:
-
-1. **Final Assessment Module (Module 6)**
-   - ✅ Shows correct completion status and score
-   - ✅ "Your Progress" box displays accurate information
-   - ✅ All buttons and functionality work
-
-2. **Overall Progress Tracking**
-   - ✅ Module status indicators are accurate
-   - ✅ Progress bars reflect actual completion
-   - ✅ Total scores are calculated correctly
-
-3. **User Experience**
-   - ✅ Profile updates work without errors
-   - ✅ Certificate generation works with real names
-   - ✅ All assessments and progress tracking function properly
-
-## 🚨 Rollback Plan
-
-If issues arise after deployment:
-
-1. **Immediate Actions**
-   - Check Render deployment logs
-   - Verify database connectivity
-   - Test critical user flows
-
-2. **Rollback Options**
-   - Previous commit: `45ed5cc`
-   - All fixes can be rolled back if necessary
-   - Database schema is backward compatible
-
-## 📞 Support Information
-
-- **Repository**: https://github.com/clarkorcullo/SEA.git
-- **Latest Commit**: `1626d5b` - Complete Final Assessment & Progress Tracking Fixes
-- **Deployment Platform**: Render
-- **Database**: PostgreSQL (managed)
+Use this playbook before every push to Render (or any production target) to ensure the Social Engineering Awareness Program ships safely.
 
 ---
 
-**✅ READY FOR PRODUCTION DEPLOYMENT**
+## ✅ Pre-Deployment
+
+1. **Code hygiene**
+   - [ ] All work committed & pushed to `main`
+   - [ ] `git status` clean
+   - [ ] Lints/tests (manual or automated) pass for touched areas
+
+2. **Secrets & config**
+   - [ ] `.env` / Render environment variables updated (SECRET_KEY, DATABASE_URL, MAIL settings, etc.)
+   - [ ] Admin credentials rotated if shared with new personnel
+   - [ ] Feature flags match release plan (see `config.py` / `helper_utilities/constants.py`)
+
+3. **Dependencies & build**
+   - [ ] `requirements.txt` refreshed (`pip freeze` after upgrades)
+   - [ ] `runtime.txt` still matches desired Python version
+   - [ ] `Procfile` still reflects gunicorn command (`--workers`, timeouts, etc.)
+
+4. **Database readiness**
+   - [ ] PostgreSQL service healthy (Render dashboard)
+   - [ ] `DATABASE_URL` uses `postgresql://...` with `sslmode=require`
+   - [ ] Pending migrations applied locally (if schema changes occurred)
+   - [ ] Content seed (`content_seed/modules.json`) validated via `python manage.py check-content` or import dry run
+
+---
+
+## ⚙️ Deployment Configuration Checklist
+
+| Area | What to confirm |
+| --- | --- |
+| **Render Service** | Auto-deploy from `main`, correct region, health check path `/health`, plan size appropriate for traffic. |
+| **Gunicorn** | `--workers 2` (512 MB) or adjust per plan, `--timeout 120`, `--max-requests 1000 --max-requests-jitter 100`. |
+| **Session Security** | `SESSION_COOKIE_SECURE`, `SESSION_COOKIE_HTTPONLY`, `SESSION_COOKIE_SAMESITE` set via `config.py`. |
+| **Logging** | Log level (INFO/DEBUG) set via env var; log retention monitored (Render log stream + `app.log`). |
+| **Backups** | Database snapshot schedule enabled; `instance/` ignored from Git to avoid leaking local DBs. |
+
+---
+
+## 🧪 Functional Verification (Staging or Local Smoke Test)
+
+1. **Authentication & profile**
+   - [ ] Register + login flow works, including email/password validation.
+   - [ ] Profile update + avatar upload succeed; certificate generation enforces real-name requirement.
+
+2. **Learning journey**
+   - [ ] Module access respects sequential unlocking rules.
+   - [ ] Module completion + progress bars update (Not Started → In Progress → Completed).
+   - [ ] Reflections save and render without XSS warnings.
+
+3. **Assessments & simulations**
+   - [ ] Knowledge checks score correctly; explanations display.
+   - [ ] Final assessment can be started, submitted, and reviewed; pass/fail thresholds enforce retake logic.
+   - [ ] Simulation flows render scenarios and scoring feedback without console errors.
+
+4. **Admin / analytics (if enabled)**
+   - [ ] Admin dashboard loads, charts render, and filters behave.
+   - [ ] User search/reset-password features respond without 5xx errors.
+
+5. **Health & security**
+   - [ ] `/health` returns `{"status": "healthy"}` (plus DB status).
+   - [ ] No secrets present in templates or logs.
+
+Document any deviations in RELEASE_NOTES.md (if used) before pushing.
+
+---
+
+## 📦 Deploy & Post-Deploy
+
+1. **Trigger deploy**
+   - Push to `main` or hit “Deploy latest commit” in Render.
+   - Watch build logs for dependency or compile errors.
+
+2. **Smoke test in production**
+   - Open the public URL, perform login, load dashboard, open at least one module, and complete a sample quiz.
+   - Confirm final assessment, profile update, and certificate generation still work on live data.
+   - Check admin panel (if accessible) for regressions.
+
+3. **Monitoring**
+   - Observe Render metrics (CPU, RAM, response times) for at least 15 minutes.
+   - Tail logs for ERROR/WARNING entries (`render logs` or `heroku logs` equivalent).
+   - Verify uptime monitor or health-check service reports green status.
+
+4. **Stakeholder communication**
+   - Post release summary in team channel (include commit range, notable changes, and verification status).
+   - Update DOCUMENTATION.md / CHANGELOG.md if new features require user guidance.
+
+---
+
+## 🔁 Rollback & Contingency
+
+1. **When to roll back**
+   - Critical path broken (login, module access, assessment submission).
+   - Security regression or data integrity issue.
+   - Sustained error rate or performance degradation > 5 minutes.
+
+2. **How to roll back**
+   - Redeploy last known-good commit (`git push origin <sha>:main` or Render rollback button).
+   - If schema changes were applied, run the corresponding downgrade or restore from snapshot.
+   - Communicate downtime + remediation steps to stakeholders.
+
+3. **Post-mortem**
+   - Capture root cause, mitigation, and follow-up tasks (tests, feature flags, monitoring improvements).
+
+---
+
+## 📞 Quick Reference
+
+- **Repository:** https://github.com/clarkorcullo/SEA  
+- **Production URL:** https://mmdcsea.onrender.com  
+- **Health Check:** https://mmdcsea.onrender.com/health  
+- **Support Contacts:** Capstone engineering team, MMDC mentors
+
+Keep this checklist updated as infrastructure or workflows change so deployments stay predictable and auditable. Happy shipping! 🚀
 

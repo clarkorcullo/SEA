@@ -1,366 +1,130 @@
 # 📁 Project Structure Guide
 
-## 🏗️ **SOCIAL ENGINEERING AWARENESS PROGRAM**
+_Last refreshed: November 2025_
 
-This document provides a comprehensive overview of the project structure, making it easy to understand, navigate, and edit the codebase.
+The Social Engineering Awareness Program follows a layered Flask architecture with SQLAlchemy models, a comprehensive service layer, and Bootstrap templates. This document reflects the **current** repository layout so new contributors aren’t misled by legacy files.
 
 ---
 
-## 📂 **Root Directory Structure**
+## 📂 Root Snapshot
 
 ```
-CapstoneProject/
-├── 🚀 CORE APPLICATION FILES
-│   ├── app.py                    # Main Flask application (1,208 lines)
-│   ├── config.py                 # Environment-based configuration
-│   ├── manage.py                 # Database and system management utilities
-│   ├── requirements.txt          # Python dependencies
-│   ├── runtime.txt               # Python version specification
-│   └── Procfile                  # Render deployment configuration
+CapstoneProject_ProtTypeBackup10/
+├── app.py
+├── config.py
+├── manage.py
+├── requirements.txt
+├── runtime.txt
+├── Procfile
 │
-├── 📚 EDUCATIONAL CONTENT
-│   └── learning_modules/         # Learning content and assessments
-│       ├── __init__.py           # Module exports and initialization
-│       ├── module1.py            # Introduction to Social Engineering
-│       ├── module2.py            # Types of Social Engineering Attacks
-│       ├── module3.py            # Phishing Detection and Prevention
-│       ├── module4.py            # Password Security and Authentication
-│       ├── module5.py            # Social Media Security
-│       ├── module6.py            # Physical Security and Social Engineering
-│       ├── module7.py            # Incident Response and Reporting
-│       └── final_assessment.py   # Final assessment content
+├── business_services/
+├── data_models/
+├── helper_utilities/
+├── templates/
+├── static/
+├── content_seed/
+├── learning_modules/
+│   ├── assessment/
+│   ├── Documents/
+│   └── Visual_Aid/
 │
-├── 🎮 INTERACTIVE SIMULATIONS
-│   └── simulations/              # Simulation engine
-│       ├── __init__.py           # Simulation exports
-│       ├── base_simulation.py    # Base simulation class (OOP pattern)
-│       ├── phishing_simulation.py      # Phishing scenarios
-│       ├── pretexting_simulation.py    # Pretexting scenarios
-│       ├── baiting_simulation.py       # Baiting scenarios
-│       └── quid_pro_quo_simulation.py  # Quid pro quo scenarios
-│
-├── 🗄️ DATA LAYER
-│   └── data_models/              # Database models and ORM
-│       ├── __init__.py           # Model exports
-│       ├── base_models.py        # Base classes and mixins
-│       ├── user_models.py        # User and authentication models
-│       ├── content_models.py     # Module and content models
-│       └── progress_models.py    # Progress tracking models
-│
-├── ⚙️ BUSINESS LOGIC
-│   └── business_services/        # Service layer architecture
-│       ├── __init__.py           # Service exports
-│       ├── user_service.py       # User management (304 lines)
-│       ├── module_service.py     # Module management (276 lines)
-│       ├── assessment_service.py # Assessment and grading (271 lines)
-│       ├── simulation_service.py # Simulation management (206 lines)
-│       ├── progress_service.py   # Progress tracking (358 lines)
-│       ├── analytics_service.py  # Analytics and reporting (424 lines)
-│       └── module_manager_service.py # Module coordination (348 lines)
-│
-├── 🛠️ UTILITIES
-│   └── helper_utilities/         # Utility functions and helpers
-│       ├── __init__.py           # Utility exports
-│       ├── constants.py          # Application constants (395 lines)
-│       ├── formatters.py         # Data formatting utilities (311 lines)
-│       └── validators.py         # Input validation utilities (269 lines)
-│
-├── 🎨 USER INTERFACE
-│   ├── templates/                # HTML templates (19 files)
-│   │   ├── base.html             # Base template with navigation
-│   │   ├── index.html            # Home page (617 lines)
-│   │   ├── login.html            # Login interface
-│   │   ├── register.html         # Registration form (518 lines)
-│   │   ├── dashboard.html        # User dashboard (434 lines)
-│   │   ├── module.html           # Module content (1,159 lines)
-│   │   ├── assessment_simple.html      # Assessment interface
-│   │   ├── simulation_simple.html      # Simulation interface
-│   │   ├── final_assessment_simple.html # Final assessment
-│   │   ├── survey.html           # Feedback survey
-│   │   ├── certificate.html      # Certificate generation
-│   │   ├── profile.html          # User profile (348 lines)
-│   │   ├── forgot_password.html  # Password reset
-│   │   ├── reset_password.html   # Password reset confirmation
-│   │   ├── 404.html              # Error page
-│   │   └── 500.html              # Server error page
-│   │
-│   └── static/                   # Static assets
-│       ├── MMDCLogo.png         # MMDC logo
-│       ├── SEALogo.png          # Social Engineering Awareness logo
-│       ├── securitybackground.mp4 # Animated security-themed backdrop
-│       └── profile_pictures/    # User profile pictures
-│
-├── 📄 DOCUMENTATION
-│   ├── README.md                 # Comprehensive project documentation
-│   ├── PROJECT_STRUCTURE.md      # This file - project organization guide
-│   └── LICENSE                   # MIT License
-│
-└── 🔧 DEVELOPMENT FILES
-    ├── .gitignore                # Git ignore rules
-    ├── app.log                   # Application logs
-    └── instance/                 # Database and instance files
-        └── social_engineering_awareness.db
+├── instance/
+├── docs & guides (*.md / *.txt)
+└── operational scripts (check_db.py, check_modules_json.py, migrate_production_database.py, etc.)
 ```
 
----
-
-## 🎯 **File Purpose and Organization**
-
-### **🚀 Core Application Files**
-
-| File | Purpose | Key Features |
-|------|---------|--------------|
-| **`app.py`** | Main Flask application | Routes, middleware, error handling |
-| **`config.py`** | Environment configuration | Database, security, deployment settings |
-| **`manage.py`** | Management utilities | Database operations, admin tasks |
-| **`requirements.txt`** | Dependencies | Python packages and versions |
-| **`runtime.txt`** | Python version | Specifies Python 3.9.18 |
-| **`Procfile`** | Deployment config | Render deployment settings |
-
-### **📚 Educational Content (`learning_modules/`)**
-
-Each module file contains:
-- **Content Structure**: HTML content with cybersecurity information
-- **Question Sets**: Multiple-choice questions for assessments
-- **Learning Objectives**: Clear goals for each module
-- **Progressive Difficulty**: From basic to advanced concepts
-
-**Module Progression:**
-1. **Module 1**: What is Social Engineering
-2. **Module 2**: Phishing: The Digital Net
-3. **Module 3**: Fortifying Your Accounts
-4. **Module 4**: Immediate Action After a Suspected Attack
-5. **Module 5**: The Evolving Threat Landscape
-6. **Final Assessment**: Comprehensive evaluation
-
-### **🎮 Interactive Simulations (`simulations/`)**
-
-**OOP Design Pattern:**
-- **`base_simulation.py`**: Abstract base class with common functionality
-- **Specific Simulations**: Each inherits from base class
-- **Scenario-Based**: Real-world social engineering scenarios
-- **Interactive Feedback**: Immediate learning feedback
-
-**Simulation Types:**
-- **Phishing**: Email and web-based attacks
-- **Pretexting**: Impersonation scenarios
-- **Baiting**: Physical device attacks
-- **Quid Pro Quo**: Exchange-based attacks
-
-### **🗄️ Data Layer (`data_models/`)**
-
-**Database Architecture:**
-- **`base_models.py`**: Common functionality and mixins
-- **`user_models.py`**: User authentication and profiles
-- **`content_models.py`**: Modules and educational content
-- **`progress_models.py`**: Progress tracking and analytics
-
-**Key Models:**
-- **User**: Authentication, profiles, progress
-- **Module**: Educational content and structure
-- **Assessment**: Questions, answers, scoring
-- **Progress**: User completion tracking
-- **Simulation**: Interactive scenario results
-
-### **⚙️ Business Logic (`business_services/`)**
-
-**Service Layer Pattern:**
-- **Separation of Concerns**: Business logic separated from routes
-- **Reusability**: Services can be used across different routes
-- **Testability**: Easy to unit test business logic
-- **Maintainability**: Clear responsibility boundaries
-
-**Service Responsibilities:**
-- **UserService**: Registration, authentication, profile management
-- **ModuleService**: Content delivery and module management
-- **AssessmentService**: Question generation and grading
-- **SimulationService**: Scenario management and scoring
-- **ProgressService**: Progress tracking and analytics
-- **AnalyticsService**: Reporting and statistics
-- **ModuleManagerService**: Module coordination and access control
-
-### **🛠️ Utilities (`helper_utilities/`)**
-
-**Utility Functions:**
-- **`constants.py`**: Application-wide constants and settings
-- **`formatters.py`**: Data formatting and presentation
-- **`validators.py`**: Input validation and security checks
-
-**Common Utilities:**
-- **Data Validation**: Email, password, input validation
-- **Formatting**: Date, score, text formatting
-- **Constants**: Configuration values and settings
-
-### **🎨 User Interface (`templates/` & `static/`)**
-
-**Template Structure:**
-- **`base.html`**: Common layout and navigation
-- **Page Templates**: Specific functionality pages
-- **Error Pages**: 404 and 500 error handling
-- **Responsive Design**: Bootstrap 5 framework
-
-**Static Assets:**
-- **Images**: Logos, backgrounds, profile pictures
-- **CSS/JS**: Styling and interactive functionality
-- **Fonts**: Typography and iconography
+**Key files**
+- `app.py` – 1.2k-line Flask entry point with routes, dependency wiring, logging, and error handlers.
+- `config.py` – Environment-specific configuration (database URLs, session/security flags, logging).
+- `manage.py` – CLI for database resets, admin creation, and content import/export.
+- `requirements.txt` + `runtime.txt` + `Procfile` – Deployment trio for Render/Gunicorn.
 
 ---
 
-## 🔧 **Development Workflow**
+## 🧠 Layered Architecture
 
-### **📝 Adding New Features**
-
-1. **Content Changes**:
-   - Edit files in `learning_modules/` for educational content
-   - Modify `simulations/` for new interactive scenarios
-   - Update templates in `templates/` for UI changes
-
-2. **Business Logic**:
-   - Add new services in `business_services/`
-   - Extend models in `data_models/` if needed
-   - Update routes in `app.py`
-
-3. **Configuration**:
-   - Modify `config.py` for new settings
-   - Update `requirements.txt` for new dependencies
-
-### **🐛 Debugging and Maintenance**
-
-1. **Logs**: Check `app.log` for application events
-2. **Database**: Use `manage.py` for database operations
-3. **Health Check**: Visit `/health` endpoint for system status
-4. **Error Pages**: Check `templates/404.html` and `templates/500.html`
-
-### **🚀 Deployment**
-
-1. **Local Development**: `python app.py`
-2. **Production**: Configure environment variables
-3. **Render Deployment**: Automatic from GitHub
-4. **Health Monitoring**: `/health` endpoint
+| Layer | Location | Responsibilities |
+| --- | --- | --- |
+| Presentation | `templates/`, `static/` | Bootstrap UI, JS helpers, certificate/assessment pages, error views. |
+| Services | `business_services/` | Business logic for users, modules, progress, assessments, simulations, analytics. |
+| Data Models | `data_models/` | SQLAlchemy ORM models (`user_models.py`, `content_models.py`, `progress_models.py`, etc.). |
+| Utilities | `helper_utilities/` | Constants, validators, formatters, persistence helpers. |
+| Content Assets | `content_seed/`, `learning_modules/Documents`, `learning_modules/Visual_Aid` | JSON seed data plus supporting imagery, certificates, infographics. |
+| Instance Data | `instance/` | Local SQLite DB; production uses PostgreSQL via `DATABASE_URL`. |
 
 ---
 
-## 📊 **Code Organization Principles**
+## 📚 Educational Content & Assets
 
-### **🎯 Clean Architecture**
-- **Separation of Concerns**: Each layer has specific responsibilities
-- **Dependency Inversion**: High-level modules don't depend on low-level modules
-- **Single Responsibility**: Each class/module has one reason to change
+- `content_seed/modules.json` – Canonical source for lesson copy, module metadata, and knowledge-check content. Import helpers push this into the database.
+- `learning_modules/assessment/final_assessment_questions.py` – Structured definition of the 25-question final assessment used by `assessment_service`.
+- `learning_modules/Documents/` – Slide decks, certificate templates, and visual references embedded in templates.
+- `learning_modules/Visual_Aid/` – Per-module infographics and simulation screenshots.
 
-### **🔄 Design Patterns**
-- **Service Layer**: Business logic encapsulation
-- **Repository Pattern**: Data access abstraction
-- **Factory Pattern**: Object creation and configuration
-- **Observer Pattern**: Event handling and notifications
-
-### **📈 Scalability**
-- **Modular Design**: Easy to add new features
-- **Configuration-Driven**: Environment-based settings
-- **Database Abstraction**: ORM for database independence
-- **Caching Ready**: Optimized for performance
+> ⚠️ Earlier iterations stored lessons in `learning_modules/module1.py`, etc. Those files were removed; rely on the JSON seed + database exports instead.
 
 ---
 
-## 🎓 **Educational Content Structure**
+## ⚙️ Business & Data Layers
 
-### **Module Content Format**
-```python
-class ModuleContent:
-    @staticmethod
-    def get_content():
-        return {
-            'title': 'Module Title',
-            'description': 'Module description',
-            'content': 'HTML content with cybersecurity information',
-            'objectives': ['Learning objective 1', 'Learning objective 2'],
-            'key_points': ['Key point 1', 'Key point 2']
-        }
-    
-    @staticmethod
-    def get_question_set_1():
-        return [
-            {
-                'question': 'Question text?',
-                'option_a': 'Option A',
-                'option_b': 'Option B',
-                'option_c': 'Option C',
-                'option_d': 'Option D',
-                'correct_answer': 'a',
-                'explanation': 'Why this answer is correct'
-            }
-        ]
-```
+### `business_services/`
+- `user_service.py` – Registration, authentication glue with Flask-Login, profile updates.
+- `module_service.py` & `module_manager_service.py` – Curriculum orchestration, sequential unlocking.
+- `assessment_service.py` – Knowledge-check delivery, scoring, and persistence.
+- `simulation_service.py` – Scenario definitions and scoring helpers (pairs with JS to render interactive flows).
+- `progress_service.py` & `analytics_service.py` – Aggregated metrics for dashboards/admin views.
 
-### **Simulation Structure**
-```python
-class BaseSimulation:
-    def __init__(self):
-        self.scenarios = []
-        self.current_scenario = 0
-    
-    def get_scenario(self, scenario_id):
-        # Return specific scenario data
-        pass
-    
-    def evaluate_response(self, response):
-        # Evaluate user response and provide feedback
-        pass
-```
+### `data_models/`
+- `base_models.py` – SQLAlchemy base class plus mixins for timestamps and serialization.
+- `user_models.py` – `User`, `PasswordResetToken`, profile picture storage helpers.
+- `content_models.py` – `Module`, `ContentSection`, reflections, and supporting relationships.
+- `progress_models.py` – `ModuleProgress`, `AssessmentResult`, `SimulationResult`.
+- `assessment_models.py` – Normalized schema for question banks and answer keys.
 
 ---
 
-## 🔍 **Quick Reference**
+## 🎨 Frontend Structure
 
-### **Common File Locations**
-- **Main App**: `app.py`
-- **Configuration**: `config.py`
-- **Database Models**: `data_models/`
-- **Business Logic**: `business_services/`
-- **Educational Content**: `learning_modules/`
-- **Simulations**: `simulations/`
-- **Templates**: `templates/`
-- **Static Files**: `static/`
-
-### **Key Routes**
-- **Home**: `/`
-- **Login**: `/login`
-- **Dashboard**: `/dashboard`
-- **Module**: `/module/<id>`
-- **Assessment**: `/assessment/<id>`
-- **Simulation**: `/simulation/<type>`
-- **Health Check**: `/health`
-
-### **Management Commands**
-```bash
-# Reset database
-python manage.py reset_database
-
-# Create admin user
-python manage.py create_admin username email password
-
-# List users
-python manage.py list_users
-
-# List modules
-python manage.py list_modules
-
-# Backup database
-python manage.py backup_database
-```
+- `templates/base.html` – Layout shell, navigation, toasts, modal containers.
+- Feature templates: `dashboard.html`, `module.html`, `assessment_simple.html`, `final_assessment_simple.html`, `simulation_simple.html`, `profile.html`, `certificate.html`, etc.
+- Auth/templates: `login.html`, `register.html`, `forgot_password.html`, `reset_password.html`.
+- Error pages: `404.html`, `500.html`.
+- `static/js/error-handler.js`, `static/js/modal-system.js` – Client-side helpers for centralized error reporting and modals.
+- `static/profile_pictures/`, `static/MMDCLogo.png`, `static/securitybackground.mp4`, etc. supply imagery across the UI.
 
 ---
 
-## 🎉 **Getting Started**
+## 🛠️ Utilities & Supporting Scripts
 
-1. **Understand the Structure**: Review this document
-2. **Set Up Environment**: Install dependencies from `requirements.txt`
-3. **Run Application**: Execute `python app.py`
-4. **Access Application**: Visit `http://localhost:5000`
-5. **Explore Features**: Navigate through modules and simulations
-6. **Make Changes**: Edit files based on your needs
-7. **Test Thoroughly**: Ensure all functionality works
-8. **Deploy**: Push to GitHub for automatic deployment
+- `helper_utilities/constants.py` – Application-wide knobs (score thresholds, pagination, award text).
+- `helper_utilities/validators.py` – Email/password regexes, form validation, sanitization helpers.
+- `helper_utilities/database_persistence.py` – Import/export helpers for module JSON.
+- Stand-alone scripts (`check_db.py`, `check_modules_json.py`, `migrate_production_database.py`) aid local troubleshooting and production migrations.
 
 ---
 
-**📚 This structure makes the project easy to understand, navigate, and modify while maintaining clean architecture and best practices.**
+## 🚀 Developer Workflow
+
+1. **Set up environment**
+   ```bash
+   pip install -r requirements.txt
+   python manage.py reset_database  # optional
+   python app.py
+   ```
+2. **Modify content** by editing `content_seed/modules.json` (then run the import helper) or adjusting DB data via admin utilities.
+3. **Update business rules** inside the relevant `business_services/*.py` file; keep routes in `app.py` thin.
+4. **Adjust UI** by editing templates/static assets. Follow `VIDEO_FORMAT_STANDARDS.md` for embedded media.
+5. **Persist assets** by adding files to `learning_modules/Documents` or `learning_modules/Visual_Aid` and referencing them in templates/business logic.
+6. **Deploy** by pushing to `main`; Render picks up the new commit using the `Procfile` command.
+
+---
+
+## 🧭 Quick Reference
+
+- **Key routes:** `/`, `/login`, `/register`, `/dashboard`, `/module/<int:id>`, `/assessment/<int:id>`, `/simulation/<type>`, `/final-assessment`, `/profile`, `/health`.
+- **Management commands:** `python manage.py reset_database`, `python manage.py import-content`, `python.manage.py export-content`, `python manage.py create_admin <username> <email> <password>`.
+- **Security controls:** PBKDF2 hashing via Werkzeug, session cookies with `HttpOnly`, `Secure`, `SameSite` flags (configured in `config.py`), rotating log handler in `app.py`.
+
+---
+
+Keeping this file in sync with the working tree prevents stale guidance and speeds up onboarding. Update it whenever you add/remove top-level directories, change the content ingestion pipeline, or move major assets.
